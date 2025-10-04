@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { ConfigModule } from '@nestjs/config';
 import { DatabaseModule } from './shared/infrastructure/typeorm/database.module';
+import { JwtTokenModule } from './shared/infrastructure/jwt/jwt.token.module';
 
 @Module({
   imports: [
@@ -9,6 +10,7 @@ import { DatabaseModule } from './shared/infrastructure/typeorm/database.module'
       isGlobal: true,
     }),
     DatabaseModule,
+    JwtTokenModule,
   ],
   controllers: [AppController],
 })
