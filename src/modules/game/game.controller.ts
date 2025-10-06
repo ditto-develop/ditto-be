@@ -1,16 +1,19 @@
-import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { ApiBearerAuth, ApiExtraModels, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { QuestionDto } from './dto/question.dto';
 import { AnswerItem } from './dto/submit-answers.dto';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { type UserPayload } from '../../common/typeguards/auth.type-guard';
+import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
+import { SwaggerApiResponse } from '../../common/decorators/swagger-api-response.decorator';
 
 @ApiTags('Game')
 @Controller('game')
+@ApiExtraModels(QuestionDto)
 export class GameController {
   @Get(':round/questions')
   @ApiOperation({ summary: '라운드 질문 조회' })
-  @ApiResponse({ status: 200, type: QuestionDto, isArray: true })
+  @SwaggerApiResponse({ type: QuestionDto, isArray: true })
   getQuestions(@Param('round') round: string) {
     // TODO:: 실제: gameService.getQuestionsForRound(round)
     const questions: QuestionDto[] = [
@@ -44,7 +47,7 @@ export class GameController {
   }
 
   @Post(':round/questions/:questionId/answer')
-  // UserGuard(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: '단일 질문 답안 제출' })
   @ApiBearerAuth()
   submitAnswers(
