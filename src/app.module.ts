@@ -8,7 +8,9 @@ import { EmailModule } from './modules/email/email.module';
 import { GameModule } from './modules/game/game.module';
 import { MatchModule } from './modules/match/match.module';
 import { ReferralModule } from './modules/referral/referral.module';
+import { APP_FILTER } from '@nestjs/core';
 import { UsersModule } from './modules/user/users.module';
+import { ResponseInterceptor } from './common/interceptors/response.interceptor';
 
 @Module({
   imports: [
@@ -22,8 +24,10 @@ import { UsersModule } from './modules/user/users.module';
     EmailModule,
     GameModule,
     MatchModule,
-    ReferralModule,
   ],
   controllers: [AppController],
+  providers: [
+    { provide: APP_INTERCEPTOR, useClass: ResponseInterceptor },
+  ],
 })
 export class AppModule {}
