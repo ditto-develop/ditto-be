@@ -1,8 +1,7 @@
-import { isNullableString, isRecord, isString } from './common.typeguard';
+import { isNullableString, isRecord, isString } from './common.type-guard';
 
 export interface UserPayload {
   id: string;
-  email?: string | null;
 }
 
 export function isUserPayload(value: unknown): value is UserPayload {

@@ -3,7 +3,7 @@ import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { QuestionDto } from './dto/question.dto';
 import { AnswerItem } from './dto/submit-answers.dto';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
-import { type UserPayload } from '../../common/typeguards/auth.typeguard';
+import { type UserPayload } from '../../common/typeguards/auth.type-guard';
 
 @ApiTags('Game')
 @Controller('game')

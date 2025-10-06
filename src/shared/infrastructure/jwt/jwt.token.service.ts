@@ -1,6 +1,6 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { UserPayload } from '../../../common/typeguards/auth.typeguard';
+import { UserPayload } from '../../../common/typeguards/auth.type-guard';
 
 @Injectable()
 export class JwtTokenService {
