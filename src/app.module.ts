@@ -8,6 +8,7 @@ import { EmailModule } from './modules/email/email.module';
 import { GameModule } from './modules/game/game.module';
 import { MatchModule } from './modules/match/match.module';
 import { ReferralModule } from './modules/referral/referral.module';
+import { UsersModule } from './modules/user/users.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { ReferralModule } from './modules/referral/referral.module';
     DatabaseModule,
     JwtTokenModule,
     AuthModule,
+    UsersModule,
     EmailModule,
     GameModule,
     MatchModule,
