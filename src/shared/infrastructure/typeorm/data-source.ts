@@ -1,12 +1,14 @@
 import { DataSourceOptions } from 'typeorm';
 import path from 'node:path';
+import { UserEntity } from '../../../infra/db/entities/user.entity';
 
 export const getDataSourceOptions = (client: string) => {
   const isSqlite = client === 'sqlite';
 
   const commonEntities = [
     // 엔티티 파일 경로(프로젝트 구조에 맞게 수정)
-    path.join(__dirname, '/**/*.entity{.ts,.js}'),
+    // path.join(__dirname, '/**/*.entity{.ts,.js}'),
+    UserEntity,
   ];
 
   let options: DataSourceOptions;

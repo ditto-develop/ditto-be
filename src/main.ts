@@ -14,6 +14,14 @@ async function bootstrap() {
     .setTitle('Ditto API')
     .setDescription('Quiz -> Result -> Email -> Share (MVP)')
     .setVersion('0.1.0')
+    .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+      },
+      'access-token',
+    )
     .build();
 
   const document = SwaggerModule.createDocument(app, config);

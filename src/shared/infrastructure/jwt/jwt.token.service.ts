@@ -1,12 +1,16 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { UserPayload } from '../../../common/typeguards/auth.typeguard';
+import { LoginUserCommand } from '../../../modules/auth/application/commands/login-user.command';
+import { UserPayload } from '../../../common/typeguards/auth.type-guard';
 
 @Injectable()
 export class JwtTokenService {
   constructor(private readonly jwtService: JwtService) {}
 
-  signToken(payload: UserPayload): string {
+  signToken(cmd: LoginUserCommand): string {
+    const payload: UserPayload = {
+      id: cmd.id.toString(),
+    };
     return this.jwtService.sign(payload);
   }
 
