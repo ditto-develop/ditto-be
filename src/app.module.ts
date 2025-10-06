@@ -7,7 +7,6 @@ import { AuthModule } from './modules/auth/auth.module';
 import { EmailModule } from './modules/email/email.module';
 import { GameModule } from './modules/game/game.module';
 import { MatchModule } from './modules/match/match.module';
-import { ReferralModule } from './modules/referral/referral.module';
 import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
 import { UsersModule } from './modules/user/users.module';
 import { ResponseInterceptor } from './common/interceptors/response.interceptor';
