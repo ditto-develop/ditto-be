@@ -12,17 +12,27 @@ import { CreateUserResponseDto } from './dto/create-user.dto';
 import { RegisterEmailRequestDto, RegisterEmailResponseDto } from './dto/register-email.dto';
 import { RegisterEmailCommand } from '../application/commands/register-email.command';
 import { RegisterEmailUseCase } from '../application/use-cases/register-email.use-case';
+import { ApiResponse } from '../../../common/dtos/api-response.dto';
+import { SwaggerApiResponse } from '../../../common/decorators/swagger-api-response.decorator';
 
 @ApiTags('Users')
 @Controller('users')
+@ApiExtraModels(ApiResponse, StartResponseDto, RegisterEmailResponseDto)
 export class UsersController {
   constructor(
     private readonly createUserUseCase: CreateUserUseCase,
     private readonly loginUserUseCase: LoginUserUseCase,
+    private readonly registerEmailUseCase: RegisterEmailUseCase,
   ) {}
 
   @Post('start')
   @HttpCode(HttpStatus.CREATED)
+  @ApiOperation({ summary: '무정보 가입 및 jwt 발급 API' })
+  @ApiQuery({ name: 'referredBy', required: false, type: String })
+  @SwaggerApiResponse({
+    status: 201,
+    type: StartResponseDto,
+  })
   async start(@Query('referredBy') referredBy?: string): Promise<StartResponseDto> {
     const cmd = new CreateUserCommand(referredBy);
     const user = await this.createUserUseCase.execute(cmd);
@@ -41,6 +51,9 @@ export class UsersController {
 
   @Patch('email')
   @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: '이메일 저장 API' })
+  @ApiBearerAuth('access-token')
+  @SwaggerApiResponse({ type: RegisterEmailResponseDto })
   async updateEmail(
     @CurrentUser() userPayload: UserPayload,
     @Body() dto: RegisterEmailRequestDto,
