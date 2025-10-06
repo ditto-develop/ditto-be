@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { IUserRepository } from '../ports/user.repository';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -20,5 +20,11 @@ export class TypeormUserRepository implements IUserRepository {
     entity.referredBy = user.referredBy?.toString() || null;
 
     await this.repo.save(entity);
+  }
+
+  async findById(id: string): Promise<UserEntity> {
+    const entity = await this.repo.findOneBy({ id: id.toString() });
+    if (!entity) throw new NotFoundException('Cannot find user with id');
+    return entity;
   }
 }
