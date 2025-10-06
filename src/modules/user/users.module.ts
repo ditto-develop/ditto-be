@@ -1,0 +1,22 @@
+import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { UserEntity } from '../../infra/db/entities/user.entity';
+import { UsersController } from './presentation/users.controller';
+import { CreateUserUseCase } from './application/use-cases/create-user.use-case';
+import { TypeormUserRepository } from './adapters/typeorm-user.repository';
+import { IUserRepositoryToken } from './ports/user.repository';
+import { LoginUserUseCase } from '../auth/application/use-cases/login-user.use-case';
+import { JwtTokenModule } from '../../shared/infrastructure/jwt/jwt.token.module';
+import { RegisterEmailUseCase } from './application/use-cases/register-email.use-case';
+
+@Module({
+  imports: [TypeOrmModule.forFeature([UserEntity]), JwtTokenModule],
+  controllers: [UsersController],
+  providers: [
+    CreateUserUseCase,
+    LoginUserUseCase,
+    RegisterEmailUseCase,
+    { provide: IUserRepositoryToken, useClass: TypeormUserRepository },
+  ],
+})
+export class UsersModule {}
