@@ -1,0 +1,544 @@
+{
+  "openapi": "3.0.0",
+  "paths": {
+    "/api/health-check": {
+      "get": {
+        "operationId": "AppController_getHello",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "App"
+        ]
+      }
+    },
+    "/api/users/start": {
+      "post": {
+        "operationId": "UsersController_start",
+        "parameters": [
+          {
+            "name": "referredBy",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/SuccessApiResponse"
+                    },
+                    {
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/StartResponseDto"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FailApiResponse"
+                }
+              }
+            }
+          }
+        },
+        "summary": "무정보 가입 및 jwt 발급 API",
+        "tags": [
+          "Users"
+        ]
+      }
+    },
+    "/api/users/email": {
+      "patch": {
+        "operationId": "UsersController_updateEmail",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterEmailRequestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/SuccessApiResponse"
+                    },
+                    {
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/RegisterEmailResponseDto"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
+        "summary": "이메일 저장 API",
+        "tags": [
+          "Users"
+        ]
+      }
+    },
+    "/api/game/{round}/questions": {
+      "get": {
+        "operationId": "GameController_getQuestions",
+        "parameters": [
+          {
+            "name": "round",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/SuccessApiResponse"
+                    },
+                    {
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/QuestionDto"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "summary": "라운드 질문 조회",
+        "tags": [
+          "Game"
+        ]
+      }
+    },
+    "/api/game/{round}/questions/{questionId}": {
+      "get": {
+        "operationId": "GameController_getQuestion",
+        "parameters": [
+          {
+            "name": "round",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "questionId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "라운드 질문 단일 조회 (임시 - 사용할지 안할지 모르겠음)",
+        "tags": [
+          "Game"
+        ]
+      }
+    },
+    "/api/game/{round}/questions/{questionId}/answer": {
+      "post": {
+        "operationId": "GameController_submitAnswers",
+        "parameters": [
+          {
+            "name": "round",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "questionId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AnswerItem"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "단일 질문 답안 제출",
+        "tags": [
+          "Game"
+        ]
+      }
+    },
+    "/api/match/similar-user-count": {
+      "get": {
+        "operationId": "MatchController_getSimilarUsersCount",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/SuccessApiResponse"
+                    },
+                    {
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/SimilarUsersCountResponseDto"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
+        "summary": "x% 이상 일치한 사용자 수 조회 API",
+        "tags": [
+          "Match"
+        ]
+      }
+    },
+    "/api/match/result-rarity": {
+      "get": {
+        "operationId": "MatchController_calculateResultRarity",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/SuccessApiResponse"
+                    },
+                    {
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/CalculateResultRarityResponseDto"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
+        "summary": "게임 결과 희귀도 계산 API",
+        "tags": [
+          "Match"
+        ]
+      }
+    }
+  },
+  "info": {
+    "title": "Ditto API",
+    "description": "Start Game -> Solve Quiz -> Match Results -> Save Email -> Share (MVP)",
+    "version": "0.1.0",
+    "contact": {}
+  },
+  "tags": [],
+  "servers": [],
+  "components": {
+    "securitySchemes": {
+      "access-token": {
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "type": "http"
+      }
+    },
+    "schemas": {
+      "ApiResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "description": "요청 성공 여부"
+          }
+        }
+      },
+      "CreateUserResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "유저 고유 ID",
+            "example": "0nI_7bpoV_dza6k4RyZwz",
+            "format": "nanoid"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "StartResponseDto": {
+        "type": "object",
+        "properties": {
+          "user": {
+            "description": "사용자 정보",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CreateUserResponseDto"
+              }
+            ]
+          },
+          "jwt": {
+            "type": "string",
+            "description": "jwt",
+            "example": "xxxxxxxxxxxxx"
+          },
+          "referralLink": {
+            "type": "string",
+            "description": "추천인 링크",
+            "example": "https://example.com/r/xxxxxxxxxxxxx"
+          }
+        },
+        "required": [
+          "user",
+          "jwt",
+          "referralLink"
+        ]
+      },
+      "RegisterEmailResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "유저 고유 ID",
+            "example": "0nI_7bpoV_dza6k4RyZwz",
+            "format": "nanoid"
+          },
+          "email": {
+            "type": "string",
+            "description": "이메일",
+            "example": "user@example.com",
+            "format": "email"
+          }
+        },
+        "required": [
+          "id",
+          "email"
+        ]
+      },
+      "FailApiResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "description": "요청 성공 여부",
+            "example": false
+          },
+          "errMessage": {
+            "type": "string",
+            "description": "에러 메시지",
+            "example": "요청에 실패했습니다."
+          },
+          "errorCode": {
+            "type": "string",
+            "description": "에러 코드"
+          }
+        }
+      },
+      "RegisterEmailRequestDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "이메일",
+            "example": "user@example.com",
+            "format": "email"
+          }
+        },
+        "required": [
+          "email"
+        ]
+      },
+      "OptionDto": {
+        "type": "object",
+        "properties": {
+          "index": {
+            "type": "number"
+          },
+          "label": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "index",
+          "label"
+        ]
+      },
+      "QuestionDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "질문 고유 ID",
+            "example": "0nI_7bpoV_dza6k4RyZwz",
+            "format": "nanoid"
+          },
+          "text": {
+            "type": "string",
+            "description": "밸런스 게임 질문",
+            "example": "한 가지 능력을 갖는다면?"
+          },
+          "options": {
+            "description": "선택지",
+            "example": [
+              {
+                "index": "0",
+                "label": "투명인간"
+              },
+              {
+                "index": "1",
+                "label": "순간이동"
+              }
+            ],
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OptionDto"
+            }
+          },
+          "round": {
+            "type": "number",
+            "description": "게임 라운드",
+            "example": 1
+          }
+        },
+        "required": [
+          "id",
+          "text",
+          "options",
+          "round"
+        ]
+      },
+      "AnswerItem": {
+        "type": "object",
+        "properties": {
+          "selectedIndex": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "selectedIndex"
+        ]
+      },
+      "SimilarUsersCountResponseDto": {
+        "type": "object",
+        "properties": {
+          "count": {
+            "type": "number",
+            "description": "x% 일치한 사용자 수",
+            "example": 3
+          }
+        },
+        "required": [
+          "count"
+        ]
+      },
+      "CalculateResultRarityResponseDto": {
+        "type": "object",
+        "properties": {
+          "rarity": {
+            "type": "number",
+            "description": "희귀도(%)",
+            "example": 15
+          }
+        },
+        "required": [
+          "rarity"
+        ]
+      }
+    }
+  }
+}
