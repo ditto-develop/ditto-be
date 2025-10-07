@@ -2,7 +2,7 @@ import { ArgumentsHost, Catch, ExceptionFilter, HttpException, HttpStatus } from
 import { Response, Request } from 'express';
 import { isApiResponse, isHttpErrorBody } from '../typeguards/http.type-guard';
 import { isArray, isString } from '../typeguards/common.type-guard';
-import { ApiResponse } from '../dtos/api-response.dto';
+import { FailApiResponse } from '../dtos/api-response.dto';
 
 @Catch()
 export class AllExceptionsFilter implements ExceptionFilter {
@@ -37,11 +37,10 @@ export class AllExceptionsFilter implements ExceptionFilter {
       }
 
       res.status(status).json(
-        new ApiResponse({
+        new FailApiResponse({
           success: false,
-          message: message ?? 'Bad Request',
+          errMessage: message ?? 'Bad Request',
           errorCode,
-          data: null,
         }),
       );
 
@@ -49,11 +48,10 @@ export class AllExceptionsFilter implements ExceptionFilter {
     }
 
     res.status(HttpStatus.INTERNAL_SERVER_ERROR).json(
-      new ApiResponse({
+      new FailApiResponse({
         success: false,
-        message: 'Internal server error',
+        errMessage: 'Internal server error',
         errorCode: 'INTERNAL_SERVER_ERROR',
-        data: null,
       }),
     );
   }
