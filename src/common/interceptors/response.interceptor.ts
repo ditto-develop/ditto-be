@@ -1,20 +1,19 @@
 import { CallHandler, ExecutionContext, Injectable, NestInterceptor } from '@nestjs/common';
 import { map, Observable } from 'rxjs';
-import { ApiResponse } from '../dtos/api-response.dto';
+import { SuccessApiResponse } from '../dtos/api-response.dto';
 import { isApiResponse } from '../typeguards/http.type-guard';
 
 @Injectable()
 export class ResponseInterceptor implements NestInterceptor {
-  intercept(context: ExecutionContext, next: CallHandler): Observable<ApiResponse<unknown>> {
+  intercept(context: ExecutionContext, next: CallHandler): Observable<SuccessApiResponse<unknown>> {
     return next.handle().pipe(
       map((data: unknown) => {
         if (isApiResponse(data)) {
           return data;
         }
 
-        return new ApiResponse({
+        return new SuccessApiResponse({
           success: true,
-          message: '요청에 성공했습니다.',
           data,
         });
       }),

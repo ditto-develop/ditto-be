@@ -1,5 +1,5 @@
 import { ApiResponse, getSchemaPath } from '@nestjs/swagger';
-import { ApiResponse as CustomApiResponse } from '../dtos/api-response.dto';
+import { SuccessApiResponse } from '../dtos/api-response.dto';
 import { Type } from '@nestjs/common';
 
 export const SwaggerApiResponse = (config?: { status?: number; type?: Type; isArray?: boolean }) =>
@@ -8,7 +8,7 @@ export const SwaggerApiResponse = (config?: { status?: number; type?: Type; isAr
     schema: {
       type: 'object',
       allOf: [
-        { $ref: getSchemaPath(CustomApiResponse) },
+        { $ref: getSchemaPath(SuccessApiResponse) },
         ...(config?.type
           ? [
               {

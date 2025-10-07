@@ -1,5 +1,12 @@
 import { Body, Controller, HttpCode, HttpStatus, Patch, Post, Query, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiExtraModels, ApiOperation, ApiTags, ApiQuery } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiExtraModels,
+  ApiOperation,
+  ApiTags,
+  ApiQuery,
+  ApiInternalServerErrorResponse,
+} from '@nestjs/swagger';
 import { CreateUserCommand } from '../application/commands/create-user.command';
 import { CreateUserUseCase } from '../application/use-cases/create-user.use-case';
 import { JwtAuthGuard } from '../../../common/guards/jwt-auth.guard';
@@ -12,7 +19,7 @@ import { CreateUserResponseDto } from './dto/create-user.dto';
 import { RegisterEmailRequestDto, RegisterEmailResponseDto } from './dto/register-email.dto';
 import { RegisterEmailCommand } from '../application/commands/register-email.command';
 import { RegisterEmailUseCase } from '../application/use-cases/register-email.use-case';
-import { ApiResponse } from '../../../common/dtos/api-response.dto';
+import { ApiResponse, FailApiResponse } from '../../../common/dtos/api-response.dto';
 import { SwaggerApiResponse } from '../../../common/decorators/swagger-api-response.decorator';
 
 @ApiTags('Users')
@@ -33,6 +40,7 @@ export class UsersController {
     status: 201,
     type: StartResponseDto,
   })
+  @ApiInternalServerErrorResponse({ type: FailApiResponse })
   async start(@Query('referredBy') referredBy?: string): Promise<StartResponseDto> {
     const cmd = new CreateUserCommand(referredBy);
     const user = await this.createUserUseCase.execute(cmd);
