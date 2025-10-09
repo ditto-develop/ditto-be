@@ -1,11 +1,11 @@
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Body, Controller, Get, HttpStatus, Param, Post, UseGuards } from '@nestjs/common';
-import { QuestionDto } from './dto/question.dto';
-import { AnswerItem } from './dto/submit-answers.dto';
-import { CurrentUser } from '../../common/decorators/current-user.decorator';
-import { type UserPayload } from '../../common/typeguards/auth.type-guard';
-import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
-import { SwaggerApiResponse } from '../../common/decorators/swagger-api-response.decorator';
+import { QuestionDto } from '../dto/question.dto';
+import { AnswerItem } from '../dto/submit-answers.dto';
+import { CurrentUser } from '../../../common/decorators/current-user.decorator';
+import { type UserPayload } from '../../../common/typeguards/auth.type-guard';
+import { JwtAuthGuard } from '../../../common/guards/jwt-auth.guard';
+import { SwaggerApiResponse } from '../../../common/decorators/swagger-api-response.decorator';
 
 @ApiTags('Game')
 @Controller('game')
