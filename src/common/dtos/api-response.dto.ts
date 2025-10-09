@@ -1,4 +1,3 @@
-import { Type } from 'class-transformer';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 
 export class ApiResponse<T = unknown> {
@@ -14,8 +13,7 @@ export class SuccessApiResponse<T = unknown> extends ApiResponse<T> {
   @ApiPropertyOptional({ example: true })
   success: boolean = true;
 
-  @ApiPropertyOptional()
-  @Type(() => Object)
+  @ApiPropertyOptional({ nullable: true })
   data?: T | null;
 
   constructor(partial: Partial<SuccessApiResponse<T>>) {
