@@ -23,6 +23,7 @@
             "name": "referredBy",
             "required": false,
             "in": "query",
+            "description": "추천 받은 코드 값",
             "schema": {
               "type": "string"
             }
@@ -311,7 +312,9 @@
                       "$ref": "#/components/schemas/SuccessApiResponse"
                     },
                     {
-                      "properties": {}
+                      "properties": {
+                        "data": null
+                      }
                     }
                   ]
                 }
@@ -368,7 +371,9 @@
                       "$ref": "#/components/schemas/SuccessApiResponse"
                     },
                     {
-                      "properties": {}
+                      "properties": {
+                        "data": null
+                      }
                     }
                   ]
                 }
@@ -465,7 +470,17 @@
     "/api/match/similar-user-count": {
       "get": {
         "operationId": "MatchController_getSimilarUsersCount",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "matchRate",
+            "required": false,
+            "in": "query",
+            "description": "매치율 (x%)",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "",
@@ -644,7 +659,7 @@
   "info": {
     "title": "Ditto API",
     "description": "Start Game -> Solve Quiz -> Match Results -> Save Email -> Share (MVP)",
-    "version": "0.1.1",
+    "version": "0.1.2",
     "contact": {}
   },
   "tags": [],
