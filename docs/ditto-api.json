@@ -56,7 +56,22 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/FailApiResponse"
+                  "type": "object",
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/FailApiResponse"
+                    },
+                    {
+                      "properties": {
+                        "errorCode": {
+                          "example": "INTERNAL_SERVER_ERROR"
+                        },
+                        "errMessage": {
+                          "example": "서버 내부 오류"
+                        }
+                      }
+                    }
+                  ]
                 }
               }
             }
@@ -97,6 +112,56 @@
                       "properties": {
                         "data": {
                           "$ref": "#/components/schemas/RegisterEmailResponseDto"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/FailApiResponse"
+                    },
+                    {
+                      "properties": {
+                        "errorCode": {
+                          "example": "UNAUTHORIZED"
+                        },
+                        "errMessage": {
+                          "example": "사용자 인증 실패"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/FailApiResponse"
+                    },
+                    {
+                      "properties": {
+                        "errorCode": {
+                          "example": "INTERNAL_SERVER_ERROR"
+                        },
+                        "errMessage": {
+                          "example": "서버 내부 오류"
                         }
                       }
                     }
@@ -155,6 +220,56 @@
                 }
               }
             }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/FailApiResponse"
+                    },
+                    {
+                      "properties": {
+                        "errorCode": {
+                          "example": "UNKNOWN ERROR"
+                        },
+                        "errMessage": {
+                          "example": "반환 가능한 질문이 없음. (데이터가 없을 때)"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/FailApiResponse"
+                    },
+                    {
+                      "properties": {
+                        "errorCode": {
+                          "example": "INTERNAL_SERVER_ERROR"
+                        },
+                        "errMessage": {
+                          "example": "서버 내부 오류"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
           }
         },
         "summary": "라운드 질문 조회",
@@ -186,7 +301,22 @@
         ],
         "responses": {
           "200": {
-            "description": ""
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/SuccessApiResponse"
+                    },
+                    {
+                      "properties": {}
+                    }
+                  ]
+                }
+              }
+            }
           }
         },
         "summary": "라운드 질문 단일 조회 (임시 - 사용할지 안할지 모르겠음)",
@@ -227,8 +357,98 @@
           }
         },
         "responses": {
-          "201": {
-            "description": ""
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/SuccessApiResponse"
+                    },
+                    {
+                      "properties": {}
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/FailApiResponse"
+                    },
+                    {
+                      "properties": {
+                        "errorCode": {
+                          "example": "UNAUTHORIZED"
+                        },
+                        "errMessage": {
+                          "example": "사용자 인증 실패"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/FailApiResponse"
+                    },
+                    {
+                      "properties": {
+                        "errorCode": {
+                          "example": "UNKNOWN ERROR"
+                        },
+                        "errMessage": {
+                          "example": "존재하지 않은 질문"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/FailApiResponse"
+                    },
+                    {
+                      "properties": {
+                        "errorCode": {
+                          "example": "INTERNAL_SERVER_ERROR"
+                        },
+                        "errMessage": {
+                          "example": "서버 내부 오류"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
           }
         },
         "security": [
@@ -261,6 +481,56 @@
                       "properties": {
                         "data": {
                           "$ref": "#/components/schemas/SimilarUsersCountResponseDto"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/FailApiResponse"
+                    },
+                    {
+                      "properties": {
+                        "errorCode": {
+                          "example": "UNAUTHORIZED"
+                        },
+                        "errMessage": {
+                          "example": "사용자 인증 실패"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/FailApiResponse"
+                    },
+                    {
+                      "properties": {
+                        "errorCode": {
+                          "example": "INTERNAL_SERVER_ERROR"
+                        },
+                        "errMessage": {
+                          "example": "서버 내부 오류"
                         }
                       }
                     }
@@ -307,6 +577,56 @@
                 }
               }
             }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/FailApiResponse"
+                    },
+                    {
+                      "properties": {
+                        "errorCode": {
+                          "example": "UNAUTHORIZED"
+                        },
+                        "errMessage": {
+                          "example": "사용자 인증 실패"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/FailApiResponse"
+                    },
+                    {
+                      "properties": {
+                        "errorCode": {
+                          "example": "INTERNAL_SERVER_ERROR"
+                        },
+                        "errMessage": {
+                          "example": "서버 내부 오류"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
           }
         },
         "security": [
@@ -324,7 +644,7 @@
   "info": {
     "title": "Ditto API",
     "description": "Start Game -> Solve Quiz -> Match Results -> Save Email -> Share (MVP)",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "contact": {}
   },
   "tags": [],
@@ -338,12 +658,36 @@
       }
     },
     "schemas": {
-      "ApiResponse": {
+      "FailApiResponse": {
         "type": "object",
         "properties": {
           "success": {
             "type": "boolean",
-            "description": "요청 성공 여부"
+            "description": "요청 성공 여부",
+            "example": false
+          },
+          "errMessage": {
+            "type": "string",
+            "description": "에러 메시지",
+            "example": "요청에 실패했습니다."
+          },
+          "errorCode": {
+            "type": "string",
+            "description": "에러 코드"
+          }
+        }
+      },
+      "SuccessApiResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "description": "요청 성공 여부",
+            "example": true
+          },
+          "data": {
+            "type": "object",
+            "nullable": true
           }
         }
       },
@@ -409,25 +753,6 @@
           "id",
           "email"
         ]
-      },
-      "FailApiResponse": {
-        "type": "object",
-        "properties": {
-          "success": {
-            "type": "boolean",
-            "description": "요청 성공 여부",
-            "example": false
-          },
-          "errMessage": {
-            "type": "string",
-            "description": "에러 메시지",
-            "example": "요청에 실패했습니다."
-          },
-          "errorCode": {
-            "type": "string",
-            "description": "에러 코드"
-          }
-        }
       },
       "RegisterEmailRequestDto": {
         "type": "object",
