@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { ApiUidProperty } from '../../../common/decorators/api-uid.decorator';
+import { ApiUidProperty } from '../../../../common/decorators/api-uid.decorator';
 
 export class OptionDto {
   @ApiProperty()
