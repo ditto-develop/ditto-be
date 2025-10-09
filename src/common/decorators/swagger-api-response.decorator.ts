@@ -35,12 +35,14 @@ export const SwaggerApiResponse = (config?: {
   }
 
   const allOf: Array<Record<string, unknown>> = [{ $ref: getSchemaPath(CustomApiResponse) }];
-  if (!fail && config?.type) {
+  if (!fail) {
     allOf.push({
       properties: {
-        data: config?.isArray
-          ? { type: 'array', items: { $ref: getSchemaPath(config.type) } }
-          : { $ref: getSchemaPath(config.type) },
+        data: !config?.type
+          ? null
+          : config?.isArray
+            ? { type: 'array', items: { $ref: getSchemaPath(config.type) } }
+            : { $ref: getSchemaPath(config.type) },
       },
     });
   } else {

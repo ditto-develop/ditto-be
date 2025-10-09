@@ -26,7 +26,7 @@ export class UsersController {
   @Post('start')
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: '무정보 가입 및 jwt 발급 API' })
-  @ApiQuery({ name: 'referredBy', required: false, type: String })
+  @ApiQuery({ name: 'referredBy', required: false, type: String, description: '추천 받은 코드 값' })
   @SwaggerApiResponse({ status: HttpStatus.CREATED, type: StartResponseDto })
   @SwaggerApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR })
   async start(@Query('referredBy') referredBy?: string): Promise<StartResponseDto> {
