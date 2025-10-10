@@ -18,9 +18,7 @@ export class TypeormGameRepository implements IGameRepository {
     // TODO:: Postgresql 사용시 아래 코드 삭제 or 주석
     //  시작
     const lastSaved = await this.repo.find({
-      order: {
-        idx: 'DESC',
-      },
+      order: { idx: 'DESC' },
       take: 1,
     });
     entity.idx = (lastSaved.length > 0 ? lastSaved[0].idx : 0) + 1;
