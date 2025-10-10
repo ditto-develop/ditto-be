@@ -1,4 +1,4 @@
-import { Column, Entity, ManyToOne, PrimaryColumn, Unique } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn, Unique } from 'typeorm';
 import { ApiUidProperty } from '../../../../common/decorators/api-uid.decorator';
 import { GameEntity } from './game.entity';
 
@@ -9,10 +9,12 @@ export class GameAnswerOptionEntity {
   @ApiUidProperty('게임 선택지 고유 ID')
   id!: string;
 
-  @ManyToOne(() => GameEntity, (game) => game.options, {
-    onDelete: 'CASCADE',
-  })
-  game: GameEntity;
+  @Column({ type: 'varchar', length: 32, name: 'game_id' })
+  gameId!: string;
+
+  @ManyToOne(() => GameEntity, (g) => g.options, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'game_id' })
+  game!: GameEntity;
 
   @Column({ type: 'int' })
   order!: number;

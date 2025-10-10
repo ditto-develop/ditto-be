@@ -9,7 +9,9 @@ export class GameEntity {
   @ApiUidProperty('게임 고유 ID')
   id!: string;
 
-  @Column({ generated: 'increment', generatedType: 'STORED', type: 'int' })
+  // TODO:: Postgresql 사용시 아래 주석 해제
+  // @Column({ generated: 'increment', generatedType: 'STORED', type: 'int' })
+  @Column({ type: 'int' })
   @ApiUidProperty('게임 순서')
   idx: number;
 
