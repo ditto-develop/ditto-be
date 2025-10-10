@@ -1,4 +1,4 @@
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiExcludeEndpoint, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Body, Controller, Get, HttpStatus, Param, Post, UseGuards } from '@nestjs/common';
 import { QuestionDto } from './dto/question.dto';
 import { AnswerItem } from './dto/submit-answers.dto';
@@ -6,10 +6,24 @@ import { CurrentUser } from '../../../common/decorators/current-user.decorator';
 import { type UserPayload } from '../../../common/typeguards/auth.type-guard';
 import { JwtAuthGuard } from '../../../common/guards/jwt-auth.guard';
 import { SwaggerApiResponse } from '../../../common/decorators/swagger-api-response.decorator';
+import { CreateGameUseCase } from '../application/use-cases/create-game.use-case';
+import { CreateGameDto } from './dto/create-game.dto';
+import { CreateGameCommand } from '../application/commands/create-game.command';
+import { GamePlainType } from '../domain/game';
 
 @ApiTags('Game')
 @Controller('game')
 export class GameController {
+  constructor(private readonly createGameUseCase: CreateGameUseCase) {}
+
+  @Post()
+  @ApiExcludeEndpoint()
+  async create(@Body() dto: CreateGameDto): Promise<GamePlainType> {
+    const cmd = new CreateGameCommand(dto);
+    const saved = await this.createGameUseCase.execute(cmd);
+    return saved.toPlain();
+  }
+
   @Get(':round/questions')
   @ApiOperation({ summary: '라운드 질문 조회' })
   @SwaggerApiResponse({ type: QuestionDto, isArray: true })
