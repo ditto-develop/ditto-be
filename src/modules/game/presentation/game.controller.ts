@@ -9,7 +9,7 @@ import { SwaggerApiResponse } from '../../../common/decorators/swagger-api-respo
 import { CreateGameUseCase } from '../application/use-cases/create-game.use-case';
 import { CreateGameDto } from './dto/create-game.dto';
 import { CreateGameCommand } from '../application/commands/create-game.command';
-import { GamePlainType } from '../domain/game';
+import { GameDto } from './dto/game.dto';
 
 @ApiTags('Game')
 @Controller('game')
@@ -18,7 +18,7 @@ export class GameController {
 
   @Post()
   @ApiExcludeEndpoint()
-  async create(@Body() dto: CreateGameDto): Promise<GamePlainType> {
+  async create(@Body() dto: CreateGameDto): Promise<GameDto> {
     const cmd = new CreateGameCommand(dto);
     const saved = await this.createGameUseCase.execute(cmd);
     return saved.toPlain();

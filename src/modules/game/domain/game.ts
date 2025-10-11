@@ -1,19 +1,7 @@
 import { NanoId } from '../../../common/value-objects/nanoid.vo';
-import { isInteger } from '../../../common/typeguards/common.type-guard';
+import { isInteger, isString } from '../../../common/typeguards/common.type-guard';
 import { Optional } from '../../../common/types/common.type';
-
-type GameOptionPlainType = {
-  id: string;
-  index: number;
-  label: string;
-};
-
-export type GamePlainType = {
-  id: string;
-  text: string;
-  options: Optional<GameOptionPlainType, 'id'>[];
-  round: number;
-};
+import { GameDto, GameOptionDto } from '../presentation/dto/game.dto';
 
 export class GameOption {
   id: NanoId;
@@ -24,7 +12,7 @@ export class GameOption {
     if (!isInteger(index) || (index !== 0 && index !== 1)) {
       throw new Error('GameOption.index must be 0 or 1');
     }
-    if (!label || typeof label !== 'string' || label.trim().length === 0) {
+    if (!label || !isString(label) || label.trim().length === 0) {
       throw new Error('Gameoption.label must be non-empty string');
     }
 
@@ -34,12 +22,12 @@ export class GameOption {
     Object.freeze(this);
   }
 
-  public static create(payload: Optional<GameOptionPlainType, 'id'>) {
+  public static create(payload: Optional<GameOptionDto, 'id'>) {
     const id = payload.id ? NanoId.from(payload.id) : NanoId.create();
     return new GameOption(id, payload.index, payload.label);
   }
 
-  public toPlain(): GameOptionPlainType {
+  public toPlain(): GameOptionDto {
     return {
       id: this.id.toString(),
       index: this.index,
@@ -77,13 +65,13 @@ export class Game {
     Object.freeze(this);
   }
 
-  public static create(payload: Optional<GamePlainType, 'id'>): Game {
+  public static create(payload: Optional<GameDto, 'id'>): Game {
     const id = payload.id ? NanoId.from(payload.id) : NanoId.create();
     const opts = payload.options.map((o) => GameOption.create({ id: o.id, index: o.index, label: o.label }));
     return new Game(id, payload.text, opts, payload.round);
   }
 
-  public toPlain(): GamePlainType {
+  public toPlain(): GameDto {
     return {
       id: this.id.toString(),
       text: this.text,
