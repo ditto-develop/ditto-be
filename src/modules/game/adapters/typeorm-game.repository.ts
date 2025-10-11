@@ -27,6 +27,14 @@ export class TypeormGameRepository implements IGameRepository {
     return this.toDomain(saved);
   }
 
+  async findAll(round: number): Promise<Game[]> {
+    const entities = await this.repo.find({
+      where: { round },
+      order: { idx: 'ASC' },
+    });
+    return entities.map(this.toDomain.bind(this));
+  }
+
   private toEntity(domain: Game): GameEntity {
     const entity = new GameEntity();
     entity.id = domain.id.toString();

@@ -1,6 +1,5 @@
 import { ApiBearerAuth, ApiExcludeEndpoint, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { Body, Controller, Get, HttpStatus, Param, Post, UseGuards } from '@nestjs/common';
-import { QuestionDto } from './dto/question.dto';
+import { Body, Controller, Get, HttpStatus, Param, ParseIntPipe, Post, UseGuards } from '@nestjs/common';
 import { AnswerItem } from './dto/submit-answers.dto';
 import { CurrentUser } from '../../../common/decorators/current-user.decorator';
 import { type UserPayload } from '../../../common/typeguards/auth.type-guard';
@@ -9,12 +8,17 @@ import { SwaggerApiResponse } from '../../../common/decorators/swagger-api-respo
 import { CreateGameUseCase } from '../application/use-cases/create-game.use-case';
 import { CreateGameDto } from './dto/create-game.dto';
 import { CreateGameCommand } from '../application/commands/create-game.command';
+import { LoadAllGamesCommand } from '../application/commands/load-all-games.command';
+import { LoadAllGamesUseCase } from '../application/use-cases/load-all-games.use-case';
 import { GameDto } from './dto/game.dto';
 
 @ApiTags('Game')
 @Controller('game')
 export class GameController {
-  constructor(private readonly createGameUseCase: CreateGameUseCase) {}
+  constructor(
+    private readonly createGameUseCase: CreateGameUseCase,
+    private readonly loadAllGamesUseCase: LoadAllGamesUseCase,
+  ) {}
 
   @Post()
   @ApiExcludeEndpoint()
@@ -26,23 +30,13 @@ export class GameController {
 
   @Get(':round/questions')
   @ApiOperation({ summary: '라운드 질문 조회' })
-  @SwaggerApiResponse({ type: QuestionDto, isArray: true })
+  @SwaggerApiResponse({ type: GameDto, isArray: true })
   @SwaggerApiResponse({ status: HttpStatus.NOT_FOUND, errorMessage: '반환 가능한 질문이 없음. (데이터가 없을 때)' })
   @SwaggerApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR })
-  getQuestions(@Param('round') round: string) {
-    // TODO:: 실제: gameService.getQuestionsForRound(round)
-    const questions: QuestionDto[] = [
-      {
-        id: 'q1',
-        text: '질문1',
-        options: [
-          { index: 0, label: 'A' },
-          { index: 1, label: 'B' },
-        ],
-        round: Number(round),
-      },
-    ];
-    return questions;
+  async getQuestions(@Param('round', ParseIntPipe) round: number): Promise<GameDto[]> {
+    const cmd = new LoadAllGamesCommand(round);
+    const loaded = await this.loadAllGamesUseCase.execute(cmd);
+    return loaded.map((g) => g.toPlain());
   }
 
   @Get(':round/questions/:questionId')

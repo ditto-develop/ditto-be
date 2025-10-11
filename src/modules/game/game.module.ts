@@ -8,10 +8,15 @@ import { GameAnswerOptionEntity } from '../../infra/db/entities/game/game-answer
 import { IGameRepositoryToken } from './ports/game.repository';
 import { TypeormGameRepository } from './adapters/typeorm-game.repository';
 import { CreateGameUseCase } from './application/use-cases/create-game.use-case';
+import { LoadAllGamesUseCase } from './application/use-cases/load-all-games.use-case';
 
 @Module({
   imports: [TypeOrmModule.forFeature([GameEntity, GameAnswerEntity, GameAnswerOptionEntity]), JwtTokenModule],
   controllers: [GameController],
-  providers: [CreateGameUseCase, { provide: IGameRepositoryToken, useClass: TypeormGameRepository }],
+  providers: [
+    CreateGameUseCase,
+    LoadAllGamesUseCase,
+    { provide: IGameRepositoryToken, useClass: TypeormGameRepository },
+  ],
 })
 export class GameModule {}
