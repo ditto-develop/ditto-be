@@ -11,6 +11,8 @@ import { CreateGameCommand } from '../application/commands/create-game.command';
 import { LoadAllGamesCommand } from '../application/commands/load-all-games.command';
 import { LoadAllGamesUseCase } from '../application/use-cases/load-all-games.use-case';
 import { GameDto } from './dto/game.dto';
+import { SubmitGameAnswerUseCase } from '../application/use-cases/submit-game-answer.use-case';
+import { SubmitGameAnswerCommand } from '../application/commands/submit-game-answer.command';
 
 @ApiTags('Game')
 @Controller('game')
@@ -18,6 +20,7 @@ export class GameController {
   constructor(
     private readonly createGameUseCase: CreateGameUseCase,
     private readonly loadAllGamesUseCase: LoadAllGamesUseCase,
+    private readonly submitGameAnswerUseCase: SubmitGameAnswerUseCase,
   ) {}
 
   @Post()
@@ -58,18 +61,23 @@ export class GameController {
   @Post(':round/questions/:questionId/answer')
   @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: '단일 질문 답안 제출' })
-  @ApiBearerAuth()
+  @ApiBearerAuth('access-token')
   @SwaggerApiResponse()
   @SwaggerApiResponse({ status: HttpStatus.NOT_FOUND, errorMessage: '존재하지 않은 질문' })
   @SwaggerApiResponse({ status: HttpStatus.UNAUTHORIZED })
   @SwaggerApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR })
-  submitAnswers(
-    @Param('round') round: string,
+  async submitAnswers(
+    @Param('round', ParseIntPipe) round: number,
     @Param('questionId') questionId: string,
     @Body() dto: AnswerItem,
     @CurrentUser() user: UserPayload,
   ) {
-    // TODO:: 실제: gameService.saveAnswers(userId, round, dto.answers)
+    const cmd = new SubmitGameAnswerCommand({
+      userId: user.id,
+      gameId: questionId,
+      selectedIndex: dto.selectedIndex,
+    });
+    await this.submitGameAnswerUseCase.execute(cmd);
     return;
   }
 }
