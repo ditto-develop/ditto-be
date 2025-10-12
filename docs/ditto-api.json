@@ -663,7 +663,11 @@
     "contact": {}
   },
   "tags": [],
-  "servers": [],
+  "servers": [
+    {
+      "url": "http://localhost:3000"
+    }
+  ],
   "components": {
     "securitySchemes": {
       "access-token": {
@@ -712,7 +716,7 @@
           "id": {
             "type": "string",
             "description": "유저 고유 ID",
-            "example": "vV2dn9ZZm1zHBPrYhRzvh",
+            "example": "FDpKkmI2DN4ACtaCdT06r",
             "format": "nanoid"
           }
         },
@@ -748,7 +752,7 @@
           "id": {
             "type": "string",
             "description": "유저 고유 ID",
-            "example": "vV2dn9ZZm1zHBPrYhRzvh",
+            "example": "FDpKkmI2DN4ACtaCdT06r",
             "format": "nanoid"
           },
           "email": {
@@ -783,7 +787,7 @@
           "id": {
             "type": "string",
             "description": "게임 선택지 고유 ID",
-            "example": "KXMnX0U5c-QndBbgmwWkN",
+            "example": "gRFE8ixekKWypZGVnYbis",
             "format": "nanoid"
           },
           "index": {
@@ -807,7 +811,7 @@
           "id": {
             "type": "string",
             "description": "게임 고유 ID",
-            "example": "2pwkTC0I-WDs51D0atoUw",
+            "example": "g84iGSg9QnTgLuSBtOtfl",
             "format": "nanoid"
           },
           "text": {
@@ -824,12 +828,12 @@
             "description": "선택지 (항상 2개여야 함)",
             "example": [
               {
-                "id": "XfnFHuU7dKcBtttK3y-Go",
+                "id": "MKEqgZHy-GpEjNizpZrn6",
                 "index": 0,
                 "label": "커피"
               },
               {
-                "id": "s-7OVmbIPm259yCNOLHnh",
+                "id": "rtiygg-l_qgwvBJ_NeStU",
                 "index": 1,
                 "label": "차"
               }
