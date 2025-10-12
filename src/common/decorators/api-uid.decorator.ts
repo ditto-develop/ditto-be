@@ -1,9 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { NanoId } from '../value-objects/nanoid.vo';
 
 export const ApiUidProperty = (description: string) =>
   ApiProperty({
     description: description,
-    example: '0nI_7bpoV_dza6k4RyZwz',
+    example: NanoId.create().toString(),
     format: 'nanoid',
     type: String,
   });
