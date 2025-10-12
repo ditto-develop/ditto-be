@@ -9,6 +9,11 @@ export const createApp = async (
 ): Promise<{ app: INestApplication; document: OpenAPIObject }> => {
   const app = await NestFactory.create(AppModule, forDocument ? { logger: false } : {});
 
+  app.enableCors({
+    origin: ['https://ditto-develop.github.io', /^http:\/\/localhost:\d+$/, /^http:\/\/127.0.0.1:\d+$/],
+    credentials: true,
+  });
+
   app.use(cookieParser());
   app.setGlobalPrefix('api');
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
