@@ -25,6 +25,7 @@ export const createApp = async (
       },
       'access-token',
     )
+    .addServer('http://localhost:3000')
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
