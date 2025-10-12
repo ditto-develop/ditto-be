@@ -192,7 +192,7 @@
             "required": true,
             "in": "path",
             "schema": {
-              "type": "string"
+              "type": "number"
             }
           }
         ],
@@ -212,7 +212,7 @@
                         "data": {
                           "type": "array",
                           "items": {
-                            "$ref": "#/components/schemas/QuestionDto"
+                            "$ref": "#/components/schemas/GameDto"
                           }
                         }
                       }
@@ -337,7 +337,7 @@
             "required": true,
             "in": "path",
             "schema": {
-              "type": "string"
+              "type": "number"
             }
           },
           {
@@ -458,7 +458,7 @@
         },
         "security": [
           {
-            "bearer": []
+            "access-token": []
           }
         ],
         "summary": "단일 질문 답안 제출",
@@ -659,7 +659,7 @@
   "info": {
     "title": "Ditto API",
     "description": "Start Game -> Solve Quiz -> Match Results -> Save Email -> Share (MVP)",
-    "version": "0.1.2",
+    "version": "0.1.3",
     "contact": {}
   },
   "tags": [],
@@ -712,7 +712,7 @@
           "id": {
             "type": "string",
             "description": "유저 고유 ID",
-            "example": "0nI_7bpoV_dza6k4RyZwz",
+            "example": "vV2dn9ZZm1zHBPrYhRzvh",
             "format": "nanoid"
           }
         },
@@ -731,11 +731,6 @@
               }
             ]
           },
-          "jwt": {
-            "type": "string",
-            "description": "jwt",
-            "example": "xxxxxxxxxxxxx"
-          },
           "referralLink": {
             "type": "string",
             "description": "추천인 링크",
@@ -744,7 +739,6 @@
         },
         "required": [
           "user",
-          "jwt",
           "referralLink"
         ]
       },
@@ -754,7 +748,7 @@
           "id": {
             "type": "string",
             "description": "유저 고유 ID",
-            "example": "0nI_7bpoV_dza6k4RyZwz",
+            "example": "vV2dn9ZZm1zHBPrYhRzvh",
             "format": "nanoid"
           },
           "email": {
@@ -783,70 +777,88 @@
           "email"
         ]
       },
-      "OptionDto": {
-        "type": "object",
-        "properties": {
-          "index": {
-            "type": "number"
-          },
-          "label": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "index",
-          "label"
-        ]
-      },
-      "QuestionDto": {
+      "GameOptionDto": {
         "type": "object",
         "properties": {
           "id": {
             "type": "string",
-            "description": "질문 고유 ID",
-            "example": "0nI_7bpoV_dza6k4RyZwz",
+            "description": "게임 선택지 고유 ID",
+            "example": "KXMnX0U5c-QndBbgmwWkN",
+            "format": "nanoid"
+          },
+          "index": {
+            "type": "number",
+            "description": "선택지 순서 (0 또는 1)"
+          },
+          "label": {
+            "type": "string",
+            "description": "선택지 텍스트"
+          }
+        },
+        "required": [
+          "id",
+          "index",
+          "label"
+        ]
+      },
+      "GameDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "게임 고유 ID",
+            "example": "2pwkTC0I-WDs51D0atoUw",
             "format": "nanoid"
           },
           "text": {
             "type": "string",
-            "description": "밸런스 게임 질문",
-            "example": "한 가지 능력을 갖는다면?"
+            "description": "질문 텍스트",
+            "example": "커피 vs 차"
+          },
+          "round": {
+            "type": "number",
+            "description": "라운드 번호",
+            "example": 1
           },
           "options": {
-            "description": "선택지",
+            "description": "선택지 (항상 2개여야 함)",
             "example": [
               {
-                "index": "0",
-                "label": "투명인간"
+                "id": "XfnFHuU7dKcBtttK3y-Go",
+                "index": 0,
+                "label": "커피"
               },
               {
-                "index": "1",
-                "label": "순간이동"
+                "id": "s-7OVmbIPm259yCNOLHnh",
+                "index": 1,
+                "label": "차"
               }
             ],
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/OptionDto"
+              "$ref": "#/components/schemas/GameOptionDto"
             }
           },
-          "round": {
+          "index": {
             "type": "number",
-            "description": "게임 라운드",
+            "description": "게임 순서",
             "example": 1
           }
         },
         "required": [
           "id",
           "text",
+          "round",
           "options",
-          "round"
+          "index"
         ]
       },
       "AnswerItem": {
         "type": "object",
         "properties": {
           "selectedIndex": {
-            "type": "number"
+            "type": "number",
+            "description": "선택지의 순서번호"
           }
         },
         "required": [

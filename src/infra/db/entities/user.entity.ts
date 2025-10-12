@@ -21,7 +21,7 @@ export class UserEntity {
   @ApiUidProperty('추천인 토큰')
   referredBy?: string | null;
 
-  // Postgresql 사용시 아래 주석 해제
+  // TODO:: Postgresql 사용시 아래 주석 해제
   // @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
   @CreateDateColumn({ name: 'created_at', type: 'datetime' })
   createdAt!: Date;

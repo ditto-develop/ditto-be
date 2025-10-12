@@ -1,5 +1,6 @@
-import { Body, Controller, HttpCode, HttpStatus, Patch, Post, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, HttpCode, HttpStatus, Patch, Post, Query, Res, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { type Response } from 'express';
 import { CreateUserCommand } from '../application/commands/create-user.command';
 import { CreateUserUseCase } from '../application/use-cases/create-user.use-case';
 import { JwtAuthGuard } from '../../../common/guards/jwt-auth.guard';
@@ -13,23 +14,21 @@ import { RegisterEmailRequestDto, RegisterEmailResponseDto } from './dto/registe
 import { RegisterEmailCommand } from '../application/commands/register-email.command';
 import { RegisterEmailUseCase } from '../application/use-cases/register-email.use-case';
 import { SwaggerApiResponse } from '../../../common/decorators/swagger-api-response.decorator';
+import { ConfigService } from '@nestjs/config';
 
 @ApiTags('Users')
 @Controller('users')
 export class UsersController {
-  constructor(
-    private readonly createUserUseCase: CreateUserUseCase,
-    private readonly loginUserUseCase: LoginUserUseCase,
-    private readonly registerEmailUseCase: RegisterEmailUseCase,
-  ) {}
-
   @Post('start')
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: '무정보 가입 및 jwt 발급 API' })
   @ApiQuery({ name: 'referredBy', required: false, type: String, description: '추천 받은 코드 값' })
   @SwaggerApiResponse({ status: HttpStatus.CREATED, type: StartResponseDto })
   @SwaggerApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR })
-  async start(@Query('referredBy') referredBy?: string): Promise<StartResponseDto> {
+  async start(
+    @Res({ passthrough: true }) res: Response,
+    @Query('referredBy') referredBy?: string,
+  ): Promise<StartResponseDto> {
     const cmd = new CreateUserCommand(referredBy);
     const user = await this.createUserUseCase.execute(cmd);
     const loginUserCommand = new LoginUserCommand(user.id.toString());
@@ -38,12 +37,27 @@ export class UsersController {
       id: user.id.toString(),
     };
     const { jwt } = this.loginUserUseCase.execute(loginUserCommand);
+
+    const isProd = this.configService.get<string>('NODE_ENV') === 'production';
+    res.cookie('access_token', jwt, {
+      httpOnly: true,
+      secure: isProd,
+      sameSite: 'lax',
+      maxAge: 1000 * 60 * 60,
+    });
+
     return {
       user: userDto,
-      jwt,
       referralLink: user.referralLink,
     };
   }
+
+  constructor(
+    private readonly configService: ConfigService,
+    private readonly createUserUseCase: CreateUserUseCase,
+    private readonly loginUserUseCase: LoginUserUseCase,
+    private readonly registerEmailUseCase: RegisterEmailUseCase,
+  ) {}
 
   @Patch('email')
   @UseGuards(JwtAuthGuard)

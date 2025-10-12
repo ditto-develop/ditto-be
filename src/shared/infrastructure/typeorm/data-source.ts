@@ -1,15 +1,13 @@
 import { DataSourceOptions } from 'typeorm';
-import path from 'node:path';
 import { UserEntity } from '../../../infra/db/entities/user.entity';
+import { GameEntity } from '../../../infra/db/entities/game/game.entity';
+import { GameAnswerEntity } from '../../../infra/db/entities/game/game-answer.entity';
+import { GameAnswerOptionEntity } from '../../../infra/db/entities/game/game-answer-option.entity';
 
 export const getDataSourceOptions = (client: string) => {
   const isSqlite = client === 'sqlite';
 
-  const commonEntities = [
-    // 엔티티 파일 경로(프로젝트 구조에 맞게 수정)
-    // path.join(__dirname, '/**/*.entity{.ts,.js}'),
-    UserEntity,
-  ];
+  const commonEntities = [UserEntity, GameEntity, GameAnswerOptionEntity, GameAnswerEntity];
 
   let options: DataSourceOptions;
   if (isSqlite) {
