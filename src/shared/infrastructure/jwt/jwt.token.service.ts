@@ -14,9 +14,10 @@ export class JwtTokenService {
     return this.jwtService.sign(payload);
   }
 
-  verifyToken(token: string): unknown {
+  verifyToken(token: string): UserPayload | null {
     try {
-      return this.jwtService.verify(token);
+      const payload = this.jwtService.verify<UserPayload>(token);
+      return payload ?? null;
     } catch {
       throw new InternalServerErrorException('Invalid or expired token');
     }

@@ -9,13 +9,6 @@ export class StartResponseDto {
   user: CreateUserResponseDto;
 
   @ApiProperty({
-    description: 'jwt',
-    example: 'xxxxxxxxxxxxx',
-    type: 'string',
-  })
-  jwt: string;
-
-  @ApiProperty({
     description: '추천인 링크',
     example: 'https://example.com/r/xxxxxxxxxxxxx',
     type: 'string',
