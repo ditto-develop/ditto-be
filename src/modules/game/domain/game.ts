@@ -41,8 +41,9 @@ export class Game {
   readonly text: string;
   readonly options: ReadonlyArray<GameOption>;
   readonly round: number;
+  readonly index?: number;
 
-  private constructor(id: NanoId, text: string, options: GameOption[], round: number) {
+  private constructor(id: NanoId, text: string, options: GameOption[], round: number, index?: number) {
     if (!text || text.trim().length === 0) {
       throw new Error('Game.text must be a non-empty string');
     }
@@ -62,13 +63,14 @@ export class Game {
     this.text = text.trim();
     this.options = options;
     this.round = round;
+    this.index = index;
     Object.freeze(this);
   }
 
   public static create(payload: Optional<GameDto, 'id'>): Game {
     const id = payload.id ? NanoId.from(payload.id) : NanoId.create();
     const opts = payload.options.map((o) => GameOption.create({ id: o.id, index: o.index, label: o.label }));
-    return new Game(id, payload.text, opts, payload.round);
+    return new Game(id, payload.text, opts, payload.round, payload.index);
   }
 
   public toPlain(): GameDto {
@@ -77,6 +79,7 @@ export class Game {
       text: this.text,
       options: this.options.map((o) => o.toPlain()),
       round: this.round,
+      index: this.index,
     };
   }
 }

@@ -47,4 +47,10 @@ export class GameDto {
   @ValidateNested({ each: true })
   @Type(() => GameOptionDto)
   options!: GameOptionDto[];
+
+  @ApiProperty({ description: '게임 순서', example: 1 })
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  index?: number;
 }

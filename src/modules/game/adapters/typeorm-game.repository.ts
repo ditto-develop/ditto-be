@@ -59,6 +59,7 @@ export class TypeormGameRepository implements IGameRepository {
       text: entity.question,
       options,
       round: entity.round,
+      index: entity.idx,
     });
   }
 }
