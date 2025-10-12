@@ -2,12 +2,14 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, OpenAPIObject, SwaggerModule } from '@nestjs/swagger';
+import cookieParser from 'cookie-parser';
 
 export const createApp = async (
   forDocument: boolean = false,
 ): Promise<{ app: INestApplication; document: OpenAPIObject }> => {
   const app = await NestFactory.create(AppModule, forDocument ? { logger: false } : {});
 
+  app.use(cookieParser());
   app.setGlobalPrefix('api');
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
 
