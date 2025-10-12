@@ -13,6 +13,10 @@ export class TypeormGameRepository implements IGameRepository {
     private readonly repo: Repository<GameEntity>,
   ) {}
 
+  async count(round: number): Promise<number> {
+    return await this.repo.count({ where: { round } });
+  }
+
   async save(domain: Game): Promise<Game> {
     const entity = this.toEntity(domain);
     // TODO:: Postgresql 사용시 아래 코드 삭제 or 주석
@@ -59,6 +63,7 @@ export class TypeormGameRepository implements IGameRepository {
       text: entity.question,
       options,
       round: entity.round,
+      index: entity.idx,
     });
   }
 }
