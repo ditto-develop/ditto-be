@@ -18,6 +18,10 @@ export function isString(value: unknown): value is string {
   return typeof value === 'string';
 }
 
+export function isInteger(value: unknown): value is number {
+  return Number.isInteger(value);
+}
+
 export function isBoolean(value: unknown): value is boolean {
   return typeof value === 'boolean';
 }
