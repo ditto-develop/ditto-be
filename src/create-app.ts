@@ -9,6 +9,16 @@ export const createApp = async (
 ): Promise<{ app: INestApplication; document: OpenAPIObject }> => {
   const app = await NestFactory.create(AppModule, forDocument ? { logger: false } : {});
 
+  app.enableCors({
+    origin: [
+      'https://ditto-develop.github.io',
+      /^http:\/\/localhost:\d+$/,
+      /^http:\/\/127.0.0.1:\d+$/,
+      'https://ditto-dev.duckdns.org',
+    ],
+    credentials: true,
+  });
+
   app.use(cookieParser());
   app.setGlobalPrefix('api');
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
@@ -16,7 +26,7 @@ export const createApp = async (
   const config = new DocumentBuilder()
     .setTitle('Ditto API')
     .setDescription('Start Game -> Solve Quiz -> Match Results -> Save Email -> Share (MVP)')
-    .setVersion('0.1.3')
+    .setVersion('0.1.4')
     .addBearerAuth(
       {
         type: 'http',
@@ -26,6 +36,8 @@ export const createApp = async (
       'access-token',
     )
     .addServer('http://localhost:3000')
+    .addServer('http://localhost:4000')
+    .addServer('https://ditto-dev.duckdns.org')
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
