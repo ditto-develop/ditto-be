@@ -10,7 +10,12 @@ export const createApp = async (
   const app = await NestFactory.create(AppModule, forDocument ? { logger: false } : {});
 
   app.enableCors({
-    origin: ['https://ditto-develop.github.io', /^http:\/\/localhost:\d+$/, /^http:\/\/127.0.0.1:\d+$/],
+    origin: [
+      'https://ditto-develop.github.io',
+      /^http:\/\/localhost:\d+$/,
+      /^http:\/\/127.0.0.1:\d+$/,
+      'https://ditto-dev.duckdns.org',
+    ],
     credentials: true,
   });
 
@@ -31,6 +36,8 @@ export const createApp = async (
       'access-token',
     )
     .addServer('http://localhost:3000')
+    .addServer('http://localhost:4000')
+    .addServer('https://ditto-dev.duckdns.org')
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
