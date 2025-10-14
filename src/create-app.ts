@@ -26,7 +26,7 @@ export const createApp = async (
   const config = new DocumentBuilder()
     .setTitle('Ditto API')
     .setDescription('Start Game -> Solve Quiz -> Match Results -> Save Email -> Share (MVP)')
-    .setVersion('0.1.3')
+    .setVersion('0.1.4')
     .addBearerAuth(
       {
         type: 'http',

@@ -659,13 +659,19 @@
   "info": {
     "title": "Ditto API",
     "description": "Start Game -> Solve Quiz -> Match Results -> Save Email -> Share (MVP)",
-    "version": "0.1.3",
+    "version": "0.1.4",
     "contact": {}
   },
   "tags": [],
   "servers": [
     {
       "url": "http://localhost:3000"
+    },
+    {
+      "url": "http://localhost:4000"
+    },
+    {
+      "url": "https://ditto-dev.duckdns.org"
     }
   ],
   "components": {
@@ -716,7 +722,7 @@
           "id": {
             "type": "string",
             "description": "유저 고유 ID",
-            "example": "FDpKkmI2DN4ACtaCdT06r",
+            "example": "0OGits4pGmyQOvGxM_sWc",
             "format": "nanoid"
           }
         },
@@ -752,7 +758,7 @@
           "id": {
             "type": "string",
             "description": "유저 고유 ID",
-            "example": "FDpKkmI2DN4ACtaCdT06r",
+            "example": "0OGits4pGmyQOvGxM_sWc",
             "format": "nanoid"
           },
           "email": {
@@ -787,7 +793,7 @@
           "id": {
             "type": "string",
             "description": "게임 선택지 고유 ID",
-            "example": "gRFE8ixekKWypZGVnYbis",
+            "example": "CTzutvokA-G0gERxCvjBz",
             "format": "nanoid"
           },
           "index": {
@@ -811,7 +817,7 @@
           "id": {
             "type": "string",
             "description": "게임 고유 ID",
-            "example": "g84iGSg9QnTgLuSBtOtfl",
+            "example": "WtlX5D7ETO9-D4oICo99o",
             "format": "nanoid"
           },
           "text": {
@@ -828,12 +834,12 @@
             "description": "선택지 (항상 2개여야 함)",
             "example": [
               {
-                "id": "MKEqgZHy-GpEjNizpZrn6",
+                "id": "0dgeaSSr_7TqeRs7QlatB",
                 "index": 0,
                 "label": "커피"
               },
               {
-                "id": "rtiygg-l_qgwvBJ_NeStU",
+                "id": "o1bpDgfj7Lwf8ugVXETch",
                 "index": 1,
                 "label": "차"
               }
