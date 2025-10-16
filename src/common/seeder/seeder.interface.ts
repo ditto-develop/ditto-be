@@ -1,4 +1,4 @@
-export const ISeederToken = 'ISeederToken';
+export const ISeederToken = Symbol('ISeederToken');
 
 export interface ISeeder {
   order?: number;
