@@ -17,13 +17,53 @@ export class TypeormGameAnswerRepository implements IGameAnswerRepository {
     @InjectRepository(GameAnswerEntity)
     private readonly gameAnswerRepo: Repository<GameAnswerEntity>,
 
-    private dataSource: DataSource,
+    private readonly dataSource: DataSource,
   ) {}
 
   async save(doamin: GameAnswer): Promise<void> {
     const entity = await this.toEntity(doamin);
     await this.gameAnswerRepo.save(entity);
     return;
+  }
+
+  async count(): Promise<number> {
+    return await this.gameAnswerRepo.count();
+  }
+
+  async bulkSave(domains: GameAnswer[], chunkSize: number = 500): Promise<void> {
+    const chunks: GameAnswer[][] = [];
+    for (let i = 0; i < domains.length; i += chunkSize) {
+      chunks.push(domains.slice(i, i + chunkSize));
+    }
+
+    for (const chunk of chunks) {
+      const queryRunner = this.dataSource.createQueryRunner();
+      await queryRunner.connect();
+      await queryRunner.startTransaction();
+      try {
+        const values = chunk.map((ga) => ({
+          id: NanoId.create().toString(),
+          userId: ga.userId.toString(),
+          gameId: ga.gameId.toString(),
+          selected: ga.selectedIndex,
+        }));
+        await queryRunner.manager
+          .createQueryBuilder()
+          .insert()
+          .into(GameAnswerEntity)
+          .values(values)
+          .orIgnore()
+          .execute();
+
+        await queryRunner.commitTransaction();
+      } catch (err) {
+        await queryRunner.rollbackTransaction();
+        await queryRunner.release();
+        throw err;
+      } finally {
+        await queryRunner.release();
+      }
+    }
   }
 
   async findOfCompleteUsers(requiredCount: number): Promise<GameAnswer[]> {

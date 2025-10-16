@@ -12,7 +12,6 @@ import { LoadAllGamesUseCase } from './application/use-cases/load-all-games.use-
 import { IGameAnswerRepositoryToken } from './ports/game-answer.repository';
 import { TypeormGameAnswerRepository } from './adapters/typeorm-game-answer.repository';
 import { SubmitGameAnswerUseCase } from './application/use-cases/submit-game-answer.use-case';
-import { GameSeederService } from './application/seeders/game-seeder.service';
 
 @Module({
   imports: [TypeOrmModule.forFeature([GameEntity, GameAnswerEntity, GameAnswerOptionEntity]), JwtTokenModule],
@@ -23,7 +22,7 @@ import { GameSeederService } from './application/seeders/game-seeder.service';
     SubmitGameAnswerUseCase,
     { provide: IGameRepositoryToken, useClass: TypeormGameRepository },
     { provide: IGameAnswerRepositoryToken, useClass: TypeormGameAnswerRepository },
-    GameSeederService,
   ],
+  exports: [CreateGameUseCase, IGameRepositoryToken, IGameAnswerRepositoryToken],
 })
 export class GameModule {}

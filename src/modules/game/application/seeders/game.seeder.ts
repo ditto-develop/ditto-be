@@ -1,12 +1,13 @@
-import { Inject, Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import { type IGameRepository, IGameRepositoryToken } from '../../ports/game.repository';
 import { CreateGameUseCase } from '../use-cases/create-game.use-case';
 import { CreateGameCommand } from '../commands/create-game.command';
 import { dummyData } from './dummy-game.data';
+import { ISeeder } from '../../../../common/seeder/export interface Seeder';
 
 @Injectable()
-export class GameSeederService implements OnModuleInit {
-  private readonly logger = new Logger(GameSeederService.name);
+export class GameSeeder implements ISeeder {
+  private readonly logger = new Logger(GameSeeder.name);
 
   constructor(
     @Inject(IGameRepositoryToken)
@@ -14,7 +15,7 @@ export class GameSeederService implements OnModuleInit {
     private readonly createGameUseCase: CreateGameUseCase,
   ) {}
 
-  async onModuleInit(): Promise<void> {
+  async seed(): Promise<void> {
     const existingGamesCount = await this.gameRepo.count(1);
     if (existingGamesCount === 0) {
       this.logger.log('게임 데이터가 없으므로 더미 데이터를 추가합니다.');
