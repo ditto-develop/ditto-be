@@ -4,4 +4,5 @@ export const IGameAnswerRepositoryToken = Symbol('IGameAnswerRepository');
 
 export interface IGameAnswerRepository {
   save(doamin: GameAnswer): Promise<void>;
+  findOfCompleteUsers(requiredCount: number): Promise<GameAnswer[]>;
 }

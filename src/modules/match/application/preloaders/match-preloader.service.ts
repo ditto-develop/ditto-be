@@ -1,8 +1,8 @@
 import { Inject, Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import { type IGameAnswerRepository, IGameAnswerRepositoryToken } from '../../../game/ports/game-answer.repository';
 import { type IGameRepository, IGameRepositoryToken } from '../../../game/ports/game.repository';
-import { DataSource } from 'typeorm';
-import { GameEntity } from '../../../../infra/db/entities/game/game.entity';
-import { GameAnswerEntity } from '../../../../infra/db/entities/game/game-answer.entity';
+import { isInteger } from '../../../../common/typeguards/common.type-guard';
+import { GameAnswer } from '../../../game/domain/game-answer';
 
 type UserAnswer = {
   userId: string;
@@ -16,56 +16,65 @@ export class MatchPreloaderService implements OnModuleInit {
   constructor(
     @Inject(IGameRepositoryToken)
     private readonly gameRepo: IGameRepository,
-    private dataSource: DataSource,
+
+    @Inject(IGameAnswerRepositoryToken)
+    private readonly gameAnswerRepo: IGameAnswerRepository,
   ) {}
 
   async onModuleInit(): Promise<void> {
     this.logger.log(await this.getAnswers());
   }
 
-  async getAnswers() {
-    const gameRepo = this.dataSource.getRepository(GameEntity);
-    const games = await gameRepo.find({
-      select: ['id', 'idx'],
-      order: { idx: 'ASC' },
-    });
+  private async fetchRequiredIdxs(round: number): Promise<number[]> {
+    const games = await this.gameRepo.findAll(round);
+    return games.filter((g) => isInteger(g.index)).map((g) => g.index!);
+  }
 
-    if (!games || games.length === 0) return [];
-
-    const maxIdx = Math.max(...games.map((g) => g.idx));
-
-    const qb = this.dataSource
-      .getRepository(GameAnswerEntity)
-      .createQueryBuilder('ga')
-      .select(['ga.user_id AS "userId"', 'ga.selected AS "selected"', 'g.idx AS "idx"'])
-      .innerJoin('ga.game', 'g')
-      .orderBy('ga.user_id', 'ASC')
-      .addOrderBy('g.idx', 'ASC');
-
-    const rows: Array<{ userId: string; selected: number; idx: number }> = await qb.getRawMany();
+  private buildUserBitArrays(rows: GameAnswer[], requiredIdxs: number[]): Map<string, string[]> {
+    const idxToPos = new Map<number, number>();
+    for (let i = 0; i < requiredIdxs.length; i++) idxToPos.set(requiredIdxs[i], i);
 
     const map = new Map<string, string[]>();
     for (const r of rows) {
-      const uid = r.userId;
-      if (!map.has(uid)) {
-        const arr = new Array<string>(maxIdx + 1).fill('0');
-        map.set(uid, arr);
+      if (r.gameIndex === undefined) {
+        this.logger.warn('gameIndex is undefined');
+        continue;
       }
 
-      const arr = map.get(uid)!;
-      arr[r.idx] = r.selected ? '1' : '0';
+      if (!map.has(r.userId.toString())) map.set(r.userId.toString(), new Array<string>(requiredIdxs.length).fill('0'));
+      const arr = map.get(r.userId.toString())!;
+      const pos = idxToPos.get(r.gameIndex);
+      if (pos === undefined) {
+        this.logger.warn(`Unexpected idx ${r.gameIndex} for user ${r.userId.toString()} - ignored`);
+        continue;
+      }
+      arr[pos] = r.selectedIndex ? '1' : '0';
     }
 
+    return map;
+  }
+
+  private buildUserAnswersFromBitArrays(userBitArrays: Map<string, string[]>): UserAnswer[] {
     const result: UserAnswer[] = [];
-    for (const [userId, bitArr] of map.entries()) {
+    for (const [userId, bitArr] of userBitArrays.entries()) {
       let s = '';
-      for (let i = maxIdx; i >= 1; i--) {
-        s += bitArr[i] ?? '0';
-      }
+      for (let i = bitArr.length - 1; i >= 0; i--) s += bitArr[i];
       result.push({ userId, answer: s });
     }
-    result.sort((a, b) => a.userId.localeCompare(b.userId));
+    return result;
+  }
 
+  private async getAnswers() {
+    const requiredIdxs = await this.fetchRequiredIdxs(1);
+    if (requiredIdxs.length === 0) return [];
+
+    const gameAnswers = await this.gameAnswerRepo.findOfCompleteUsers(requiredIdxs.length);
+    if (gameAnswers.length === 0) return [];
+
+    const userBitArrays = this.buildUserBitArrays(gameAnswers, requiredIdxs);
+    const result = this.buildUserAnswersFromBitArrays(userBitArrays);
+
+    result.sort((a, b) => a.userId.localeCompare(b.userId));
     return result;
   }
 }
