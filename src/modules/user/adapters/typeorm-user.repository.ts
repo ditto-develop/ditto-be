@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { IUserRepository } from '../ports/user.repository';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { UserEntity } from '../../../infra/db/entities/user.entity';
 import { User } from '../domain/user';
 
@@ -10,7 +10,13 @@ export class TypeormUserRepository implements IUserRepository {
   constructor(
     @InjectRepository(UserEntity)
     private readonly repo: Repository<UserEntity>,
+
+    private readonly dataSource: DataSource,
   ) {}
+
+  async count(): Promise<number> {
+    return await this.repo.count();
+  }
 
   async save(user: User): Promise<void> {
     const entity = new UserEntity();
@@ -26,5 +32,35 @@ export class TypeormUserRepository implements IUserRepository {
     const entity = await this.repo.findOneBy({ id: id.toString() });
     if (!entity) throw new NotFoundException('Cannot find user with id');
     return entity;
+  }
+
+  async bulkSave(users: User[], chunkSize: number = 500): Promise<void> {
+    const chunks: User[][] = [];
+    for (let i = 0; i < users.length; i += chunkSize) {
+      chunks.push(users.slice(i, i + chunkSize));
+    }
+
+    for (const chunk of chunks) {
+      const queryRunner = this.dataSource.createQueryRunner();
+      await queryRunner.connect();
+      await queryRunner.startTransaction();
+      try {
+        const values = chunk.map((u) => ({
+          id: u.id.toString(),
+          email: null,
+          referralToken: u.referralToken.toString(),
+          referredBy: null,
+        }));
+        await queryRunner.manager.createQueryBuilder().insert().into(UserEntity).values(values).orIgnore().execute();
+
+        await queryRunner.commitTransaction();
+      } catch (err) {
+        await queryRunner.rollbackTransaction();
+        await queryRunner.release();
+        throw err;
+      } finally {
+        await queryRunner.release();
+      }
+    }
   }
 }

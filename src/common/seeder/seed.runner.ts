@@ -1,6 +1,5 @@
 import { Inject, Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
 import { ISeeder, ISeederToken } from './export interface Seeder';
-import { isArray } from '../typeguards/common.type-guard';
 
 @Injectable()
 export class SeedRunner implements OnApplicationBootstrap {
@@ -8,17 +7,15 @@ export class SeedRunner implements OnApplicationBootstrap {
 
   constructor(
     @Inject(ISeederToken)
-    private readonly seeders: ISeeder | ISeeder[] | undefined,
+    private readonly seeders: ISeeder[],
   ) {}
 
   async onApplicationBootstrap() {
-    const seedersArray: ISeeder[] = isArray(this.seeders) ? this.seeders : this.seeders ? [this.seeders] : [];
-
-    if (!seedersArray || seedersArray.length === 0) {
+    if (!this.seeders || this.seeders.length === 0) {
       this.logger.log('등록된 Seeder가 없습니다.');
     }
 
-    const sorted = [...seedersArray].sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+    const sorted = [...this.seeders].sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
     for (const seeder of sorted) {
       const name = seeder.constructor?.name ?? 'UnknownSeeder';
       try {
