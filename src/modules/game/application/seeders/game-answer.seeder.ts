@@ -1,5 +1,5 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
-import { ISeeder } from '../../../../common/seeder/export interface Seeder';
+import { ISeeder } from '../../../../common/seeder/seeder.interface';
 import { GameSeeder } from './game.seeder';
 import { type IGameRepository, IGameRepositoryToken } from '../../ports/game.repository';
 import { type IGameAnswerRepository, IGameAnswerRepositoryToken } from '../../ports/game-answer.repository';
