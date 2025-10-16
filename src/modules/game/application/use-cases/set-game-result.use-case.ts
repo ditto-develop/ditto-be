@@ -9,7 +9,7 @@ export class SetGameResultUseCase {
     private readonly gameAnswerCounter: IGameAnswerCounter,
   ) {}
 
-  async execute(binary: Binary): Promise<void> {
-    await this.gameAnswerCounter.increment(binary);
+  async execute(round: number, binary: Binary): Promise<void> {
+    await this.gameAnswerCounter.increment(round, binary);
   }
 }

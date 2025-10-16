@@ -99,7 +99,7 @@ export class GameController {
       round,
     });
     const key = await this.getGameResultKeyUseCase.execute(cmd);
-    await this.setGameResultUseCase.execute(key);
+    await this.setGameResultUseCase.execute(round, key);
     return;
   }
 }

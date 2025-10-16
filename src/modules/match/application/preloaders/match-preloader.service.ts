@@ -31,7 +31,7 @@ export class MatchPreloaderService implements OnModuleInit {
   async onModuleInit(): Promise<void> {
     const answers = await this.getAnswers();
     answers.forEach((value) => {
-      this.gameAnswerCounter.increment(value.answer);
+      this.gameAnswerCounter.increment(1, value.answer);
     });
   }
 

@@ -16,16 +16,16 @@ export class InMemoryGameAnswerCounter extends GameAnswerCounter {
     this.memory[this.memorySize] = this.memory[this.memorySize] + 1;
   }
 
-  increment(binary: Binary): Promise<void> {
-    const key = this.binaryToNumber(binary);
+  increment(round: number, binary: Binary): Promise<void> {
+    const key = GameAnswerCounter.binaryToNumber(round, binary);
 
     this.memory[key] = this.memory[key] + 1;
     this.incrementTotal();
     return Promise.resolve();
   }
 
-  get(binary: Binary): Promise<number> {
-    const key = this.binaryToNumber(binary);
+  get(round: number, binary: Binary): Promise<number> {
+    const key = GameAnswerCounter.binaryToNumber(round, binary);
 
     return Promise.resolve(this.memory[key]);
   }
