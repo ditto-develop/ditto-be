@@ -1,5 +1,5 @@
 import { Inject, Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
-import { ISeeder, ISeederToken } from './export interface Seeder';
+import { ISeeder, ISeederToken } from './seeder.interface';
 
 @Injectable()
 export class SeedRunner implements OnApplicationBootstrap {

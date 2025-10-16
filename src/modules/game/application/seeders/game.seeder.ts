@@ -3,7 +3,7 @@ import { type IGameRepository, IGameRepositoryToken } from '../../ports/game.rep
 import { CreateGameUseCase } from '../use-cases/create-game.use-case';
 import { CreateGameCommand } from '../commands/create-game.command';
 import { dummyData } from './dummy-game.data';
-import { ISeeder } from '../../../../common/seeder/export interface Seeder';
+import { ISeeder } from '../../../../common/seeder/seeder.interface';
 
 @Injectable()
 export class GameSeeder implements ISeeder {
