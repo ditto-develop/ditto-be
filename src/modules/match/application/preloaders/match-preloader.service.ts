@@ -3,6 +3,10 @@ import { type IGameAnswerRepository, IGameAnswerRepositoryToken } from '../../..
 import { type IGameRepository, IGameRepositoryToken } from '../../../game/ports/game.repository';
 import { isInteger } from '../../../../common/typeguards/common.type-guard';
 import { GameAnswer } from '../../../game/domain/game-answer';
+import {
+  type IGameAnswerCounter,
+  IGameAnswerCounterToken,
+} from '../../../game/application/services/counter/game-answer-counter.interface';
 
 type UserAnswer = {
   userId: string;
@@ -19,10 +23,16 @@ export class MatchPreloaderService implements OnModuleInit {
 
     @Inject(IGameAnswerRepositoryToken)
     private readonly gameAnswerRepo: IGameAnswerRepository,
+
+    @Inject(IGameAnswerCounterToken)
+    private readonly gameAnswerCounter: IGameAnswerCounter,
   ) {}
 
   async onModuleInit(): Promise<void> {
-    this.logger.log(await this.getAnswers());
+    const answers = await this.getAnswers();
+    answers.forEach((value) => {
+      this.gameAnswerCounter.increment(value.answer);
+    });
   }
 
   private async fetchRequiredIdxs(round: number): Promise<number[]> {

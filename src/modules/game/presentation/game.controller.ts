@@ -13,6 +13,9 @@ import { LoadAllGamesUseCase } from '../application/use-cases/load-all-games.use
 import { GameDto } from './dto/game.dto';
 import { SubmitGameAnswerUseCase } from '../application/use-cases/submit-game-answer.use-case';
 import { SubmitGameAnswerCommand } from '../application/commands/submit-game-answer.command';
+import { GetGameResultKeyCommand } from '../application/commands/get-game-result-key.command';
+import { GetGameResultKeyUseCase } from '../application/use-cases/get-game-result-key.use-case';
+import { SetGameResultUseCase } from '../application/use-cases/set-game-result.use-case';
 
 @ApiTags('Game')
 @Controller('game')
@@ -21,6 +24,8 @@ export class GameController {
     private readonly createGameUseCase: CreateGameUseCase,
     private readonly loadAllGamesUseCase: LoadAllGamesUseCase,
     private readonly submitGameAnswerUseCase: SubmitGameAnswerUseCase,
+    private readonly getGameResultKeyUseCase: GetGameResultKeyUseCase,
+    private readonly setGameResultUseCase: SetGameResultUseCase,
   ) {}
 
   @Post()
@@ -78,6 +83,23 @@ export class GameController {
       selectedIndex: dto.selectedIndex,
     });
     await this.submitGameAnswerUseCase.execute(cmd);
+    return;
+  }
+
+  @Post(':round/end')
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: '라운드의 모든 답안 제출 완료' })
+  @ApiBearerAuth('access-token')
+  @SwaggerApiResponse()
+  @SwaggerApiResponse({ status: HttpStatus.UNAUTHORIZED })
+  @SwaggerApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR })
+  async submitEnd(@Param('round', ParseIntPipe) round: number, @CurrentUser() user: UserPayload) {
+    const cmd = new GetGameResultKeyCommand({
+      userId: user.id,
+      round,
+    });
+    const key = await this.getGameResultKeyUseCase.execute(cmd);
+    await this.setGameResultUseCase.execute(key);
     return;
   }
 }

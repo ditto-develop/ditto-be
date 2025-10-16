@@ -6,12 +6,15 @@ export const IGameAnswerCounterToken = Symbol('IGameAnswerCounterToken');
 export interface IGameAnswerCounter {
   increment(binary: Binary): Promise<void>;
   get(binary: Binary): Promise<number>;
+  getTotal(): Promise<number>;
 }
 
 export abstract class GameAnswerCounter implements IGameAnswerCounter {
   abstract increment(binary: Binary): Promise<void>;
 
   abstract get(binary: Binary): Promise<number>;
+
+  abstract getTotal(): Promise<number>;
 
   protected binaryToNumber(binary: Binary): number {
     if (!this.isBinary12Key(binary)) throw Error(`키 형태가 아닙니다. value: ${String(binary)}`);

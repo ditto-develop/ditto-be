@@ -20,6 +20,19 @@ export class TypeormGameAnswerRepository implements IGameAnswerRepository {
     private readonly dataSource: DataSource,
   ) {}
 
+  async findByUserId(userId: string): Promise<GameAnswer[]> {
+    const entities = await this.gameAnswerRepo.find({
+      where: { userId },
+    });
+    return entities.map((entity) =>
+      GameAnswer.create({
+        userId,
+        gameId: entity.gameId,
+        selectedIndex: entity.selected,
+      }),
+    );
+  }
+
   async save(doamin: GameAnswer): Promise<void> {
     const entity = await this.toEntity(doamin);
     await this.gameAnswerRepo.save(entity);

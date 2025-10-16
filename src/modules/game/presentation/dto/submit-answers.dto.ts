@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsInt, Max, Min } from 'class-validator';
 import { ApiUidProperty } from '../../../../common/decorators/api-uid.decorator';
+import { GetGameResultKeyCommand } from '../../application/commands/get-game-result-key.command';
 
 export class AnswerItem {
   @ApiProperty({ description: '선택지의 순서번호' })
@@ -20,4 +21,10 @@ export class SubmitAnswerDto extends AnswerItem {
 
 export class SubmitAnswerIncludeGameIndex extends SubmitAnswerDto {
   gameIndex?: number;
+}
+
+export class GetGameResultKeyDto {
+  userId: string;
+
+  round: number;
 }
