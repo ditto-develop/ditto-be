@@ -4,6 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
 import { UserEntity } from '../../../infra/db/entities/user.entity';
 import { User } from '../domain/user';
+import { NanoId } from '../../../common/value-objects/nanoid.vo';
 
 @Injectable()
 export class TypeormUserRepository implements IUserRepository {
@@ -16,6 +17,11 @@ export class TypeormUserRepository implements IUserRepository {
 
   async count(): Promise<number> {
     return await this.repo.count();
+  }
+
+  async findAll(): Promise<User[]> {
+    const entities = await this.repo.find();
+    return entities.map(this.toDomain.bind(this));
   }
 
   async save(user: User): Promise<void> {
@@ -62,5 +68,15 @@ export class TypeormUserRepository implements IUserRepository {
         await queryRunner.release();
       }
     }
+  }
+
+  private toDomain(entity: UserEntity): User {
+    const referredBy = entity.referredBy ? NanoId.from(entity.referredBy) : null;
+    return User.create({
+      id: NanoId.from(entity.id),
+      referralToken: NanoId.from(entity.referralToken),
+      email: entity.email,
+      referredBy,
+    });
   }
 }

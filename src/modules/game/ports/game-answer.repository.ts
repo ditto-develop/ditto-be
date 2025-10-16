@@ -4,4 +4,6 @@ export const IGameAnswerRepositoryToken = Symbol('IGameAnswerRepository');
 
 export interface IGameAnswerRepository {
   save(doamin: GameAnswer): Promise<void>;
+  count(): Promise<number>;
+  bulkSave(domains: GameAnswer[], chunkSize?: number): Promise<void>;
 }
