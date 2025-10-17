@@ -6,6 +6,7 @@ import {
   IGameAnswerCounterToken,
 } from '../../../game/application/services/counter/game-answer-counter.interface';
 import { GameCount } from '../../../game/domain/game';
+import { SimilarUsersCountResponseDto } from '../../presentation/dto/similar-users-count-response.dto';
 
 export class CountSimilarUseCase {
   private readonly populationCountMap: Map<string, Uint8Array> = new Map();
@@ -20,7 +21,7 @@ export class CountSimilarUseCase {
     }
     this.populationCountMap.set('1', populationCountForRound1);
   }
-  async execute(cmd: CountSimilarCommand): Promise<{ total: number; similarCount: number }> {
+  async execute(cmd: CountSimilarCommand): Promise<SimilarUsersCountResponseDto> {
     const strRound = String(cmd.round);
     const populationCount = this.populationCountMap.get(strRound)!;
 
@@ -41,7 +42,8 @@ export class CountSimilarUseCase {
 
     // 본인 제외
     similarCount -= 1;
-    const total = (await this.gameAnswerCounter.getTotal()) - 1;
-    return { total, similarCount };
+    const totalCount = (await this.gameAnswerCounter.getTotal()) - 1;
+    const sameCount = (await this.gameAnswerCounter.get(cmd.round, cmd.gameResult)) - 1;
+    return { totalCount, similarCount, sameCount };
   }
 }

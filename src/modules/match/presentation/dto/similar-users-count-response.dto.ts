@@ -2,16 +2,23 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export class SimilarUsersCountResponseDto {
   @ApiProperty({
-    description: '전체 사용자 수',
-    example: 1000,
+    description: '전체 사용자 수 (본인 제외)',
+    example: 1002,
     type: Number,
   })
-  total: number;
+  totalCount: number;
 
   @ApiProperty({
-    description: 'x% 일치한 사용자 수',
-    example: 3,
+    description: 'x% 일치한 사용자 수 (본인 제외)',
+    example: 28,
     type: Number,
   })
-  count: number;
+  similarCount: number;
+
+  @ApiProperty({
+    description: '100% 일치한 사용자 수 (본인 제외)',
+    example: 2,
+    type: Number,
+  })
+  sameCount: number;
 }

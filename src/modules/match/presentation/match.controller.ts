@@ -2,7 +2,6 @@ import { Controller, Get, HttpStatus, Param, ParseIntPipe, Query, UseGuards } fr
 import { JwtAuthGuard } from '../../../common/guards/jwt-auth.guard';
 import { ApiBearerAuth, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { SwaggerApiResponse } from '../../../common/decorators/swagger-api-response.decorator';
-import { CalculateResultRarityResponseDto } from './dto/calculate-result-rarity-response.dto';
 import { SimilarUsersCountResponseDto } from './dto/similar-users-count-response.dto';
 import { CountSimilarUseCase } from '../application/use-cases/count-similar.use-case';
 import { CountSimilarCommand } from '../application/commands/count-similar.command';
@@ -40,23 +39,6 @@ export class MatchController {
     const gameResult = await this.getGameResultKeyUseCase.execute(getGameResultKeyCmd);
     const countSimilarCmd = new CountSimilarCommand(gameResult, matchRate, round);
 
-    const result = await this.countSimilarUseCase.execute(countSimilarCmd);
-    return {
-      total: result.total,
-      count: result.similarCount,
-    };
-  }
-
-  @Get('result-rarity')
-  @UseGuards(JwtAuthGuard)
-  @ApiOperation({ summary: '게임 결과 희귀도 계산 API' })
-  @ApiBearerAuth('access-token')
-  @SwaggerApiResponse({ type: CalculateResultRarityResponseDto })
-  @SwaggerApiResponse({ status: HttpStatus.UNAUTHORIZED })
-  @SwaggerApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR })
-  calculateResultRarity(): CalculateResultRarityResponseDto {
-    return {
-      rarity: 15,
-    };
+    return await this.countSimilarUseCase.execute(countSimilarCmd);
   }
 }
