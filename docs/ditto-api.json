@@ -467,15 +467,119 @@
         ]
       }
     },
-    "/api/match/similar-user-count": {
+    "/api/game/{round}/end": {
+      "post": {
+        "operationId": "GameController_submitEnd",
+        "parameters": [
+          {
+            "name": "round",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/SuccessApiResponse"
+                    },
+                    {
+                      "properties": {
+                        "data": null
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/FailApiResponse"
+                    },
+                    {
+                      "properties": {
+                        "errorCode": {
+                          "example": "UNAUTHORIZED"
+                        },
+                        "errMessage": {
+                          "example": "사용자 인증 실패"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/FailApiResponse"
+                    },
+                    {
+                      "properties": {
+                        "errorCode": {
+                          "example": "INTERNAL_SERVER_ERROR"
+                        },
+                        "errMessage": {
+                          "example": "서버 내부 오류"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
+        "summary": "라운드의 모든 답안 제출 완료",
+        "tags": [
+          "Game"
+        ]
+      }
+    },
+    "/api/match/{round}/similar-user-count": {
       "get": {
         "operationId": "MatchController_getSimilarUsersCount",
         "parameters": [
           {
+            "name": "round",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
             "name": "matchRate",
             "required": false,
             "in": "query",
-            "description": "매치율 (x%)",
+            "description": "매치율 (x%) - 기본 값(80)",
             "schema": {
               "type": "number"
             }
@@ -565,101 +669,12 @@
           "Match"
         ]
       }
-    },
-    "/api/match/result-rarity": {
-      "get": {
-        "operationId": "MatchController_calculateResultRarity",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "allOf": [
-                    {
-                      "$ref": "#/components/schemas/SuccessApiResponse"
-                    },
-                    {
-                      "properties": {
-                        "data": {
-                          "$ref": "#/components/schemas/CalculateResultRarityResponseDto"
-                        }
-                      }
-                    }
-                  ]
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "allOf": [
-                    {
-                      "$ref": "#/components/schemas/FailApiResponse"
-                    },
-                    {
-                      "properties": {
-                        "errorCode": {
-                          "example": "UNAUTHORIZED"
-                        },
-                        "errMessage": {
-                          "example": "사용자 인증 실패"
-                        }
-                      }
-                    }
-                  ]
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "allOf": [
-                    {
-                      "$ref": "#/components/schemas/FailApiResponse"
-                    },
-                    {
-                      "properties": {
-                        "errorCode": {
-                          "example": "INTERNAL_SERVER_ERROR"
-                        },
-                        "errMessage": {
-                          "example": "서버 내부 오류"
-                        }
-                      }
-                    }
-                  ]
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "access-token": []
-          }
-        ],
-        "summary": "게임 결과 희귀도 계산 API",
-        "tags": [
-          "Match"
-        ]
-      }
     }
   },
   "info": {
     "title": "Ditto API",
     "description": "Start Game -> Solve Quiz -> Match Results -> Save Email -> Share (MVP)",
-    "version": "0.1.4",
+    "version": "0.1.5",
     "contact": {}
   },
   "tags": [],
@@ -722,7 +737,7 @@
           "id": {
             "type": "string",
             "description": "유저 고유 ID",
-            "example": "0OGits4pGmyQOvGxM_sWc",
+            "example": "5GQCrHlxAvYU2lO7SVB4_",
             "format": "nanoid"
           }
         },
@@ -758,7 +773,7 @@
           "id": {
             "type": "string",
             "description": "유저 고유 ID",
-            "example": "0OGits4pGmyQOvGxM_sWc",
+            "example": "5GQCrHlxAvYU2lO7SVB4_",
             "format": "nanoid"
           },
           "email": {
@@ -793,7 +808,7 @@
           "id": {
             "type": "string",
             "description": "게임 선택지 고유 ID",
-            "example": "CTzutvokA-G0gERxCvjBz",
+            "example": "lIxy2h4A71pNoJhwheZ_N",
             "format": "nanoid"
           },
           "index": {
@@ -817,7 +832,7 @@
           "id": {
             "type": "string",
             "description": "게임 고유 ID",
-            "example": "WtlX5D7ETO9-D4oICo99o",
+            "example": "rZ4EE5jMHeiAUnf0U3TPn",
             "format": "nanoid"
           },
           "text": {
@@ -834,12 +849,12 @@
             "description": "선택지 (항상 2개여야 함)",
             "example": [
               {
-                "id": "0dgeaSSr_7TqeRs7QlatB",
+                "id": "LNL3Fw0S_GZocLpZnCEEZ",
                 "index": 0,
                 "label": "커피"
               },
               {
-                "id": "o1bpDgfj7Lwf8ugVXETch",
+                "id": "6PNrHx65U7MHkO8rP2qZm",
                 "index": 1,
                 "label": "차"
               }
@@ -878,27 +893,26 @@
       "SimilarUsersCountResponseDto": {
         "type": "object",
         "properties": {
-          "count": {
+          "totalCount": {
             "type": "number",
-            "description": "x% 일치한 사용자 수",
-            "example": 3
+            "description": "전체 사용자 수 (본인 제외)",
+            "example": 1002
+          },
+          "similarCount": {
+            "type": "number",
+            "description": "x% 일치한 사용자 수 (본인 제외)",
+            "example": 28
+          },
+          "sameCount": {
+            "type": "number",
+            "description": "100% 일치한 사용자 수 (본인 제외)",
+            "example": 2
           }
         },
         "required": [
-          "count"
-        ]
-      },
-      "CalculateResultRarityResponseDto": {
-        "type": "object",
-        "properties": {
-          "rarity": {
-            "type": "number",
-            "description": "희귀도(%)",
-            "example": 15
-          }
-        },
-        "required": [
-          "rarity"
+          "totalCount",
+          "similarCount",
+          "sameCount"
         ]
       }
     }

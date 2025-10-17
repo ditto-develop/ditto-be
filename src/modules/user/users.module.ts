@@ -8,6 +8,7 @@ import { IUserRepositoryToken } from './ports/user.repository';
 import { LoginUserUseCase } from '../auth/application/use-cases/login-user.use-case';
 import { JwtTokenModule } from '../../shared/infrastructure/jwt/jwt.token.module';
 import { RegisterEmailUseCase } from './application/use-cases/register-email.use-case';
+import { CreateRandomUsersUserCase } from './application/use-cases/create-random-users.user-case';
 
 @Module({
   imports: [TypeOrmModule.forFeature([UserEntity]), JwtTokenModule],
@@ -16,7 +17,9 @@ import { RegisterEmailUseCase } from './application/use-cases/register-email.use
     CreateUserUseCase,
     LoginUserUseCase,
     RegisterEmailUseCase,
+    CreateRandomUsersUserCase,
     { provide: IUserRepositoryToken, useClass: TypeormUserRepository },
   ],
+  exports: [CreateRandomUsersUserCase, IUserRepositoryToken],
 })
 export class UsersModule {}

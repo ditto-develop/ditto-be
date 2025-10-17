@@ -2,10 +2,11 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { IGameAnswerRepository } from '../ports/game-answer.repository';
 import { InjectRepository } from '@nestjs/typeorm';
 import { GameAnswerEntity } from '../../../infra/db/entities/game/game-answer.entity';
-import { Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { GameAnswer } from '../domain/game-answer';
 import { NanoId } from '../../../common/value-objects/nanoid.vo';
 import { GameEntity } from '../../../infra/db/entities/game/game.entity';
+import { SubmitAnswerIncludeGameIndex } from '../presentation/dto/submit-answers.dto';
 
 @Injectable()
 export class TypeormGameAnswerRepository implements IGameAnswerRepository {
@@ -15,12 +16,90 @@ export class TypeormGameAnswerRepository implements IGameAnswerRepository {
 
     @InjectRepository(GameAnswerEntity)
     private readonly gameAnswerRepo: Repository<GameAnswerEntity>,
+
+    private readonly dataSource: DataSource,
   ) {}
+
+  async findByUserId(userId: string): Promise<GameAnswer[]> {
+    const entities = await this.gameAnswerRepo.find({
+      where: { userId },
+    });
+    return entities.map((entity) =>
+      GameAnswer.create({
+        userId,
+        gameId: entity.gameId,
+        selectedIndex: entity.selected,
+      }),
+    );
+  }
 
   async save(doamin: GameAnswer): Promise<void> {
     const entity = await this.toEntity(doamin);
     await this.gameAnswerRepo.save(entity);
     return;
+  }
+
+  async count(): Promise<number> {
+    return await this.gameAnswerRepo.count();
+  }
+
+  async bulkSave(domains: GameAnswer[], chunkSize: number = 500): Promise<void> {
+    const chunks: GameAnswer[][] = [];
+    for (let i = 0; i < domains.length; i += chunkSize) {
+      chunks.push(domains.slice(i, i + chunkSize));
+    }
+
+    for (const chunk of chunks) {
+      const queryRunner = this.dataSource.createQueryRunner();
+      await queryRunner.connect();
+      await queryRunner.startTransaction();
+      try {
+        const values = chunk.map((ga) => ({
+          id: NanoId.create().toString(),
+          userId: ga.userId.toString(),
+          gameId: ga.gameId.toString(),
+          selected: ga.selectedIndex,
+        }));
+        await queryRunner.manager
+          .createQueryBuilder()
+          .insert()
+          .into(GameAnswerEntity)
+          .values(values)
+          .orIgnore()
+          .execute();
+
+        await queryRunner.commitTransaction();
+      } catch (err) {
+        await queryRunner.rollbackTransaction();
+        await queryRunner.release();
+        throw err;
+      } finally {
+        await queryRunner.release();
+      }
+    }
+  }
+
+  async findOfCompleteUsers(requiredCount: number): Promise<GameAnswer[]> {
+    const sub = this.dataSource
+      .getRepository(GameAnswerEntity)
+      .createQueryBuilder('subga')
+      .select('subga.user_id')
+      .innerJoin('subga.game', 'subg')
+      .groupBy('subga.user_id')
+      .having('COUNT(subga.user_id) = :requiredCount');
+
+    const qb = this.dataSource
+      .getRepository(GameAnswerEntity)
+      .createQueryBuilder('ga')
+      .select(['ga.user_id AS "userId"', 'g.id AS "gameId"', 'ga.selected AS "selectedIndex"', 'g.idx AS "gameIndex"'])
+      .innerJoin('ga.game', 'g')
+      .where(`ga.user_id IN (${sub.getQuery()})`)
+      .orderBy('ga.user_id', 'ASC')
+      .addOrderBy('g.idx', 'ASC')
+      .setParameter('requiredCount', requiredCount);
+
+    const data = await qb.getRawMany<SubmitAnswerIncludeGameIndex>();
+    return data.map((answer) => GameAnswer.create(answer));
   }
 
   private async toEntity(domain: GameAnswer): Promise<GameAnswerEntity> {

@@ -11,6 +11,7 @@ import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
 import { UsersModule } from './modules/user/users.module';
 import { ResponseInterceptor } from './common/interceptors/response.interceptor';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
+import { SeederModule } from './common/seeder/seeder.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
     EmailModule,
     GameModule,
     MatchModule,
+    SeederModule,
   ],
   controllers: [AppController],
   providers: [
