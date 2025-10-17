@@ -1,20 +1,19 @@
 import { Binary } from '../../../../../common/types/common.type';
 import { isBinary } from '../../../../../common/typeguards/common.type-guard';
 import { GameCount } from '../../../domain/game';
-import { bindCallbackInternals } from 'rxjs/internal/observable/bindCallbackInternals';
 
 export const IGameAnswerCounterToken = Symbol('IGameAnswerCounterToken');
 
 export interface IGameAnswerCounter {
   increment(round: number, binary: Binary): Promise<void>;
-  get(round: number, binary: Binary): Promise<number>;
+  get(round: number, binary: Binary | number): Promise<number>;
   getTotal(): Promise<number>;
 }
 
 export abstract class GameAnswerCounter implements IGameAnswerCounter {
   abstract increment(round: number, binary: Binary): Promise<void>;
 
-  abstract get(round: number, binary: Binary): Promise<number>;
+  abstract get(round: number, binary: Binary | number): Promise<number>;
 
   abstract getTotal(): Promise<number>;
 

@@ -22,29 +22,26 @@ export class CountSimilarUseCase {
   }
   async execute(cmd: CountSimilarCommand): Promise<{ total: number; similarCount: number }> {
     const strRound = String(cmd.round);
-    console.log(`strRound: `, strRound);
     const populationCount = this.populationCountMap.get(strRound)!;
-    console.log(`populationCount: `, populationCount);
 
     const BITS = GameCount[strRound] as number;
-    console.log(`BITS: `, BITS);
     const MAX_KEY = 1 << BITS;
-    console.log(`MAX_KEY: `, MAX_KEY);
 
     const answer = GameAnswerCounter.binaryToNumber(cmd.round, cmd.gameResult);
-    console.log(`answer: `, answer);
     const requiredMatches = Math.ceil((BITS * cmd.thresholdPercent) / 100);
-    console.log(`requiredMatches: `, requiredMatches);
     const allowedDiff = BITS - requiredMatches;
-    console.log(`allowedDiff: `, allowedDiff);
 
     let similarCount = 0;
     for (let key = 0; key < MAX_KEY; key++) {
       const dist = populationCount[answer ^ key];
       if (dist <= allowedDiff) {
-        similarCount += await this.gameAnswerCounter.get(cmd.round, cmd.gameResult);
+        similarCount += await this.gameAnswerCounter.get(cmd.round, key);
       }
     }
-    return { total: await this.gameAnswerCounter.getTotal(), similarCount };
+
+    // 본인 제외
+    similarCount -= 1;
+    const total = (await this.gameAnswerCounter.getTotal()) - 1;
+    return { total, similarCount };
   }
 }

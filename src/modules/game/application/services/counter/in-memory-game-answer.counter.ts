@@ -1,6 +1,7 @@
 import { GameAnswerCounter } from './game-answer-counter.interface';
 import { Binary } from '../../../../../common/types/common.type';
 import { GameCount } from '../../../domain/game';
+import { isInteger } from '../../../../../common/typeguards/common.type-guard';
 
 export class InMemoryGameAnswerCounter extends GameAnswerCounter {
   private readonly memorySize: number;
@@ -24,9 +25,8 @@ export class InMemoryGameAnswerCounter extends GameAnswerCounter {
     return Promise.resolve();
   }
 
-  get(round: number, binary: Binary): Promise<number> {
-    const key = GameAnswerCounter.binaryToNumber(round, binary);
-
+  get(round: number, binary: Binary | number): Promise<number> {
+    const key = isInteger(binary) ? binary : GameAnswerCounter.binaryToNumber(round, binary);
     return Promise.resolve(this.memory[key]);
   }
 

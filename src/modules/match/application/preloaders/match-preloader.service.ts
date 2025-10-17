@@ -30,9 +30,9 @@ export class MatchPreloaderService implements OnModuleInit {
 
   async onModuleInit(): Promise<void> {
     const answers = await this.getAnswers();
-    answers.forEach((value) => {
-      this.gameAnswerCounter.increment(1, value.answer);
-    });
+    for (const value of answers) {
+      await this.gameAnswerCounter.increment(1, value.answer);
+    }
   }
 
   private async fetchRequiredIdxs(round: number): Promise<number[]> {
@@ -68,7 +68,7 @@ export class MatchPreloaderService implements OnModuleInit {
     const result: UserAnswer[] = [];
     for (const [userId, bitArr] of userBitArrays.entries()) {
       let s = '';
-      for (let i = bitArr.length - 1; i >= 0; i--) s += bitArr[i];
+      for (let i = 0; i < bitArr.length; i++) s += bitArr[i];
       result.push({ userId, answer: s });
     }
     return result;
