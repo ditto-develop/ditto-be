@@ -3,6 +3,7 @@ import { AppModule } from './app.module';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, OpenAPIObject, SwaggerModule } from '@nestjs/swagger';
 import cookieParser from 'cookie-parser';
+import { version } from '../package.json';
 
 export const createApp = async (
   forDocument: boolean = false,
@@ -26,7 +27,7 @@ export const createApp = async (
   const config = new DocumentBuilder()
     .setTitle('Ditto API')
     .setDescription('Start Game -> Solve Quiz -> Match Results -> Save Email -> Share (MVP)')
-    .setVersion('0.1.4')
+    .setVersion(version)
     .addBearerAuth(
       {
         type: 'http',
