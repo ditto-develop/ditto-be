@@ -6,6 +6,7 @@ import { DataSource, Repository } from 'typeorm';
 import { GameAnswer } from '../domain/game-answer';
 import { NanoId } from '../../../common/value-objects/nanoid.vo';
 import { GameEntity } from '../../../infra/db/entities/game/game.entity';
+import { SubmitAnswerIncludeGameIndex } from '../presentation/dto/submit-answers.dto';
 
 @Injectable()
 export class TypeormGameAnswerRepository implements IGameAnswerRepository {
@@ -18,6 +19,19 @@ export class TypeormGameAnswerRepository implements IGameAnswerRepository {
 
     private readonly dataSource: DataSource,
   ) {}
+
+  async findByUserId(userId: string): Promise<GameAnswer[]> {
+    const entities = await this.gameAnswerRepo.find({
+      where: { userId },
+    });
+    return entities.map((entity) =>
+      GameAnswer.create({
+        userId,
+        gameId: entity.gameId,
+        selectedIndex: entity.selected,
+      }),
+    );
+  }
 
   async save(doamin: GameAnswer): Promise<void> {
     const entity = await this.toEntity(doamin);
@@ -63,6 +77,29 @@ export class TypeormGameAnswerRepository implements IGameAnswerRepository {
         await queryRunner.release();
       }
     }
+  }
+
+  async findOfCompleteUsers(requiredCount: number): Promise<GameAnswer[]> {
+    const sub = this.dataSource
+      .getRepository(GameAnswerEntity)
+      .createQueryBuilder('subga')
+      .select('subga.user_id')
+      .innerJoin('subga.game', 'subg')
+      .groupBy('subga.user_id')
+      .having('COUNT(subga.user_id) = :requiredCount');
+
+    const qb = this.dataSource
+      .getRepository(GameAnswerEntity)
+      .createQueryBuilder('ga')
+      .select(['ga.user_id AS "userId"', 'g.id AS "gameId"', 'ga.selected AS "selectedIndex"', 'g.idx AS "gameIndex"'])
+      .innerJoin('ga.game', 'g')
+      .where(`ga.user_id IN (${sub.getQuery()})`)
+      .orderBy('ga.user_id', 'ASC')
+      .addOrderBy('g.idx', 'ASC')
+      .setParameter('requiredCount', requiredCount);
+
+    const data = await qb.getRawMany<SubmitAnswerIncludeGameIndex>();
+    return data.map((answer) => GameAnswer.create(answer));
   }
 
   private async toEntity(domain: GameAnswer): Promise<GameAnswerEntity> {

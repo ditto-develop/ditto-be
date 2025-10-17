@@ -17,3 +17,12 @@ export class SubmitAnswerDto extends AnswerItem {
   @ApiUidProperty('게임 고유 ID')
   gameId: string;
 }
+
+export class SubmitAnswerIncludeGameIndex extends SubmitAnswerDto {
+  gameIndex?: number;
+}
+
+export class GetGameResultKeyDto {
+  userId: string;
+  round: number;
+}

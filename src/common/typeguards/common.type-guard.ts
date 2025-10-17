@@ -1,3 +1,5 @@
+import { Binary } from '../types/common.type';
+
 export function isObject(value: unknown): value is object {
   return !(typeof value !== 'object' || value === null);
 }
@@ -40,4 +42,8 @@ export function isUndefined(value: unknown): value is undefined {
 
 export function isNullableString(value: unknown): value is string | null | undefined {
   return isString(value) || isNull(value) || isUndefined(value);
+}
+
+export function isBinary(value: unknown): value is Binary {
+  return isString(value) && /^[01]+$/.test(value);
 }

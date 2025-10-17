@@ -3,6 +3,10 @@ import { isInteger, isString } from '../../../common/typeguards/common.type-guar
 import { Optional } from '../../../common/types/common.type';
 import { GameDto, GameOptionDto } from '../presentation/dto/game.dto';
 
+export const GameCount = {
+  '1': 12,
+};
+
 export class GameOption {
   id: NanoId;
   index: number;
