@@ -12,11 +12,17 @@ import { UsersModule } from './modules/user/users.module';
 import { ResponseInterceptor } from './common/interceptors/response.interceptor';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 import { SeederModule } from './common/seeder/seeder.module';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
+    }),
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'public', 'images'),
+      serveRoot: '/images',
     }),
     DatabaseModule,
     JwtTokenModule,
