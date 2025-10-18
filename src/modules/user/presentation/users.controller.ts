@@ -1,5 +1,19 @@
-import { Body, Controller, HttpCode, HttpStatus, Patch, Post, Query, Res, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
+import {
+  Body,
+  Controller,
+  HttpCode,
+  HttpStatus,
+  Param,
+  ParseIntPipe,
+  Patch,
+  Post,
+  Query,
+  Res,
+  UploadedFile,
+  UseGuards,
+  UseInterceptors,
+} from '@nestjs/common';
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { type Response } from 'express';
 import { CreateUserCommand } from '../application/commands/create-user.command';
 import { CreateUserUseCase } from '../application/use-cases/create-user.use-case';
@@ -15,6 +29,12 @@ import { RegisterEmailCommand } from '../application/commands/register-email.com
 import { RegisterEmailUseCase } from '../application/use-cases/register-email.use-case';
 import { SwaggerApiResponse } from '../../../common/decorators/swagger-api-response.decorator';
 import { ConfigService } from '@nestjs/config';
+import { join } from 'path';
+import { UploadInterceptor } from '../../../common/interceptors/upload.interceptor';
+import { UploadedFileVo } from '../../../common/value-objects/uploaded-file.vo';
+import { UploadFileDto } from './dto/upload-file.dto';
+import { UploadGameResultImageCommand } from '../application/commands/upload-game-result-image.command';
+import { UploadGameResultImageUseCase } from '../application/use-cases/upload-game-result-image.use-case';
 
 @ApiTags('Users')
 @Controller('users')
@@ -57,6 +77,7 @@ export class UsersController {
     private readonly createUserUseCase: CreateUserUseCase,
     private readonly loginUserUseCase: LoginUserUseCase,
     private readonly registerEmailUseCase: RegisterEmailUseCase,
+    private readonly uploadGameResultImageUseCase: UploadGameResultImageUseCase,
   ) {}
 
   @Patch('email')
@@ -76,6 +97,39 @@ export class UsersController {
     return {
       id: user.id.toString(),
       email: user.getEmail(),
+    };
+  }
+
+  @Patch(':round/image')
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(
+    new UploadInterceptor({
+      fieldName: 'file',
+      dest: join(process.cwd(), 'public', 'images'),
+      allowedMimeTypes: ['image/png', 'image/jpeg'],
+    }),
+  )
+  @ApiOperation({ summary: '라운드별 결과 등록 API' })
+  @ApiBearerAuth('access-token')
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({ type: UploadFileDto })
+  @SwaggerApiResponse({ status: HttpStatus.UNAUTHORIZED })
+  @SwaggerApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR })
+  async uploadGameResultImage(
+    @Param('round', ParseIntPipe) round: number,
+    @CurrentUser() user: UserPayload,
+    @UploadedFile() uploadedFile: Express.Multer.File,
+  ): Promise<{
+    url: string;
+  }> {
+    if (!uploadedFile) throw new Error('No file uploaded');
+
+    const vo = UploadedFileVo.fromMulterFile(uploadedFile);
+    const cmd = new UploadGameResultImageCommand(user.id, round, vo);
+    await this.uploadGameResultImageUseCase.execute(cmd);
+
+    return {
+      url: vo.url,
     };
   }
 }

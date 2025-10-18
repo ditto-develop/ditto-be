@@ -1,13 +1,14 @@
 import { DataSourceOptions } from 'typeorm';
-import { UserEntity } from '../../../infra/db/entities/user.entity';
+import { UserEntity } from '../../../infra/db/entities/user/user.entity';
 import { GameEntity } from '../../../infra/db/entities/game/game.entity';
 import { GameAnswerEntity } from '../../../infra/db/entities/game/game-answer.entity';
 import { GameAnswerOptionEntity } from '../../../infra/db/entities/game/game-answer-option.entity';
+import { ImageEntity } from '../../../infra/db/entities/user/image.entity';
 
 export const getDataSourceOptions = (client: string) => {
   const isSqlite = client === 'sqlite';
 
-  const commonEntities = [UserEntity, GameEntity, GameAnswerOptionEntity, GameAnswerEntity];
+  const commonEntities = [UserEntity, GameEntity, GameAnswerOptionEntity, GameAnswerEntity, ImageEntity];
 
   let options: DataSourceOptions;
   if (isSqlite) {

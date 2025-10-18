@@ -1,6 +1,7 @@
-import { Column, CreateDateColumn, Entity, Index, PrimaryColumn } from 'typeorm';
-import { ApiUserEmailProperty } from '../../../common/decorators/api-user-email.decorator';
-import { ApiUidProperty } from '../../../common/decorators/api-uid.decorator';
+import { Column, CreateDateColumn, Entity, Index, OneToMany, PrimaryColumn } from 'typeorm';
+import { ApiUserEmailProperty } from '../../../../common/decorators/api-user-email.decorator';
+import { ApiUidProperty } from '../../../../common/decorators/api-uid.decorator';
+import { ImageEntity } from './image.entity';
 
 @Entity({ name: 'users' })
 export class UserEntity {
@@ -20,6 +21,11 @@ export class UserEntity {
   @Column({ name: 'referred_by', type: 'varchar', length: 32, nullable: true })
   @ApiUidProperty('추천인 토큰')
   referredBy?: string | null;
+
+  @OneToMany(() => ImageEntity, (img) => img.user, {
+    eager: true,
+  })
+  images!: ImageEntity[];
 
   // TODO:: Postgresql 사용시 아래 주석 해제
   // @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })

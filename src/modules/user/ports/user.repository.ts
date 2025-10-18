@@ -1,5 +1,5 @@
 import { User } from '../domain/user';
-import { UserEntity } from '../../../infra/db/entities/user.entity';
+import { UserEntity } from '../../../infra/db/entities/user/user.entity';
 
 export const IUserRepositoryToken = Symbol('IUserRepository');
 

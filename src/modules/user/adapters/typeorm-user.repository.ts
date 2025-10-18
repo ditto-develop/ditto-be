@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { IUserRepository } from '../ports/user.repository';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
-import { UserEntity } from '../../../infra/db/entities/user.entity';
+import { UserEntity } from '../../../infra/db/entities/user/user.entity';
 import { User } from '../domain/user';
 import { NanoId } from '../../../common/value-objects/nanoid.vo';
 
