@@ -21,5 +21,5 @@ export class ImageEntity {
 
   @Column({ name: 'image_path', type: 'varchar', length: 255, nullable: true })
   @ApiUserEmailProperty()
-  imagePath?: string | null;
+  imagePath: string;
 }

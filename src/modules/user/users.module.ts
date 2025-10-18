@@ -10,6 +10,9 @@ import { JwtTokenModule } from '../../shared/infrastructure/jwt/jwt.token.module
 import { RegisterEmailUseCase } from './application/use-cases/register-email.use-case';
 import { CreateRandomUsersUserCase } from './application/use-cases/create-random-users.user-case';
 import { ImageEntity } from '../../infra/db/entities/user/image.entity';
+import { UploadGameResultImageUseCase } from './application/use-cases/upload-game-result-image.use-case';
+import { IImageRepositoryToken } from './ports/image.repository';
+import { TypeormImageRepository } from './adapters/typeorm-image.repository';
 
 @Module({
   imports: [TypeOrmModule.forFeature([UserEntity, ImageEntity]), JwtTokenModule],
@@ -19,7 +22,9 @@ import { ImageEntity } from '../../infra/db/entities/user/image.entity';
     LoginUserUseCase,
     RegisterEmailUseCase,
     CreateRandomUsersUserCase,
+    UploadGameResultImageUseCase,
     { provide: IUserRepositoryToken, useClass: TypeormUserRepository },
+    { provide: IImageRepositoryToken, useClass: TypeormImageRepository },
   ],
   exports: [CreateRandomUsersUserCase, IUserRepositoryToken],
 })
