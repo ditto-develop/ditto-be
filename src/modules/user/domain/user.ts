@@ -1,12 +1,38 @@
 import { NanoId } from '../../../common/value-objects/nanoid.vo';
+import { isInteger, isString } from '../../../common/typeguards/common.type-guard';
 
 export type NewUserProps = Partial<User>;
+
+export class Image {
+  userId: NanoId;
+  round: number;
+  imagePath: string;
+
+  private constructor(userId: NanoId, round: number, imagePath: string) {
+    if (!isInteger(round) || round <= 0) {
+      throw new Error('Image.round must be greater than 0');
+    }
+    if (!imagePath || !isString(imagePath) || imagePath.trim().length === 0) {
+      throw new Error('Image.imagePath must be non-empty string');
+    }
+
+    this.userId = userId;
+    this.round = round;
+    this.imagePath = imagePath;
+    Object.freeze(this);
+  }
+
+  public static create(userId: NanoId, round: number, imagePath: string) {
+    return new Image(userId, round, imagePath);
+  }
+}
 
 export class User {
   readonly id: NanoId; // 고유 아이디
   readonly email?: string | null; // 이메일
   readonly referralToken: NanoId; // 추천 코드 (발급)
   readonly referredBy?: NanoId | null; // 추천인 코드 (입력)
+  readonly images?: Image[] | null;
 
   private constructor(props: NewUserProps) {
     this.id = props.id ?? NanoId.create();
