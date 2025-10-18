@@ -183,6 +183,92 @@
         ]
       }
     },
+    "/api/users/{round}/image": {
+      "patch": {
+        "operationId": "UsersController_uploadGameResultImage",
+        "parameters": [
+          {
+            "name": "round",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/UploadFileDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/FailApiResponse"
+                    },
+                    {
+                      "properties": {
+                        "errorCode": {
+                          "example": "UNAUTHORIZED"
+                        },
+                        "errMessage": {
+                          "example": "사용자 인증 실패"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/FailApiResponse"
+                    },
+                    {
+                      "properties": {
+                        "errorCode": {
+                          "example": "INTERNAL_SERVER_ERROR"
+                        },
+                        "errMessage": {
+                          "example": "서버 내부 오류"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
+        "summary": "라운드별 결과 등록 API",
+        "tags": [
+          "Users"
+        ]
+      }
+    },
     "/api/game/{round}/questions": {
       "get": {
         "operationId": "GameController_getQuestions",
@@ -674,7 +760,7 @@
   "info": {
     "title": "Ditto API",
     "description": "Start Game -> Solve Quiz -> Match Results -> Save Email -> Share (MVP)",
-    "version": "0.1.5",
+    "version": "0.1.6",
     "contact": {}
   },
   "tags": [],
@@ -737,7 +823,7 @@
           "id": {
             "type": "string",
             "description": "유저 고유 ID",
-            "example": "5GQCrHlxAvYU2lO7SVB4_",
+            "example": "MxOuLt5-uC2a3SV_F9ZXk",
             "format": "nanoid"
           }
         },
@@ -773,7 +859,7 @@
           "id": {
             "type": "string",
             "description": "유저 고유 ID",
-            "example": "5GQCrHlxAvYU2lO7SVB4_",
+            "example": "MxOuLt5-uC2a3SV_F9ZXk",
             "format": "nanoid"
           },
           "email": {
@@ -802,13 +888,25 @@
           "email"
         ]
       },
+      "UploadFileDto": {
+        "type": "object",
+        "properties": {
+          "file": {
+            "type": "string",
+            "format": "binary"
+          }
+        },
+        "required": [
+          "file"
+        ]
+      },
       "GameOptionDto": {
         "type": "object",
         "properties": {
           "id": {
             "type": "string",
             "description": "게임 선택지 고유 ID",
-            "example": "lIxy2h4A71pNoJhwheZ_N",
+            "example": "0EfPXTn5FECdzLaEJsdl_",
             "format": "nanoid"
           },
           "index": {
@@ -832,7 +930,7 @@
           "id": {
             "type": "string",
             "description": "게임 고유 ID",
-            "example": "rZ4EE5jMHeiAUnf0U3TPn",
+            "example": "pXNCKO9aT6WiwIM2Y2CLA",
             "format": "nanoid"
           },
           "text": {
@@ -849,12 +947,12 @@
             "description": "선택지 (항상 2개여야 함)",
             "example": [
               {
-                "id": "LNL3Fw0S_GZocLpZnCEEZ",
+                "id": "2C8CaWFehXzoaidXDRIPe",
                 "index": 0,
                 "label": "커피"
               },
               {
-                "id": "6PNrHx65U7MHkO8rP2qZm",
+                "id": "SZac21Ia_zN10EO1hZZA2",
                 "index": 1,
                 "label": "차"
               }
