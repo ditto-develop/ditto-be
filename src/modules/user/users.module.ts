@@ -9,9 +9,10 @@ import { LoginUserUseCase } from '../auth/application/use-cases/login-user.use-c
 import { JwtTokenModule } from '../../shared/infrastructure/jwt/jwt.token.module';
 import { RegisterEmailUseCase } from './application/use-cases/register-email.use-case';
 import { CreateRandomUsersUserCase } from './application/use-cases/create-random-users.user-case';
+import { ImageEntity } from '../../infra/db/entities/user/image.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([UserEntity]), JwtTokenModule],
+  imports: [TypeOrmModule.forFeature([UserEntity, ImageEntity]), JwtTokenModule],
   controllers: [UsersController],
   providers: [
     CreateUserUseCase,
