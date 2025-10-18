@@ -1,5 +1,5 @@
 import { DataSourceOptions } from 'typeorm';
-import { UserEntity } from '../../../infra/db/entities/user.entity';
+import { UserEntity } from '../../../infra/db/entities/user/user.entity';
 import { GameEntity } from '../../../infra/db/entities/game/game.entity';
 import { GameAnswerEntity } from '../../../infra/db/entities/game/game-answer.entity';
 import { GameAnswerOptionEntity } from '../../../infra/db/entities/game/game-answer-option.entity';

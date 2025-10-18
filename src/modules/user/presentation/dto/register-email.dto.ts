@@ -1,5 +1,5 @@
 import { PickType } from '@nestjs/swagger';
-import { UserEntity } from '../../../../infra/db/entities/user.entity';
+import { UserEntity } from '../../../../infra/db/entities/user/user.entity';
 import { ApiUserEmailProperty } from '../../../../common/decorators/api-user-email.decorator';
 import { IsEmail } from 'class-validator';
 
