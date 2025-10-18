@@ -21,8 +21,8 @@ import { join } from 'path';
       isGlobal: true,
     }),
     ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', 'public', 'images'),
-      serveRoot: '/images',
+      rootPath: join(process.cwd(), 'public', 'images'),
+      serveRoot: '/api/images',
     }),
     DatabaseModule,
     JwtTokenModule,
