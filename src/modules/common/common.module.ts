@@ -1,5 +1,5 @@
 import { Global, Module } from '@nestjs/common';
-import { EncryptionService } from 'src/modules/common/services/encryption.service.js';
+import { EncryptionService } from 'src/modules/common/services/encryption.service';
 
 @Global()
 @Module({

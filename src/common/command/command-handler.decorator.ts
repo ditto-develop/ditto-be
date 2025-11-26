@@ -1,5 +1,5 @@
 import { SetMetadata } from '@nestjs/common';
-import { ICommand } from 'src/common/command/command.interface.js';
+import { ICommand } from 'src/common/command/command.interface';
 
 /**
  * CommandHandler 데코레이터 메타데이터 키

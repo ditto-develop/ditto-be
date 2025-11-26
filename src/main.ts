@@ -4,7 +4,7 @@ import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
 import { writeFileSync } from 'node:fs';
 import { version } from '../package.json';
-import { GlobalExceptionFilter } from 'src/exceptions/exception.filter';
+import { GlobalExceptionFilter } from 'src/common/exceptions/exception.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -20,7 +20,7 @@ async function bootstrap() {
     .setDescription(
       'Start Game -> Solve Quiz -> Match Results -> Save Email -> Share (MVP)',
     )
-    .setVersion(version as string)
+    .setVersion(version)
     .addBearerAuth(
       {
         type: 'http',

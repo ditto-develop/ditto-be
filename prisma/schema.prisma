@@ -1,0 +1,70 @@
+// This is your Prisma schema file,
+// learn more about it in docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model QuizSet {
+  id          String   @id @default(cuid())
+  week        Int      // 주차 (1, 2, 3, ...)
+  category    String   // 카테고리
+  title       String   // 퀴즈 세트 제목
+  description String?  // 퀴즈 세트 설명
+  startDate   DateTime // 시작일
+  endDate     DateTime // 종료일 (시작일로부터 7일)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  quizzes     Quiz[]
+  
+  @@map("quiz_sets")
+}
+
+model Quiz {
+  id          String   @id @default(cuid())
+  question    String   // 퀴즈 질문
+  order       Int      // 퀴즈 순서
+  quizSetId   String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  quizSet     QuizSet  @relation(fields: [quizSetId], references: [id], onDelete: Cascade)
+  choices     Choice[]
+  answers     QuizAnswer[]
+  
+  @@map("quizzes")
+}
+
+model Choice {
+  id     String @id @default(cuid())
+  text   String // 선택지 내용
+  quizId String
+  order  Int    // 선택지 순서
+  
+  quiz   Quiz   @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  answers QuizAnswer[]
+  
+  @@map("choices")
+}
+
+model QuizAnswer {
+  id       String   @id @default(cuid())
+  userId   String   // 사용자 식별자
+  quizId   String
+  choiceId String
+  answeredAt DateTime @default(now())
+  
+  quiz     Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  choice   Choice   @relation(fields: [choiceId], references: [id], onDelete: Cascade)
+  
+  @@map("quiz_answers")
+}
