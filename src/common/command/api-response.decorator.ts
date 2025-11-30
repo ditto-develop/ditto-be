@@ -1,6 +1,5 @@
 import { applyDecorators, Type } from '@nestjs/common';
 import { ApiExtraModels, ApiResponse, getSchemaPath } from '@nestjs/swagger';
-import { CommandResultDto } from './command.interface';
 
 /**
  * Command 응답을 위한 Swagger 데코레이터
