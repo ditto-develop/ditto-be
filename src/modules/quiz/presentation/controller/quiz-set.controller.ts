@@ -8,12 +8,7 @@ import {
   Put,
   Query,
 } from '@nestjs/common';
-import {
-  ApiExtraModels,
-  ApiOperation,
-  ApiResponse,
-  ApiTags,
-} from '@nestjs/swagger';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ApiCommandResponse } from 'src/common/command/api-response.decorator';
 import { CommandBus } from 'src/common/command/command-bus';
 import { ICommandResult } from 'src/common/command/command.interface';
