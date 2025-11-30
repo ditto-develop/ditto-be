@@ -1,0 +1,611 @@
+{
+  "openapi": "3.0.0",
+  "paths": {
+    "/api/quizzes": {
+      "post": {
+        "operationId": "QuizController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateQuizDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "퀴즈 생성 성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuizDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "퀴즈 생성",
+        "tags": [
+          "Quizzes"
+        ]
+      }
+    },
+    "/api/quiz-sets": {
+      "post": {
+        "operationId": "QuizSetController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateQuizSetDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "퀴즈 세트 생성 성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/QuizSetDto"
+                    },
+                    "error": {
+                      "type": "string",
+                      "example": "에러 메시지"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "퀴즈 세트 생성",
+        "tags": [
+          "Quiz Sets"
+        ]
+      },
+      "get": {
+        "operationId": "QuizSetController_findAll",
+        "parameters": [
+          {
+            "name": "week",
+            "required": false,
+            "in": "query",
+            "description": "주차 필터",
+            "schema": {
+              "example": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "category",
+            "required": false,
+            "in": "query",
+            "description": "카테고리 필터",
+            "schema": {
+              "example": "일상",
+              "type": "string"
+            }
+          },
+          {
+            "name": "isActive",
+            "required": false,
+            "in": "query",
+            "description": "활성화 여부 필터",
+            "schema": {
+              "example": true,
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "퀴즈 세트 목록 조회 성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/QuizSetDto"
+                      }
+                    },
+                    "error": {
+                      "type": "string",
+                      "example": "에러 메시지"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "퀴즈 세트 목록 조회",
+        "tags": [
+          "Quiz Sets"
+        ]
+      }
+    },
+    "/api/quiz-sets/{id}": {
+      "get": {
+        "operationId": "QuizSetController_findById",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "퀴즈 세트 조회 성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/QuizSetDto"
+                    },
+                    "error": {
+                      "type": "string",
+                      "example": "에러 메시지"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "퀴즈 세트 조회",
+        "tags": [
+          "Quiz Sets"
+        ]
+      },
+      "put": {
+        "operationId": "QuizSetController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateQuizSetDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "퀴즈 세트 수정 성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/QuizSetDto"
+                    },
+                    "error": {
+                      "type": "string",
+                      "example": "에러 메시지"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "퀴즈 세트 수정",
+        "tags": [
+          "Quiz Sets"
+        ]
+      },
+      "delete": {
+        "operationId": "QuizSetController_delete",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "퀴즈 세트 삭제 성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "error": {
+                      "type": "string",
+                      "example": "에러 메시지"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "퀴즈 세트 삭제",
+        "tags": [
+          "Quiz Sets"
+        ]
+      }
+    },
+    "/api/quiz-sets/{id}/activate": {
+      "post": {
+        "operationId": "QuizSetController_activate",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "퀴즈 세트 활성화 성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/QuizSetDto"
+                    },
+                    "error": {
+                      "type": "string",
+                      "example": "에러 메시지"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "퀴즈 세트 활성화",
+        "tags": [
+          "Quiz Sets"
+        ]
+      }
+    },
+    "/api/quiz-sets/{id}/deactivate": {
+      "post": {
+        "operationId": "QuizSetController_deactivate",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "퀴즈 세트 비활성화 성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "error": {
+                      "type": "string",
+                      "example": "에러 메시지"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "퀴즈 세트 비활성화",
+        "tags": [
+          "Quiz Sets"
+        ]
+      }
+    }
+  },
+  "info": {
+    "title": "Ditto API",
+    "description": "Start Game -> Solve Quiz -> Match Results -> Save Email -> Share (MVP)",
+    "version": "0.0.1",
+    "contact": {}
+  },
+  "tags": [],
+  "servers": [
+    {
+      "url": "http://localhost:4000"
+    },
+    {
+      "url": "https://www.ditto.pics"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "access-token": {
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "type": "http"
+      }
+    },
+    "schemas": {
+      "CreateQuizDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "퀴즈 ID",
+            "example": "123e4567-e89b-12d3-a456-426614174000"
+          },
+          "question": {
+            "type": "string",
+            "description": "퀴즈 질문",
+            "example": "사과 vs 바나나"
+          },
+          "quizSetId": {
+            "type": "string",
+            "description": "퀴즈 세트 ID",
+            "example": "123e4567-e89b-12d3-a456-426614174000"
+          },
+          "order": {
+            "type": "number",
+            "description": "퀴즈 순서",
+            "example": 1
+          }
+        },
+        "required": [
+          "id",
+          "question",
+          "quizSetId"
+        ]
+      },
+      "QuizDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "퀴즈 ID",
+            "example": "123e4567-e89b-12d3-a456-426614174000"
+          },
+          "question": {
+            "type": "string",
+            "description": "퀴즈 질문",
+            "example": "사과 vs 바나나"
+          },
+          "quizSetId": {
+            "type": "string",
+            "description": "퀴즈 세트 ID",
+            "example": "123e4567-e89b-12d3-a456-426614174000"
+          },
+          "order": {
+            "type": "number",
+            "description": "퀴즈 순서",
+            "nullable": true,
+            "example": 1
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "생성일",
+            "example": "2025-01-01T00:00:00.000Z"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "수정일",
+            "example": "2025-01-01T00:00:00.000Z"
+          }
+        },
+        "required": [
+          "id",
+          "question",
+          "quizSetId",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "QuizSetDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "퀴즈 세트 ID",
+            "example": "cuid"
+          },
+          "week": {
+            "type": "number",
+            "description": "주차",
+            "example": 1
+          },
+          "category": {
+            "type": "string",
+            "description": "카테고리",
+            "example": "일상"
+          },
+          "title": {
+            "type": "string",
+            "description": "퀴즈 세트 제목",
+            "example": "1주차 일상 퀴즈"
+          },
+          "description": {
+            "type": "string",
+            "description": "퀴즈 세트 설명",
+            "example": "일상생활에 관한 퀴즈 세트입니다."
+          },
+          "startDate": {
+            "format": "date-time",
+            "type": "string",
+            "description": "시작일",
+            "example": "2025-12-01T00:00:00Z"
+          },
+          "endDate": {
+            "format": "date-time",
+            "type": "string",
+            "description": "종료일",
+            "example": "2025-12-08T00:00:00Z"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "생성일",
+            "example": "2025-11-29T12:00:00Z"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "수정일",
+            "example": "2025-11-29T12:00:00Z"
+          },
+          "isActive": {
+            "type": "boolean",
+            "description": "활성화 여부",
+            "example": true
+          }
+        },
+        "required": [
+          "id",
+          "week",
+          "category",
+          "title",
+          "startDate",
+          "endDate",
+          "createdAt",
+          "updatedAt",
+          "isActive"
+        ]
+      },
+      "CreateQuizSetDto": {
+        "type": "object",
+        "properties": {
+          "week": {
+            "type": "number",
+            "description": "주차",
+            "example": 1
+          },
+          "category": {
+            "type": "string",
+            "description": "카테고리",
+            "example": "일상"
+          },
+          "title": {
+            "type": "string",
+            "description": "퀴즈 세트 제목",
+            "example": "1주차 일상 퀴즈"
+          },
+          "description": {
+            "type": "string",
+            "description": "퀴즈 세트 설명",
+            "example": "일상생활에 관한 퀴즈 세트입니다."
+          },
+          "startDate": {
+            "type": "string",
+            "description": "시작일",
+            "example": "2025-12-01T00:00:00Z"
+          }
+        },
+        "required": [
+          "week",
+          "category",
+          "title",
+          "startDate"
+        ]
+      },
+      "UpdateQuizSetDto": {
+        "type": "object",
+        "properties": {
+          "week": {
+            "type": "number",
+            "description": "주차",
+            "example": 1
+          },
+          "category": {
+            "type": "string",
+            "description": "카테고리",
+            "example": "일상"
+          },
+          "title": {
+            "type": "string",
+            "description": "퀴즈 세트 제목",
+            "example": "1주차 일상 퀴즈"
+          },
+          "description": {
+            "type": "string",
+            "description": "퀴즈 세트 설명",
+            "example": "일상생활에 관한 퀴즈 세트입니다."
+          },
+          "startDate": {
+            "type": "string",
+            "description": "시작일",
+            "example": "2025-12-01T00:00:00Z"
+          },
+          "isActive": {
+            "type": "boolean",
+            "description": "활성화 여부",
+            "example": true
+          }
+        }
+      }
+    }
+  }
+}

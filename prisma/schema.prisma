@@ -21,11 +21,13 @@ model QuizSet {
   description String?  // 퀴즈 세트 설명
   startDate   DateTime // 시작일
   endDate     DateTime // 종료일 (시작일로부터 7일)
+  isActive    Boolean  @default(true) // 활성화 여부
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   
   quizzes     Quiz[]
   
+  @@unique([week, category])
   @@map("quiz_sets")
 }
 

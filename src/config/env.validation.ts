@@ -22,7 +22,7 @@ class EnvironmentVariables {
   DATABASE_URL: string = '';
 
   @IsString()
-  ENCRYPTION_KEY: string = '';
+  ENCRYPTION_KEY: string = 'your-encryption-key-change-in-production';
 }
 
 export function validate(config: Record<string, unknown>) {
