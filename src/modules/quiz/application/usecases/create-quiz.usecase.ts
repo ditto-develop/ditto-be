@@ -1,14 +1,14 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { CreateQuizDto } from 'src/modules/quiz/application/dto/create-quiz.dto';
-import { Quiz } from 'src/modules/quiz/domain/entities/quiz.entity';
-import {
-  IQuizRepository,
-  QUIZ_REPOSITORY_TOKEN,
-} from 'src/modules/quiz/infrastructure/repository/quiz.repository.interface';
+import { CreateQuizDto } from '@module/quiz/application/dto/create-quiz.dto';
+import { Quiz } from '@module/quiz/domain/entities/quiz.entity';
 import {
   IQuizSetRepository,
   QUIZ_SET_REPOSITORY_TOKEN,
-} from 'src/modules/quiz/infrastructure/repository/quiz-set.repository.interface';
+} from '@module/quiz/infrastructure/repository/quiz-set.repository.interface';
+import {
+  IQuizRepository,
+  QUIZ_REPOSITORY_TOKEN,
+} from '@module/quiz/infrastructure/repository/quiz.repository.interface';
+import { Inject, Injectable } from '@nestjs/common';
 
 @Injectable()
 export class CreateQuizUseCase {
@@ -33,9 +33,7 @@ export class CreateQuizUseCase {
     // 퀴즈 세트에 이미 12개의 퀴즈가 있는지 확인
     const quizCount = await this.quizSetRepository.countQuizzes(dto.quizSetId);
     if (quizCount >= 12) {
-      throw new Error(
-        `퀴즈 세트에 이미 12개의 퀴즈가 있습니다. 최대 12개까지 추가할 수 있습니다.`,
-      );
+      throw new Error(`퀴즈 세트에 이미 12개의 퀴즈가 있습니다. 최대 12개까지 추가할 수 있습니다.`);
     }
 
     const quiz = Quiz.create('', dto.question, dto.order, dto.quizSetId);

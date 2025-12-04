@@ -1,5 +1,5 @@
-import { ICommand } from 'src/common/command/command.interface';
-import { QuizSetListQueryDto } from 'src/modules/quiz/application/dto/quiz-set-list-query.dto';
+import { ICommand } from '@common/command/command.interface';
+import { QuizSetListQueryDto } from '@module/quiz/application/dto/quiz-set-list-query.dto';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface GetQuizSetsQuery extends QuizSetListQueryDto {}

@@ -1,54 +1,29 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Post,
-  Put,
-  Query,
-} from '@nestjs/common';
-import {
-  ApiExtraModels,
-  ApiOperation,
-  ApiResponse,
-  ApiTags,
-} from '@nestjs/swagger';
-import { ApiCommandResponse } from 'src/common/command/api-response.decorator';
-import { CommandBus } from 'src/common/command/command-bus';
-import { ICommandResult } from 'src/common/command/command.interface';
-import { CreateQuizSetDto } from 'src/modules/quiz/application/dto/create-quiz-set.dto';
-import { UpdateQuizSetDto } from 'src/modules/quiz/application/dto/update-quiz-set.dto';
-import { QuizSetDto } from 'src/modules/quiz/application/dto/quiz-set.dto';
-import { CreateQuizSetCommand } from 'src/modules/quiz/presentation/commands/create-quiz-set.command';
-import { UpdateQuizSetCommand } from 'src/modules/quiz/presentation/commands/update-quiz-set.command';
-import { DeleteQuizSetCommand } from 'src/modules/quiz/presentation/commands/delete-quiz-set.command';
-import { GetQuizSetCommand } from 'src/modules/quiz/presentation/commands/get-quiz-set.command';
-import { GetQuizSetsCommand } from 'src/modules/quiz/presentation/commands/get-quiz-sets.command';
-import { ActivateQuizSetCommand } from 'src/modules/quiz/presentation/commands/activate-quiz-set.command';
-import { DeactivateQuizSetCommand } from 'src/modules/quiz/presentation/commands/deactivate-quiz-set.command';
-import {
-  IQuizSetRepository,
-  QUIZ_SET_REPOSITORY_TOKEN,
-} from 'src/modules/quiz/infrastructure/repository/quiz-set.repository.interface';
-import { Inject } from '@nestjs/common';
-import { QuizSetListQueryDto } from 'src/modules/quiz/application/dto/quiz-set-list-query.dto';
+import { Body, Controller, Delete, Get, Param, Post, Put, Query } from '@nestjs/common';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { CommandBus } from '@common/command/command-bus';
+import { ApiCommandResponse } from '@common/command/api-response.decorator';
+import { QuizSetDto } from '@module/quiz/application/dto/quiz-set.dto';
+import { ICommandResult } from '@common/command/command.interface';
+import { CreateQuizSetDto } from '@module/quiz/application/dto/create-quiz-set.dto';
+import { CreateQuizSetCommand } from '@module/quiz/presentation/commands/create-quiz-set.command';
+import { QuizSetListQueryDto } from '@module/quiz/application/dto/quiz-set-list-query.dto';
+import { GetQuizSetsCommand } from '@module/quiz/presentation/commands/get-quiz-sets.command';
+import { GetQuizSetCommand } from '@module/quiz/presentation/commands/get-quiz-set.command';
+import { UpdateQuizSetDto } from '@module/quiz/application/dto/update-quiz-set.dto';
+import { UpdateQuizSetCommand } from '@module/quiz/presentation/commands/update-quiz-set.command';
+import { DeleteQuizSetCommand } from '@module/quiz/presentation/commands/delete-quiz-set.command';
+import { ActivateQuizSetCommand } from '@module/quiz/presentation/commands/activate-quiz-set.command';
+import { DeactivateQuizSetCommand } from '@module/quiz/presentation/commands/deactivate-quiz-set.command';
 
 @ApiTags('Quiz Sets')
 @Controller('quiz-sets')
 export class QuizSetController {
-  constructor(
-    private readonly commandBus: CommandBus,
-    @Inject(QUIZ_SET_REPOSITORY_TOKEN)
-    private readonly quizSetRepository: IQuizSetRepository,
-  ) {}
+  constructor(private readonly commandBus: CommandBus) {}
 
   @Post()
   @ApiOperation({ summary: '퀴즈 세트 생성' })
   @ApiCommandResponse(201, '퀴즈 세트 생성 성공', QuizSetDto)
-  async create(
-    @Body() dto: CreateQuizSetDto,
-  ): Promise<ICommandResult<QuizSetDto>> {
+  async create(@Body() dto: CreateQuizSetDto): Promise<ICommandResult<QuizSetDto>> {
     console.log(`[QuizSetController] QuizSet 생성: title=${dto.title}`);
     const command = new CreateQuizSetCommand(dto);
     return await this.commandBus.execute<QuizSetDto>(command);
@@ -57,12 +32,8 @@ export class QuizSetController {
   @Get()
   @ApiOperation({ summary: '퀴즈 세트 목록 조회' })
   @ApiCommandResponse(200, '퀴즈 세트 목록 조회 성공', QuizSetDto, true)
-  async findAll(
-    @Query() query: QuizSetListQueryDto,
-  ): Promise<ICommandResult<QuizSetDto[]>> {
-    console.log(
-      `[QuizSetController] QuizSet 목록 조회: query=${JSON.stringify(query)}`,
-    );
+  async findAll(@Query() query: QuizSetListQueryDto): Promise<ICommandResult<QuizSetDto[]>> {
+    console.log(`[QuizSetController] QuizSet 목록 조회: query=${JSON.stringify(query)}`);
     const command = new GetQuizSetsCommand(query);
     return await this.commandBus.execute<QuizSetDto[]>(command);
   }
@@ -90,10 +61,7 @@ export class QuizSetController {
   @Put(':id')
   @ApiOperation({ summary: '퀴즈 세트 수정' })
   @ApiCommandResponse(200, '퀴즈 세트 수정 성공', QuizSetDto)
-  async update(
-    @Param('id') id: string,
-    @Body() dto: UpdateQuizSetDto,
-  ): Promise<ICommandResult<QuizSetDto>> {
+  async update(@Param('id') id: string, @Body() dto: UpdateQuizSetDto): Promise<ICommandResult<QuizSetDto>> {
     console.log(`[QuizSetController] QuizSet 수정: id=${id}`);
     const command = new UpdateQuizSetCommand(id, dto);
     return await this.commandBus.execute<QuizSetDto>(command);

@@ -1,11 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import {
-  IsBoolean,
-  IsDateString,
-  IsInt,
-  IsOptional,
-  IsString,
-} from 'class-validator';
+import { IsBoolean, IsDateString, IsInt, IsOptional, IsString } from 'class-validator';
 
 export class UpdateQuizSetDto {
   @ApiProperty({

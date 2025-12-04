@@ -20,24 +20,10 @@ export class Quiz {
   }
 
   update(question: string, order: number): Quiz {
-    return new Quiz(
-      this.id,
-      question,
-      order,
-      this.quizSetId,
-      this.createdAt,
-      new Date(),
-    );
+    return new Quiz(this.id, question, order, this.quizSetId, this.createdAt, new Date());
   }
 
   updateOrder(newOrder: number): Quiz {
-    return new Quiz(
-      this.id,
-      this.question,
-      newOrder,
-      this.quizSetId,
-      this.createdAt,
-      new Date(),
-    );
+    return new Quiz(this.id, this.question, newOrder, this.quizSetId, this.createdAt, new Date());
   }
 }

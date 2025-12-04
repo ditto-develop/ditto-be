@@ -47,14 +47,7 @@ export class QuizDto {
   @IsDate()
   updatedAt: Date;
 
-  constructor(
-    id: string,
-    question: string,
-    quizSetId: string,
-    order: number | null,
-    createdAt: Date,
-    updatedAt: Date,
-  ) {
+  constructor(id: string, question: string, quizSetId: string, order: number | null, createdAt: Date, updatedAt: Date) {
     this.id = id;
     this.question = question;
     this.quizSetId = quizSetId;
@@ -71,13 +64,6 @@ export class QuizDto {
     createdAt: Date;
     updatedAt: Date;
   }) {
-    return new QuizDto(
-      quiz.id,
-      quiz.question,
-      quiz.quizSetId,
-      quiz.order,
-      quiz.createdAt,
-      quiz.updatedAt,
-    );
+    return new QuizDto(quiz.id, quiz.question, quiz.quizSetId, quiz.order, quiz.createdAt, quiz.updatedAt);
   }
 }

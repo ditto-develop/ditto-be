@@ -5,7 +5,7 @@ import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
 import { writeFileSync } from 'node:fs';
 import { version } from '../package.json';
-import { GlobalExceptionFilter } from 'src/common/exceptions/exception.filter';
+import { GlobalExceptionFilter } from '@common/exceptions/exception.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -27,9 +27,7 @@ async function bootstrap() {
 
   const config = new DocumentBuilder()
     .setTitle('Ditto API')
-    .setDescription(
-      'Start Game -> Solve Quiz -> Match Results -> Save Email -> Share (MVP)',
-    )
+    .setDescription('Start Game -> Solve Quiz -> Match Results -> Save Email -> Share (MVP)')
     .setVersion(version)
     .addBearerAuth(
       {

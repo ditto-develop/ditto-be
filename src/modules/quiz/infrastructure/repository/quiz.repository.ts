@@ -1,7 +1,7 @@
+import { PrismaService } from '@module/common/prisma/prisma.service';
+import { Quiz } from '@module/quiz/domain/entities/quiz.entity';
+import { IQuizRepository } from '@module/quiz/infrastructure/repository/quiz.repository.interface';
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from 'src/modules/common/prisma/prisma.service';
-import { Quiz } from 'src/modules/quiz/domain/entities/quiz.entity';
-import { IQuizRepository } from 'src/modules/quiz/infrastructure/repository/quiz.repository.interface';
 
 @Injectable()
 export class QuizRepository implements IQuizRepository {
@@ -30,13 +30,6 @@ export class QuizRepository implements IQuizRepository {
     createdAt: Date;
     updatedAt: Date;
   }): Quiz {
-    return Quiz.create(
-      quiz.id,
-      quiz.question,
-      quiz.order,
-      quiz.quizSetId,
-      quiz.createdAt,
-      quiz.updatedAt,
-    );
+    return Quiz.create(quiz.id, quiz.question, quiz.order, quiz.quizSetId, quiz.createdAt, quiz.updatedAt);
   }
 }

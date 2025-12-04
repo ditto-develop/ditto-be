@@ -1,15 +1,15 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { QuizSet } from 'src/modules/quiz/domain/entities/quiz-set.entity';
+import { QuizSet } from '@module/quiz/domain/entities/quiz-set.entity';
 import {
   IQuizSetRepository,
   QUIZ_SET_REPOSITORY_TOKEN,
-} from 'src/modules/quiz/infrastructure/repository/quiz-set.repository.interface';
+} from '@module/quiz/infrastructure/repository/quiz-set.repository.interface';
+import { Inject, Injectable } from '@nestjs/common';
 
 @Injectable()
 export class ActivateQuizSetUseCase {
   constructor(
     @Inject(QUIZ_SET_REPOSITORY_TOKEN)
-    private readonly quizSetRepository: IQuizSetRepository,
+    private readonly quizSetRepo: IQuizSetRepository,
   ) {
     console.log('[ActivateQuizSetUseCase] ActivateQuizSetUseCase 초기화');
   }
@@ -18,7 +18,7 @@ export class ActivateQuizSetUseCase {
     console.log(`[ActivateQuizSetUseCase] QuizSet 활성화 시작: id=${id}`);
 
     // QuizSet이 존재하는지 확인
-    const quizSet = await this.quizSetRepository.findById(id);
+    const quizSet = await this.quizSetRepo.findById(id);
     if (!quizSet) {
       throw new Error(`퀴즈 세트를 찾을 수 없습니다: ${id}`);
     }
@@ -30,7 +30,7 @@ export class ActivateQuizSetUseCase {
 
     // QuizSet 활성화 (new QuizSet 인스턴스로 생성)
     const activatedQuizSet = quizSet.activate();
-    const saved = await this.quizSetRepository.update(activatedQuizSet);
+    const saved = await this.quizSetRepo.update(activatedQuizSet);
 
     console.log(`[ActivateQuizSetUseCase] QuizSet 활성화 완료: id=${saved.id}`);
     return saved;

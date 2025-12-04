@@ -1,12 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import {
-  IsDateString,
-  IsInt,
-  IsOptional,
-  IsString,
-  Min,
-} from 'class-validator';
-
+import { IsDateString, IsInt, IsOptional, IsString, Min } from 'class-validator';
 export class CreateQuizSetDto {
   @ApiProperty({
     description: '주차',
