@@ -1,7 +1,6 @@
 import { CommandBus } from '@common/command/command-bus';
 import { CommandBusModule } from '@common/command/command-bus.module';
-import { COMMAND_HANDLER_METADATA } from '@common/command/command-handler.decorator';
-import { ICommand } from '@common/command/command.interface';
+import { registerCommandHandlers } from '@common/command/command-handler-registry.util';
 import { CommonModule } from '@module/common/common.module';
 import { ActivateQuizSetUseCase } from '@module/quiz/application/usecases/activate-quiz-set.usecase';
 import { CreateQuizSetUseCase } from '@module/quiz/application/usecases/create-quiz-set.usecase';
@@ -83,30 +82,22 @@ export class QuizModule implements OnModuleInit {
   onModuleInit() {
     console.log('[QuizModule] 핸들러 등록 시작');
 
-    const handlers = [
-      { handler: this.createQuizHandler, class: CreateQuizHandler },
-      { handler: this.createQuizSetHandler, class: CreateQuizSetHandler },
-      { handler: this.updateQuizSetHandler, class: UpdateQuizSetHandler },
-      { handler: this.deleteQuizSetHandler, class: DeleteQuizSetHandler },
-      { handler: this.getQuizSetHandler, class: GetQuizSetHandler },
-      { handler: this.getQuizSetsHandler, class: GetQuizSetsHandler },
-      { handler: this.activateQuizSetHandler, class: ActivateQuizSetHandler },
-      {
-        handler: this.deactivateQuizSetHandler,
-        class: DeactivateQuizSetHandler,
-      },
-    ];
-
-    handlers.forEach(({ handler, class: handlerClass }) => {
-      const commandType = Reflect.getMetadata(COMMAND_HANDLER_METADATA, handlerClass) as new (
-        ...args: any[]
-      ) => ICommand;
-      if (commandType) {
-        const commandName = commandType.name;
-        this.commandBus.registerHandler(commandName, handler);
-        console.log(`[QuizModule] 핸들러 등록: ${handlerClass.name} -> ${commandName}`);
-      }
-    });
-    console.log('[QuizModule] 핸들러 등록 완료');
+    registerCommandHandlers(
+      this.commandBus,
+      [
+        { handler: this.createQuizHandler, class: CreateQuizHandler },
+        { handler: this.createQuizSetHandler, class: CreateQuizSetHandler },
+        { handler: this.updateQuizSetHandler, class: UpdateQuizSetHandler },
+        { handler: this.deleteQuizSetHandler, class: DeleteQuizSetHandler },
+        { handler: this.getQuizSetHandler, class: GetQuizSetHandler },
+        { handler: this.getQuizSetsHandler, class: GetQuizSetsHandler },
+        { handler: this.activateQuizSetHandler, class: ActivateQuizSetHandler },
+        {
+          handler: this.deactivateQuizSetHandler,
+          class: DeactivateQuizSetHandler,
+        },
+      ],
+      'QuizModule',
+    );
   }
 }
