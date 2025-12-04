@@ -13,19 +13,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum Gender {
-  MAIL
-  FEMAIL
-  OTHER
-  UNKNOWN
-}
-
-enum RoleName {
-  SUPER_ADMIN
-  ADMIN
-  USER
-}
-
 enum SocialProvider {
   KAKAO
   GOOGLE
@@ -49,7 +36,7 @@ model User {
   passwordHash String?
 
   // 프로필 정보
-  gender    Gender
+  gender    String
   age       Int
   birthDate DateTime?
 
@@ -67,7 +54,8 @@ model User {
 
 model Role {
   id    Int        @id @default(autoincrement())
-  name  RoleName   @unique
+  name  String
+  code  String     @unique
   users UserRole[]
 
   createdAt DateTime @default(now())
