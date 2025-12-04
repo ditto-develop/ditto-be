@@ -1,4 +1,4 @@
-import { Quiz } from 'src/modules/quiz/domain/entities/quiz.entity';
+import { Quiz } from '@module/quiz/domain/entities/quiz.entity';
 
 /**
  * Quiz Repository 인터페이스

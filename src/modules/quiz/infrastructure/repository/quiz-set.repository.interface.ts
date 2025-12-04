@@ -1,4 +1,4 @@
-import { QuizSet } from 'src/modules/quiz/domain/entities/quiz-set.entity';
+import { QuizSet } from '@module/quiz/domain/entities/quiz-set.entity';
 
 /**
  * QuizSet Repository 인터페이스
@@ -63,11 +63,7 @@ export interface IQuizSetRepository {
   /**
    * 다중 필터로 QuizSet 목록 조회
    */
-  findByFilters(
-    week?: number,
-    category?: string,
-    isActive?: boolean,
-  ): Promise<QuizSet[]>;
+  findByFilters(week?: number, category?: string, isActive?: boolean): Promise<QuizSet[]>;
 }
 
 export const QUIZ_SET_REPOSITORY_TOKEN = Symbol('QuizSetRepository');

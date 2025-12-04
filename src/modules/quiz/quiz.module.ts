@@ -1,30 +1,30 @@
+import { CommandBus } from '@common/command/command-bus';
+import { CommandBusModule } from '@common/command/command-bus.module';
+import { COMMAND_HANDLER_METADATA } from '@common/command/command-handler.decorator';
+import { ICommand } from '@common/command/command.interface';
+import { CommonModule } from '@module/common/common.module';
+import { ActivateQuizSetUseCase } from '@module/quiz/application/usecases/activate-quiz-set.usecase';
+import { CreateQuizSetUseCase } from '@module/quiz/application/usecases/create-quiz-set.usecase';
+import { CreateQuizUseCase } from '@module/quiz/application/usecases/create-quiz.usecase';
+import { DeactivateQuizSetUseCase } from '@module/quiz/application/usecases/deactivate-quiz-set.usecase';
+import { DeleteQuizSetUseCase } from '@module/quiz/application/usecases/delete-quiz-set.usecase';
+import { GetQuizSetsUseCase } from '@module/quiz/application/usecases/get-quiz-sets.usecase';
+import { UpdateQuizSetUseCase } from '@module/quiz/application/usecases/update-quiz-set.usecase';
+import { QuizSetRepository } from '@module/quiz/infrastructure/repository/quiz-set.repository';
+import { QUIZ_SET_REPOSITORY_TOKEN } from '@module/quiz/infrastructure/repository/quiz-set.repository.interface';
+import { QuizRepository } from '@module/quiz/infrastructure/repository/quiz.repository';
+import { QUIZ_REPOSITORY_TOKEN } from '@module/quiz/infrastructure/repository/quiz.repository.interface';
+import { ActivateQuizSetHandler } from '@module/quiz/presentation/commands/handlers/activate-quiz-set.handler';
+import { CreateQuizSetHandler } from '@module/quiz/presentation/commands/handlers/create-quiz-set.handler';
+import { CreateQuizHandler } from '@module/quiz/presentation/commands/handlers/create-quiz.handler';
+import { DeactivateQuizSetHandler } from '@module/quiz/presentation/commands/handlers/deactivate-quiz-set.handler';
+import { DeleteQuizSetHandler } from '@module/quiz/presentation/commands/handlers/delete-quiz-set.handler';
+import { GetQuizSetHandler } from '@module/quiz/presentation/commands/handlers/get-quiz-set.handler';
+import { GetQuizSetsHandler } from '@module/quiz/presentation/commands/handlers/get-quiz-sets.handler';
+import { UpdateQuizSetHandler } from '@module/quiz/presentation/commands/handlers/update-quiz-set.handler';
+import { QuizSetController } from '@module/quiz/presentation/controller/quiz-set.controller';
+import { QuizController } from '@module/quiz/presentation/controller/quiz.controller';
 import { Module, OnModuleInit } from '@nestjs/common';
-import { CommandBus } from 'src/common/command/command-bus';
-import { CommandBusModule } from 'src/common/command/command-bus.module';
-import { COMMAND_HANDLER_METADATA } from 'src/common/command/command-handler.decorator';
-import { ICommand } from 'src/common/command/command.interface';
-import { CommonModule } from 'src/modules/common/common.module';
-import { CreateQuizUseCase } from 'src/modules/quiz/application/usecases/create-quiz.usecase';
-import { UpdateQuizSetUseCase } from 'src/modules/quiz/application/usecases/update-quiz-set.usecase';
-import { DeleteQuizSetUseCase } from 'src/modules/quiz/application/usecases/delete-quiz-set.usecase';
-import { QUIZ_REPOSITORY_TOKEN } from 'src/modules/quiz/infrastructure/repository/quiz.repository.interface';
-import { QuizRepository } from 'src/modules/quiz/infrastructure/repository/quiz.repository';
-import { QUIZ_SET_REPOSITORY_TOKEN } from 'src/modules/quiz/infrastructure/repository/quiz-set.repository.interface';
-import { QuizSetRepository } from 'src/modules/quiz/infrastructure/repository/quiz-set.repository';
-import { CreateQuizHandler } from 'src/modules/quiz/presentation/commands/handlers/create-quiz.handler';
-import { CreateQuizSetHandler } from 'src/modules/quiz/presentation/commands/handlers/create-quiz-set.handler';
-import { UpdateQuizSetHandler } from 'src/modules/quiz/presentation/commands/handlers/update-quiz-set.handler';
-import { DeleteQuizSetHandler } from 'src/modules/quiz/presentation/commands/handlers/delete-quiz-set.handler';
-import { QuizController } from 'src/modules/quiz/presentation/controller/quiz.controller';
-import { QuizSetController } from 'src/modules/quiz/presentation/controller/quiz-set.controller';
-import { CreateQuizSetUseCase } from 'src/modules/quiz/application/usecases/create-quiz-set.usecase';
-import { GetQuizSetHandler } from 'src/modules/quiz/presentation/commands/handlers/get-quiz-set.handler';
-import { GetQuizSetsHandler } from 'src/modules/quiz/presentation/commands/handlers/get-quiz-sets.handler';
-import { ActivateQuizSetHandler } from 'src/modules/quiz/presentation/commands/handlers/activate-quiz-set.handler';
-import { DeactivateQuizSetHandler } from 'src/modules/quiz/presentation/commands/handlers/deactivate-quiz-set.handler';
-import { ActivateQuizSetUseCase } from 'src/modules/quiz/application/usecases/activate-quiz-set.usecase';
-import { DeactivateQuizSetUseCase } from 'src/modules/quiz/application/usecases/deactivate-quiz-set.usecase';
-import { GetQuizSetsUseCase } from 'src/modules/quiz/application/usecases/get-quiz-sets.usecase';
 
 const QuizRepositoryProvider = {
   provide: QUIZ_REPOSITORY_TOKEN,
@@ -98,16 +98,13 @@ export class QuizModule implements OnModuleInit {
     ];
 
     handlers.forEach(({ handler, class: handlerClass }) => {
-      const commandType = Reflect.getMetadata(
-        COMMAND_HANDLER_METADATA,
-        handlerClass,
-      ) as new (...args: any[]) => ICommand;
+      const commandType = Reflect.getMetadata(COMMAND_HANDLER_METADATA, handlerClass) as new (
+        ...args: any[]
+      ) => ICommand;
       if (commandType) {
         const commandName = commandType.name;
         this.commandBus.registerHandler(commandName, handler);
-        console.log(
-          `[QuizModule] 핸들러 등록: ${handlerClass.name} -> ${commandName}`,
-        );
+        console.log(`[QuizModule] 핸들러 등록: ${handlerClass.name} -> ${commandName}`);
       }
     });
     console.log('[QuizModule] 핸들러 등록 완료');

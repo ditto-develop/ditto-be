@@ -1,5 +1,5 @@
-import { ICommand } from 'src/common/command/command.interface';
-import { UpdateQuizSetDto } from 'src/modules/quiz/application/dto/update-quiz-set.dto';
+import { ICommand } from '@common/command/command.interface';
+import { UpdateQuizSetDto } from '@module/quiz/application/dto/update-quiz-set.dto';
 
 export class UpdateQuizSetCommand implements ICommand {
   readonly commandId?: string;

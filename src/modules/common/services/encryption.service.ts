@@ -53,11 +53,7 @@ export class EncryptionService {
       const iv = crypto.randomBytes(this.ivLength);
 
       // 암호화기 생성
-      const cipher = crypto.createCipheriv(
-        this.algorithm,
-        this.encryptionKey,
-        iv,
-      );
+      const cipher = crypto.createCipheriv(this.algorithm, this.encryptionKey, iv);
 
       // 암호화
       let encrypted = cipher.update(plainText, 'utf8', 'base64');
@@ -67,11 +63,7 @@ export class EncryptionService {
       const authTag = (cipher as crypto.CipherGCM).getAuthTag();
 
       // IV:암호문:AuthTag 형식으로 결합하여 Base64 인코딩
-      const combined = Buffer.concat([
-        iv,
-        Buffer.from(encrypted, 'base64'),
-        authTag,
-      ]);
+      const combined = Buffer.concat([iv, Buffer.from(encrypted, 'base64'), authTag]);
 
       return combined.toString('base64');
     } catch (error) {
@@ -110,17 +102,10 @@ export class EncryptionService {
       // IV:암호문:AuthTag 형식으로 분리
       const iv = combined.subarray(0, this.ivLength);
       const authTag = combined.subarray(combined.length - this.authTagLength);
-      const ciphertext = combined.subarray(
-        this.ivLength,
-        combined.length - this.authTagLength,
-      );
+      const ciphertext = combined.subarray(this.ivLength, combined.length - this.authTagLength);
 
       // 복호화기 생성
-      const decipher = crypto.createDecipheriv(
-        this.algorithm,
-        this.encryptionKey,
-        iv,
-      );
+      const decipher = crypto.createDecipheriv(this.algorithm, this.encryptionKey, iv);
       (decipher as crypto.DecipherGCM).setAuthTag(authTag);
 
       // 복호화

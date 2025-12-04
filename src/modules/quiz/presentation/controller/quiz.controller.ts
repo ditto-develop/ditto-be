@@ -1,16 +1,10 @@
-import {
-  Body,
-  Controller,
-  Post,
-  UsePipes,
-  ValidationPipe,
-} from '@nestjs/common';
+import { CommandBus } from '@common/command/command-bus';
+import { ICommandResult } from '@common/command/command.interface';
+import { CreateQuizDto } from '@module/quiz/application/dto/create-quiz.dto';
+import { QuizDto } from '@module/quiz/application/dto/quiz.dto';
+import { CreateQuizCommand } from '@module/quiz/presentation/commands/create-quiz.command';
+import { Body, Controller, Post, UsePipes, ValidationPipe } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { CommandBus } from 'src/common/command/command-bus';
-import { ICommandResult } from 'src/common/command/command.interface';
-import { CreateQuizDto } from 'src/modules/quiz/application/dto/create-quiz.dto';
-import { QuizDto } from 'src/modules/quiz/application/dto/quiz.dto';
-import { CreateQuizCommand } from 'src/modules/quiz/presentation/commands/create-quiz.command';
 
 @ApiTags('Quizzes')
 @Controller('quizzes')

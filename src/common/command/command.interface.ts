@@ -1,3 +1,5 @@
+import { ApiProperty } from '@nestjs/swagger';
+
 /**
  * Command 인터페이스
  * 모든 Command는 이 인터페이스를 구현해야 함
@@ -8,8 +10,6 @@ export interface ICommand {
    */
   readonly commandId?: string;
 }
-
-import { ApiProperty } from '@nestjs/swagger';
 
 /**
  * Command 결과 인터페이스

@@ -1,11 +1,11 @@
+import { CommandBusModule } from '@common/command/command-bus.module';
+import configuration from '@config/configuration';
+import { CommonModule } from '@module/common/common.module';
+import { PrismaModule } from '@module/common/prisma/prisma.module';
+import { QuizModule } from '@module/quiz/quiz.module';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { CommandBusModule } from 'src/common/command/command-bus.module';
-import configuration from 'src/config/configuration';
-import { validate } from 'src/config/env.validation';
-import { CommonModule } from 'src/modules/common/common.module';
-import { PrismaModule } from 'src/modules/common/prisma/prisma.module';
-import { QuizModule } from 'src/modules/quiz/quiz.module';
+import { validate } from 'class-validator';
 
 @Module({
   imports: [

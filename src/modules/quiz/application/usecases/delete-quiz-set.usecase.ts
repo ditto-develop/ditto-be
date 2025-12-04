@@ -1,8 +1,8 @@
-import { Inject, Injectable } from '@nestjs/common';
 import {
   IQuizSetRepository,
   QUIZ_SET_REPOSITORY_TOKEN,
-} from 'src/modules/quiz/infrastructure/repository/quiz-set.repository.interface';
+} from '@module/quiz/infrastructure/repository/quiz-set.repository.interface';
+import { Inject, Injectable } from '@nestjs/common';
 
 @Injectable()
 export class DeleteQuizSetUseCase {
@@ -25,9 +25,7 @@ export class DeleteQuizSetUseCase {
     // QuizSet에 속한 퀴즈가 있는지 확인
     const quizCount = await this.quizSetRepository.countQuizzes(id);
     if (quizCount > 0) {
-      throw new Error(
-        `퀴즈 세트에 ${quizCount}개의 퀴즈가 있어 삭제할 수 없습니다. 먼저 모든 퀴즈를 삭제해주세요.`,
-      );
+      throw new Error(`퀴즈 세트에 ${quizCount}개의 퀴즈가 있어 삭제할 수 없습니다. 먼저 모든 퀴즈를 삭제해주세요.`);
     }
 
     // QuizSet 삭제

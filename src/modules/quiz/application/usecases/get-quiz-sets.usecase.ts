@@ -1,10 +1,10 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { QuizSet } from 'src/modules/quiz/domain/entities/quiz-set.entity';
-import { QuizSetListQueryDto } from 'src/modules/quiz/application/dto/quiz-set-list-query.dto';
+import { QuizSetListQueryDto } from '@module/quiz/application/dto/quiz-set-list-query.dto';
+import { QuizSet } from '@module/quiz/domain/entities/quiz-set.entity';
 import {
   IQuizSetRepository,
   QUIZ_SET_REPOSITORY_TOKEN,
-} from 'src/modules/quiz/infrastructure/repository/quiz-set.repository.interface';
+} from '@module/quiz/infrastructure/repository/quiz-set.repository.interface';
+import { Inject, Injectable } from '@nestjs/common';
 
 @Injectable()
 export class GetQuizSetsUseCase {
@@ -16,19 +16,13 @@ export class GetQuizSetsUseCase {
   }
 
   async execute(query: QuizSetListQueryDto): Promise<QuizSet[]> {
-    console.log(
-      `[GetQuizSetsUseCase] 퀴즈 세트 목록 조회 시작: query=${JSON.stringify(
-        query,
-      )}`,
-    );
+    console.log(`[GetQuizSetsUseCase] 퀴즈 세트 목록 조회 시작: query=${JSON.stringify(query)}`);
 
     let quizSets: QuizSet[];
 
     // 활성화 여부 필터링
     if (query.isActive !== undefined) {
-      quizSets = await this.quizSetRepository.findByActiveStatus(
-        query.isActive,
-      );
+      quizSets = await this.quizSetRepository.findByActiveStatus(query.isActive);
     }
     // 주차 필터링
     else if (query.week !== undefined) {
@@ -44,9 +38,7 @@ export class GetQuizSetsUseCase {
       quizSets = await this.quizSetRepository.findAll();
     }
 
-    console.log(
-      `[GetQuizSetsUseCase] 퀴즈 세트 목록 조회 완료: count=${quizSets.length}`,
-    );
+    console.log(`[GetQuizSetsUseCase] 퀴즈 세트 목록 조회 완료: count=${quizSets.length}`);
     return quizSets;
   }
 }
