@@ -13,15 +13,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum SocialProvider {
-  KAKAO
-  GOOGLE
-  NAVER
-  APPLE
-  GITHUB
-  OTHER
-}
-
 model User {
   id String @id @default(cuid())
 
@@ -48,38 +39,36 @@ model User {
   updatedAt DateTime @updatedAt
 
   // 관계
-  roles          UserRole[]
+  roleId         Int
+  role           Role                @relation(fields: [roleId], references: [id])
   socialAccounts UserSocialAccount[]
+
+  @@map("users")
 }
 
 model Role {
-  id    Int        @id @default(autoincrement())
-  name  String
-  code  String     @unique
-  users UserRole[]
+  id   Int    @id @default(autoincrement())
+  name String
+  code String @unique
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-}
 
-model UserRole {
-  userId String
-  roleId Int
+  users User[]
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  role Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
-
-  @@id([userId, roleId])
+  @@map("roles")
 }
 
 model UserSocialAccount {
-  id             Int
+  id             Int    @id @default(autoincrement())
   userId         String
-  provider       SocialProvider
+  provider       String
   providerUserId String
-  user           User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user           User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerUserId])
+  @@unique([userId, provider])
+  @@map("user_social_accounts")
 }
 
 model QuizSet {

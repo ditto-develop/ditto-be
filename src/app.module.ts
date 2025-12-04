@@ -4,6 +4,7 @@ import { CommonModule } from '@module/common/common.module';
 import { PrismaModule } from '@module/common/prisma/prisma.module';
 import { QuizModule } from '@module/quiz/quiz.module';
 import { RoleModule } from '@module/role/role.module';
+import { UserModule } from '@module/user/user.module';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { validate } from 'class-validator';
@@ -20,6 +21,7 @@ import { validate } from 'class-validator';
     CommonModule,
     CommandBusModule,
     RoleModule,
+    UserModule,
     QuizModule,
   ],
 })
