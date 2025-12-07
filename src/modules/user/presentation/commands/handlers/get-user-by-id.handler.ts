@@ -14,10 +14,10 @@ export class GetUserByIdHandler implements ICommandHandler<GetUserByIdCommand, U
   }
 
   async execute(command: GetUserByIdCommand): Promise<ICommandResult<UserDto>> {
-    console.log(`[GetUserByIdHandler] Command 실행 시작: id=${command.id}`);
+    console.log(`[GetUserByIdHandler] Command 실행 시작: id=${command.id}, requestUserId=${command.requestUserId}`);
 
     try {
-      const user = await this.getUserByIdUseCase.execute(command.id);
+      const user = await this.getUserByIdUseCase.execute(command.id, command.requestUserId);
       const userDto = UserDto.fromDomain(user);
 
       console.log(`[GetUserByIdHandler] Command 실행 완료: 사용자 조회 성공`);

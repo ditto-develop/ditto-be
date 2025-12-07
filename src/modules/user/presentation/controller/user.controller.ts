@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
 import { ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { CommandBus } from '@common/command/command-bus';
 import { ApiCommandResponse } from '@common/command/api-response.decorator';
@@ -9,6 +9,9 @@ import {
   CreateUserDto,
   UpdateUserDto,
   UserSocialAccountDto,
+  LoginDto,
+  SocialLoginDto,
+  LoginResponseDto,
 } from '@module/user/application/dto/user.dto';
 import { CreateAdminUserCommand } from '@module/user/presentation/commands/create-admin-user.command';
 import { CreateUserCommand } from '@module/user/presentation/commands/create-user.command';
@@ -20,6 +23,13 @@ import { GetMyProfileCommand } from '@module/user/presentation/commands/get-my-p
 import { LeaveUserCommand } from '@module/user/presentation/commands/leave-user.command';
 import { RemoveSocialAccountCommand } from '@module/user/presentation/commands/remove-social-account.command';
 import { UpdateUserCommand } from '@module/user/presentation/commands/update-user.command';
+import { LoginCommand } from '@module/user/presentation/commands/login.command';
+import { SocialLoginCommand } from '@module/user/presentation/commands/social-login.command';
+import { JwtAuthGuard } from '@module/user/infrastructure/guards/jwt-auth.guard';
+import { RolesGuard } from '@module/user/infrastructure/guards/roles.guard';
+import { Roles } from '@module/user/infrastructure/decorators/roles.decorator';
+import { CurrentUser } from '@module/user/infrastructure/decorators/current-user.decorator';
+import { RoleCode } from '@module/role/domain/entities/role.entity';
 
 @ApiTags('User')
 @Controller('users')
@@ -47,90 +57,102 @@ export class UserController {
   }
 
   @Get()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(RoleCode.ADMIN, RoleCode.SUPER_ADMIN)
   @ApiOperation({ summary: '모든 사용자 조회', description: '관리자가 모든 사용자를 조회합니다.' })
   @ApiCommandResponse(200, '사용자 목록 조회 성공', UserDto, true)
-  async findAll(): Promise<ICommandResult<UserDto[]>> {
+  async findAll(@CurrentUser() currentUser): Promise<ICommandResult<UserDto[]>> {
     console.log('[UserController] 모든 사용자 조회 요청');
-    // TODO: 권한 체크 (관리자만 가능)
-    const command = new GetAllUsersCommand();
+    const command = new GetAllUsersCommand(currentUser.id);
     return await this.commandBus.execute<UserDto[]>(command);
   }
 
   @Get(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(RoleCode.ADMIN, RoleCode.SUPER_ADMIN, RoleCode.USER)
   @ApiOperation({ summary: '사용자 상세 조회', description: '특정 사용자의 상세 정보를 조회합니다.' })
   @ApiParam({ name: 'id', type: 'string', description: '사용자 ID' })
   @ApiCommandResponse(200, '사용자 조회 성공', UserDto, false)
   @ApiCommandResponse(404, '사용자를 찾을 수 없음')
-  async findById(@Param('id') id: string): Promise<ICommandResult<UserDto>> {
+  async findById(@Param('id') id: string, @CurrentUser() currentUser): Promise<ICommandResult<UserDto>> {
     console.log(`[UserController] 사용자 조회 요청: id=${id}`);
-    // TODO: 권한 체크 (관리자 또는 본인만 가능)
-    const command = new GetUserByIdCommand(id);
+
+    const command = new GetUserByIdCommand(id, currentUser.id);
     return await this.commandBus.execute<UserDto>(command);
   }
 
   @Get('/me/profile')
+  @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: '본인 정보 조회', description: '현재 로그인한 사용자의 정보를 조회합니다.' })
   @ApiCommandResponse(200, '본인 정보 조회 성공', UserDto, false)
-  async getMyProfile(): Promise<ICommandResult<UserDto>> {
+  async getMyProfile(@CurrentUser() user): Promise<ICommandResult<UserDto>> {
     console.log('[UserController] 본인 정보 조회 요청');
-    // TODO: 현재 사용자 ID 가져오기
-    const currentUserId = 'temp-user-id'; // 임시
-    const command = new GetMyProfileCommand(currentUserId);
+    const command = new GetMyProfileCommand(user.id);
     return await this.commandBus.execute<UserDto>(command);
   }
 
   @Patch(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(RoleCode.ADMIN, RoleCode.SUPER_ADMIN, RoleCode.USER)
   @ApiOperation({ summary: '사용자 정보 수정', description: '사용자 정보를 수정합니다.' })
   @ApiParam({ name: 'id', type: 'string', description: '사용자 ID' })
   @ApiCommandResponse(200, '사용자 정보 수정 성공', UserDto, false)
-  async update(@Param('id') id: string, @Body() dto: UpdateUserDto): Promise<ICommandResult<UserDto>> {
+  async update(
+    @Param('id') id: string,
+    @Body() dto: UpdateUserDto,
+    @CurrentUser() currentUser,
+  ): Promise<ICommandResult<UserDto>> {
     console.log(`[UserController] 사용자 정보 수정 요청: id=${id}`);
-    // TODO: 현재 사용자 ID 가져오기
-    const currentUserId = 'temp-user-id'; // 임시
-    const command = new UpdateUserCommand(id, dto, currentUserId);
+
+    const command = new UpdateUserCommand(id, dto, currentUser.id);
     return await this.commandBus.execute<UserDto>(command);
   }
 
   @Delete(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(RoleCode.ADMIN, RoleCode.SUPER_ADMIN)
   @ApiOperation({ summary: '사용자 영구 삭제', description: '관리자가 사용자를 영구 삭제합니다.' })
   @ApiParam({ name: 'id', type: 'string', description: '사용자 ID' })
   @ApiCommandResponse(200, '사용자 삭제 성공')
-  async delete(@Param('id') id: string): Promise<ICommandResult<void>> {
+  async delete(@Param('id') id: string, @CurrentUser() currentUser): Promise<ICommandResult<void>> {
     console.log(`[UserController] 사용자 삭제 요청: id=${id}`);
-    // TODO: 현재 사용자 ID 가져오기
-    const currentUserId = 'temp-admin-id'; // 임시
-    const command = new DeleteUserCommand(id, currentUserId);
+    const command = new DeleteUserCommand(id, currentUser.id);
     return await this.commandBus.execute<void>(command);
   }
 
   @Post(':id/leave')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(RoleCode.USER)
   @ApiOperation({ summary: '사용자 탈퇴', description: '사용자를 탈퇴 처리합니다.' })
   @ApiParam({ name: 'id', type: 'string', description: '사용자 ID' })
   @ApiCommandResponse(200, '사용자 탈퇴 처리 성공', UserDto, false)
-  async leave(@Param('id') id: string): Promise<ICommandResult<UserDto>> {
+  async leave(@Param('id') id: string, @CurrentUser() currentUser): Promise<ICommandResult<UserDto>> {
     console.log(`[UserController] 사용자 탈퇴 요청: id=${id}`);
-    // TODO: 현재 사용자 ID 가져오기
-    const currentUserId = id; // 임시 (본인 탈퇴 가정)
-    const command = new LeaveUserCommand(id, currentUserId);
+
+    const command = new LeaveUserCommand(id, currentUser.id);
     return await this.commandBus.execute<UserDto>(command);
   }
 
   @Post(':id/social-accounts')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(RoleCode.USER)
   @ApiOperation({ summary: '소셜 계정 추가', description: '사용자에게 소셜 계정을 추가합니다.' })
   @ApiParam({ name: 'id', type: 'string', description: '사용자 ID' })
   @ApiCommandResponse(201, '소셜 계정 추가 성공', UserSocialAccountDto, false)
   async addSocialAccount(
     @Param('id') userId: string,
     @Body() dto: { provider: string; providerUserId: string },
+    @CurrentUser() currentUser,
   ): Promise<ICommandResult<UserSocialAccountDto>> {
     console.log(`[UserController] 소셜 계정 추가 요청: userId=${userId}`);
-    // TODO: 현재 사용자 ID 가져오기
-    const currentUserId = userId; // 임시 (본인 계정 가정)
-    const command = new AddSocialAccountCommand(userId, dto, currentUserId);
+
+    const command = new AddSocialAccountCommand(userId, dto, currentUser.id);
     return await this.commandBus.execute<UserSocialAccountDto>(command);
   }
 
   @Delete(':id/social-accounts/:provider')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(RoleCode.USER)
   @ApiOperation({ summary: '소셜 계정 제거', description: '사용자의 소셜 계정을 제거합니다.' })
   @ApiParam({ name: 'id', type: 'string', description: '사용자 ID' })
   @ApiParam({ name: 'provider', type: 'string', description: '소셜 로그인 제공자' })
@@ -138,11 +160,31 @@ export class UserController {
   async removeSocialAccount(
     @Param('id') userId: string,
     @Param('provider') provider: string,
+    @CurrentUser() currentUser,
   ): Promise<ICommandResult<void>> {
     console.log(`[UserController] 소셜 계정 제거 요청: userId=${userId}, provider=${provider}`);
-    // TODO: 현재 사용자 ID 가져오기
-    const currentUserId = userId; // 임시 (본인 계정 가정)
-    const command = new RemoveSocialAccountCommand(userId, provider, currentUserId);
+
+    const command = new RemoveSocialAccountCommand(userId, provider, currentUser.id);
     return await this.commandBus.execute<void>(command);
+  }
+
+  @Post('/login')
+  @ApiOperation({ summary: '관리자 로그인', description: '관리자 계정으로 로그인합니다.' })
+  @ApiCommandResponse(200, '로그인 성공', LoginResponseDto, false)
+  @ApiCommandResponse(401, '인증 실패')
+  async login(@Body() dto: LoginDto): Promise<ICommandResult<LoginResponseDto>> {
+    console.log('[UserController] 관리자 로그인 요청');
+    const command = new LoginCommand(dto);
+    return await this.commandBus.execute<LoginResponseDto>(command);
+  }
+
+  @Post('/social-login')
+  @ApiOperation({ summary: '소셜 로그인', description: '소셜 계정으로 로그인합니다.' })
+  @ApiCommandResponse(200, '로그인 성공', LoginResponseDto, false)
+  @ApiCommandResponse(401, '인증 실패')
+  async socialLogin(@Body() dto: SocialLoginDto): Promise<ICommandResult<LoginResponseDto>> {
+    console.log('[UserController] 소셜 로그인 요청');
+    const command = new SocialLoginCommand(dto);
+    return await this.commandBus.execute<LoginResponseDto>(command);
   }
 }

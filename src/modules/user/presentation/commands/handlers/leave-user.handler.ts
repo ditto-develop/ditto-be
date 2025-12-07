@@ -14,13 +14,10 @@ export class LeaveUserHandler implements ICommandHandler<LeaveUserCommand, UserD
   }
 
   async execute(command: LeaveUserCommand): Promise<ICommandResult<UserDto>> {
-    console.log(`[LeaveUserHandler] Command 실행 시작: id=${command.id}`);
+    console.log(`[LeaveUserHandler] Command 실행 시작: id=${command.id}, currentUserId=${command.currentUserId}`);
 
     try {
-      // TODO: 인증 시스템 구현 후 currentUser 조회 로직 추가
-      const currentUser = { id: command.currentUserId, isAdmin: () => false } as any; // 임시
-
-      const user = await this.leaveUserUseCase.execute(command.id, currentUser);
+      const user = await this.leaveUserUseCase.execute(command.id, command.currentUserId);
       const userDto = UserDto.fromDomain(user);
 
       console.log(`[LeaveUserHandler] Command 실행 완료: 사용자 탈퇴 처리 성공`);

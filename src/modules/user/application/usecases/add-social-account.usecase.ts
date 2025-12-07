@@ -1,6 +1,5 @@
-import { BusinessRuleException } from '@common/exceptions/domain.exception';
+import { BusinessRuleException, EntityNotFoundException } from '@common/exceptions/domain.exception';
 import { Inject, Injectable } from '@nestjs/common';
-import { User } from '@module/user/domain/entities/user.entity';
 import { UserSocialAccount } from '@module/user/domain/entities/user-social-account.entity';
 import {
   USER_REPOSITORY_TOKEN,
@@ -25,18 +24,24 @@ export class AddSocialAccountUseCase {
     console.log('[AddSocialAccountUseCase] AddSocialAccountUseCase 초기화');
   }
 
-  async execute(userId: string, dto: AddSocialAccountDto, currentUser: User): Promise<UserSocialAccount> {
-    console.log(`[AddSocialAccountUseCase] 소셜 계정 추가 실행: userId=${userId}, provider=${dto.provider}`);
+  async execute(userId: string, dto: AddSocialAccountDto, currentUserId: string): Promise<UserSocialAccount> {
+    console.log(`[AddSocialAccountUseCase] 소셜 계정 추가 실행: userId=${userId}, provider=${dto.provider}, currentUserId=${currentUserId}`);
+
+    // 요청자 정보 조회
+    const currentUser = await this.userRepo.findById(currentUserId);
+    if (!currentUser) {
+      throw new EntityNotFoundException('요청자', currentUserId);
+    }
 
     // 대상 사용자 조회
     const targetUser = await this.userRepo.findById(userId);
     if (!targetUser) {
-      throw new BusinessRuleException('사용자를 찾을 수 없습니다.');
+      throw new EntityNotFoundException('사용자', userId);
     }
 
     // 권한 검증: 본인만 소셜 계정 추가 가능
     if (currentUser.id !== userId) {
-      throw new BusinessRuleException('본인의 소셜 계정만 추가할 수 있습니다.');
+      throw new BusinessRuleException('본인의 계정에만 소셜 계정을 추가할 수 있습니다.', 'SELF_OPERATION_ONLY');
     }
 
     // 소셜 계정 중복 검증

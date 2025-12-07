@@ -13,13 +13,10 @@ export class RemoveSocialAccountHandler implements ICommandHandler<RemoveSocialA
   }
 
   async execute(command: RemoveSocialAccountCommand): Promise<ICommandResult<void>> {
-    console.log(`[RemoveSocialAccountHandler] Command 실행 시작: userId=${command.userId}, provider=${command.provider}`);
+    console.log(`[RemoveSocialAccountHandler] Command 실행 시작: userId=${command.userId}, provider=${command.provider}, currentUserId=${command.currentUserId}`);
 
     try {
-      // TODO: 인증 시스템 구현 후 currentUser 조회 로직 추가
-      const currentUser = { id: command.currentUserId } as any; // 임시
-
-      await this.removeSocialAccountUseCase.execute(command.userId, command.provider, currentUser);
+      await this.removeSocialAccountUseCase.execute(command.userId, command.provider, command.currentUserId);
 
       console.log(`[RemoveSocialAccountHandler] Command 실행 완료: 소셜 계정 제거 성공`);
       return {

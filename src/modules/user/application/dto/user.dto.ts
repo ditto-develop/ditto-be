@@ -230,3 +230,31 @@ export class UpdateUserDto {
   @IsEmail()
   email?: string;
 }
+
+export class LoginDto {
+  @ApiProperty({ description: '관리자 사용자명' })
+  @IsString()
+  username: string;
+
+  @ApiProperty({ description: '비밀번호' })
+  @IsString()
+  password: string;
+}
+
+export class SocialLoginDto {
+  @ApiProperty({ description: '소셜 로그인 제공자' })
+  @IsString()
+  provider: string;
+
+  @ApiProperty({ description: '제공자의 사용자 ID' })
+  @IsString()
+  providerUserId: string;
+}
+
+export class LoginResponseDto {
+  @ApiProperty({ description: '액세스 토큰' })
+  accessToken: string;
+
+  @ApiProperty({ description: '사용자 정보' })
+  user: UserDto;
+}

@@ -14,13 +14,10 @@ export class UpdateUserHandler implements ICommandHandler<UpdateUserCommand, Use
   }
 
   async execute(command: UpdateUserCommand): Promise<ICommandResult<UserDto>> {
-    console.log(`[UpdateUserHandler] Command 실행 시작: id=${command.id}`);
+    console.log(`[UpdateUserHandler] Command 실행 시작: id=${command.id}, currentUserId=${command.currentUserId}`);
 
     try {
-      // TODO: 인증 시스템 구현 후 currentUser 조회 로직 추가
-      const currentUser = { id: command.currentUserId } as any; // 임시
-
-      const user = await this.updateUserUseCase.execute(command.id, command.dto, currentUser);
+      const user = await this.updateUserUseCase.execute(command.id, command.dto, command.currentUserId);
       const userDto = UserDto.fromDomain(user);
 
       console.log(`[UpdateUserHandler] Command 실행 완료: 사용자 정보 수정 성공`);

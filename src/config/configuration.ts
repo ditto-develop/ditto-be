@@ -9,6 +9,6 @@ export default () => ({
     url: process.env.DATABASE_URL || '',
   },
   encryption: {
-    key: process.env.ENCRYPTION_KEY || '',
+    key: process.env.ENCRYPTION_KEY || 'your-secret-key-change-in-production',
   },
 });

@@ -1,4 +1,4 @@
-import { BusinessRuleException } from '@common/exceptions/domain.exception';
+import { BusinessRuleException, EntityNotFoundException } from '@common/exceptions/domain.exception';
 import { Inject, Injectable } from '@nestjs/common';
 import { User, UserUpdateProps } from '@module/user/domain/entities/user.entity';
 import {
@@ -13,18 +13,24 @@ export class UpdateUserUseCase {
     console.log('[UpdateUserUseCase] UpdateUserUseCase 초기화');
   }
 
-  async execute(id: string, dto: UpdateUserDto, currentUser: User): Promise<User> {
-    console.log(`[UpdateUserUseCase] 사용자 정보 수정 실행: id=${id}`);
+  async execute(id: string, dto: UpdateUserDto, currentUserId: string): Promise<User> {
+    console.log(`[UpdateUserUseCase] 사용자 정보 수정 실행: id=${id}, currentUserId=${currentUserId}`);
+
+    // 요청자 정보 조회
+    const currentUser = await this.userRepo.findById(currentUserId);
+    if (!currentUser) {
+      throw new EntityNotFoundException('요청자', currentUserId);
+    }
 
     // 대상 사용자 조회
     const targetUser = await this.userRepo.findById(id);
     if (!targetUser) {
-      throw new BusinessRuleException('사용자를 찾을 수 없습니다.');
+      throw new EntityNotFoundException('사용자', id);
     }
 
-    // 권한 검증
-    if (!currentUser.isAdmin() && currentUser.id !== id) {
-      throw new BusinessRuleException('본인의 정보만 수정할 수 있습니다.');
+    // 권한 검증: 관리자이거나 본인만 수정 가능
+    if (!targetUser.canBeModifiedBy(currentUser)) {
+      throw new BusinessRuleException('수정 권한이 없습니다.', 'INSUFFICIENT_PERMISSIONS');
     }
 
     // 권한 검증 및 데이터 준비

@@ -14,13 +14,10 @@ export class AddSocialAccountHandler implements ICommandHandler<AddSocialAccount
   }
 
   async execute(command: AddSocialAccountCommand): Promise<ICommandResult<UserSocialAccountDto>> {
-    console.log(`[AddSocialAccountHandler] Command 실행 시작: userId=${command.userId}`);
+    console.log(`[AddSocialAccountHandler] Command 실행 시작: userId=${command.userId}, currentUserId=${command.currentUserId}`);
 
     try {
-      // TODO: 인증 시스템 구현 후 currentUser 조회 로직 추가
-      const currentUser = { id: command.currentUserId } as any; // 임시
-
-      const socialAccount = await this.addSocialAccountUseCase.execute(command.userId, command.dto, currentUser);
+      const socialAccount = await this.addSocialAccountUseCase.execute(command.userId, command.dto, command.currentUserId);
       const socialAccountDto = UserSocialAccountDto.fromDomain(socialAccount);
 
       console.log(`[AddSocialAccountHandler] Command 실행 완료: 소셜 계정 추가 성공`);

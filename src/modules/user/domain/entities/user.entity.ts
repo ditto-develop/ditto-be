@@ -104,6 +104,33 @@ export class User {
   }
 
   /**
+   * 현재 사용자가 이 사용자 정보를 접근할 수 있는지 확인
+   */
+  canBeAccessedBy(currentUser: User): boolean {
+    // 관리자는 모든 사용자 정보에 접근 가능
+    if (currentUser.isAdmin()) {
+      return true;
+    }
+
+    // 일반 사용자는 본인 정보만 접근 가능
+    return this.id === currentUser.id;
+  }
+
+  /**
+   * 현재 사용자가 이 사용자를 수정할 수 있는지 확인
+   */
+  canBeModifiedBy(currentUser: User): boolean {
+    return this.canBeAccessedBy(currentUser);
+  }
+
+  /**
+   * 현재 사용자가 이 사용자를 삭제할 수 있는지 확인 (관리자만)
+   */
+  canBeDeletedBy(currentUser: User): boolean {
+    return currentUser.isAdmin();
+  }
+
+  /**
    * 주어진 필드를 수정할 수 있는지 권한에 따라 확인
    */
   canModify(field: keyof User, currentUser: User): boolean {

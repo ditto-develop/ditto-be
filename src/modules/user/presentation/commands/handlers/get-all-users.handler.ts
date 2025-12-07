@@ -13,11 +13,11 @@ export class GetAllUsersHandler implements ICommandHandler<GetAllUsersCommand, U
     console.log('[GetAllUsersHandler] GetAllUsersHandler 초기화');
   }
 
-  async execute(_: GetAllUsersCommand): Promise<ICommandResult<UserDto[]>> {
-    console.log('[GetAllUsersHandler] Command 실행 시작');
+  async execute(command: GetAllUsersCommand): Promise<ICommandResult<UserDto[]>> {
+    console.log(`[GetAllUsersHandler] Command 실행 시작: requestUserId=${command.requestUserId}`);
 
     try {
-      const users = await this.getAllUsersUseCase.execute();
+      const users = await this.getAllUsersUseCase.execute(command.requestUserId);
       const userDtos = users.map((user) => UserDto.fromDomain(user));
 
       console.log(`[GetAllUsersHandler] Command 실행 완료: ${userDtos.length}개 사용자 조회`);

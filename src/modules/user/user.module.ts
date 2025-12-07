@@ -3,6 +3,8 @@ import { CommandBus } from '@common/command/command-bus';
 import { CommandBusModule } from '@common/command/command-bus.module';
 import { registerCommandHandlers } from '@common/command/command-handler-registry.util';
 import { RoleModule } from '@module/role/role.module';
+import { JwtModule, JwtModuleOptions } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
 import { UserRepository } from '@module/user/infrastructure/repository/user.repository';
 import { USER_REPOSITORY_TOKEN } from '@module/user/infrastructure/repository/user.repository.interface';
 import { UserSocialAccountRepository } from '@module/user/infrastructure/repository/user-social-account.repository';
@@ -28,6 +30,10 @@ import { GetUserByIdHandler } from '@module/user/presentation/commands/handlers/
 import { LeaveUserHandler } from '@module/user/presentation/commands/handlers/leave-user.handler';
 import { RemoveSocialAccountHandler } from '@module/user/presentation/commands/handlers/remove-social-account.handler';
 import { UpdateUserHandler } from '@module/user/presentation/commands/handlers/update-user.handler';
+import { LoginHandler } from '@module/user/presentation/commands/handlers/login.handler';
+import { SocialLoginHandler } from '@module/user/presentation/commands/handlers/social-login.handler';
+import { AuthService } from '@module/user/application/services/auth.service';
+import { LoginUseCase } from '@module/user/application/usecases/login.usecase';
 
 const UserRepositoryProvider = {
   provide: USER_REPOSITORY_TOKEN,
@@ -40,12 +46,30 @@ const UserSocialAccountRepositoryProvider = {
 };
 
 @Module({
-  imports: [CommandBusModule, RoleModule],
+  imports: [
+    CommandBusModule,
+    RoleModule,
+    JwtModule.registerAsync({
+      useFactory: (configService: ConfigService): JwtModuleOptions => {
+        const expiresIn = configService.get<string>('jwt.expiresIn') || '24h';
+        return {
+          secret: configService.get<string>('jwt.secret'),
+          signOptions: {
+            expiresIn: expiresIn as any,
+          },
+        };
+      },
+      inject: [ConfigService],
+    }),
+  ],
   controllers: [UserController],
   providers: [
     // Repositories
     UserRepositoryProvider,
     UserSocialAccountRepositoryProvider,
+
+    // Services
+    AuthService,
 
     // UseCases
     CreateAdminUserUseCase,
@@ -58,6 +82,7 @@ const UserSocialAccountRepositoryProvider = {
     LeaveUserUseCase,
     AddSocialAccountUseCase,
     RemoveSocialAccountUseCase,
+    LoginUseCase,
 
     // Handlers
     CreateAdminUserHandler,
@@ -70,6 +95,8 @@ const UserSocialAccountRepositoryProvider = {
     LeaveUserHandler,
     AddSocialAccountHandler,
     RemoveSocialAccountHandler,
+    LoginHandler,
+    SocialLoginHandler,
   ],
   exports: [USER_REPOSITORY_TOKEN, USER_SOCIAL_ACCOUNT_REPOSITORY_TOKEN],
 })
@@ -86,6 +113,8 @@ export class UserModule implements OnModuleInit {
     private readonly leaveUserHandler: LeaveUserHandler,
     private readonly addSocialAccountHandler: AddSocialAccountHandler,
     private readonly removeSocialAccountHandler: RemoveSocialAccountHandler,
+    private readonly loginHandler: LoginHandler,
+    private readonly socialLoginHandler: SocialLoginHandler,
   ) {
     console.log('[UserModule] UserModule 초기화');
   }
@@ -104,6 +133,8 @@ export class UserModule implements OnModuleInit {
         { handler: this.leaveUserHandler, class: LeaveUserHandler },
         { handler: this.addSocialAccountHandler, class: AddSocialAccountHandler },
         { handler: this.removeSocialAccountHandler, class: RemoveSocialAccountHandler },
+        { handler: this.loginHandler, class: LoginHandler },
+        { handler: this.socialLoginHandler, class: SocialLoginHandler },
       ],
       'UserModule',
     );
