@@ -1,7 +1,7 @@
+import { PrismaService } from '@module/common/prisma/prisma.service';
+import { QuizSet } from '@module/quiz/domain/entities/quiz-set.entity';
+import { IQuizSetRepository } from '@module/quiz/infrastructure/repository/quiz-set.repository.interface';
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from 'src/modules/common/prisma/prisma.service';
-import { QuizSet } from 'src/modules/quiz/domain/entities/quiz-set.entity';
-import { IQuizSetRepository } from 'src/modules/quiz/infrastructure/repository/quiz-set.repository.interface';
 
 @Injectable()
 export class QuizSetRepository implements IQuizSetRepository {
@@ -112,9 +112,7 @@ export class QuizSetRepository implements IQuizSetRepository {
   }
 
   async findByActiveStatus(isActive: boolean): Promise<QuizSet[]> {
-    console.log(
-      `[QuizSetRepository] 활성화 상태로 QuizSet 목록 조회: isActive=${isActive}`,
-    );
+    console.log(`[QuizSetRepository] 활성화 상태로 QuizSet 목록 조회: isActive=${isActive}`);
 
     const quizSets = await this.prisma.quizSet.findMany({
       where: { isActive },
@@ -124,11 +122,7 @@ export class QuizSetRepository implements IQuizSetRepository {
     return quizSets.map((quizSet) => this.toDomain(quizSet));
   }
 
-  async findByFilters(
-    week?: number,
-    category?: string,
-    isActive?: boolean,
-  ): Promise<QuizSet[]> {
+  async findByFilters(week?: number, category?: string, isActive?: boolean): Promise<QuizSet[]> {
     console.log(
       `[QuizSetRepository] 다중 필터로 QuizSet 목록 조회: week=${week}, category=${category}, isActive=${isActive}`,
     );

@@ -1,12 +1,6 @@
-import {
-  ArgumentsHost,
-  Catch,
-  ExceptionFilter,
-  HttpStatus,
-  Logger,
-} from '@nestjs/common';
+import { DomainException } from '@common/exceptions/domain.exception';
+import { ArgumentsHost, Catch, ExceptionFilter, HttpStatus, Logger } from '@nestjs/common';
 import { Response, Request } from 'express';
-import { DomainException } from 'src/common/exceptions/domain.exception';
 
 @Catch()
 export class GlobalExceptionFilter implements ExceptionFilter {
@@ -41,10 +35,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     }
 
     const status = HttpStatus.INTERNAL_SERVER_ERROR;
-    const message =
-      exception instanceof Error
-        ? exception.message
-        : '알 수 없는 오류가 발생했습니다.';
+    const message = exception instanceof Error ? exception.message : '알 수 없는 오류가 발생했습니다.';
 
     this.logger.error('예상치 못한 예외 발생:', exception);
     console.error(`[GlobalExceptionFilter] 예상치 못한 예외:`, message);

@@ -41,18 +41,7 @@ export class QuizSet {
       throw new Error('종료일은 시작일보다 이후여야 합니다.');
     }
 
-    return new QuizSet(
-      id,
-      week,
-      category,
-      title,
-      description,
-      startDate,
-      endDate,
-      isActive,
-      createdAt,
-      updatedAt,
-    );
+    return new QuizSet(id, week, category, title, description, startDate, endDate, isActive, createdAt, updatedAt);
   }
 
   static createWithEndDate(
@@ -70,18 +59,7 @@ export class QuizSet {
     const endDate = new Date(startDate);
     endDate.setDate(endDate.getDate() + 7);
 
-    return QuizSet.create(
-      id,
-      week,
-      category,
-      title,
-      description,
-      startDate,
-      endDate,
-      isActive,
-      createdAt,
-      updatedAt,
-    );
+    return QuizSet.create(id, week, category, title, description, startDate, endDate, isActive, createdAt, updatedAt);
   }
 
   update(

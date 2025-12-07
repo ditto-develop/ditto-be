@@ -35,9 +35,7 @@ export function validate(config: Record<string, unknown>) {
   });
 
   if (errors.length > 0) {
-    const errorMessage = errors
-      .map((error) => Object.values(error.constraints || {}).join(','))
-      .join('; ');
+    const errorMessage = errors.map((error) => Object.values(error.constraints || {}).join(',')).join('; ');
     throw new Error(`환경 변수 검증 실패: ${errorMessage}`);
   }
 

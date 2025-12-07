@@ -1,5 +1,5 @@
 import { Global, Module } from '@nestjs/common';
-import { CommandBus } from 'src/common/command/command-bus';
+import { CommandBus } from '@common/command/command-bus';
 
 @Global()
 @Module({

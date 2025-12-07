@@ -1,4 +1,4 @@
-import { ICommand, ICommandResult } from 'src/common/command/command.interface';
+import { ICommand, ICommandResult } from '@common/command/command.interface';
 
 /**
  * Command Handler 인터페이스

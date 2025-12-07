@@ -1,10 +1,10 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { CreateQuizSetDto } from 'src/modules/quiz/application/dto/create-quiz-set.dto';
-import { QuizSet } from 'src/modules/quiz/domain/entities/quiz-set.entity';
+import { CreateQuizSetDto } from '@module/quiz/application/dto/create-quiz-set.dto';
+import { QuizSet } from '@module/quiz/domain/entities/quiz-set.entity';
 import {
   IQuizSetRepository,
   QUIZ_SET_REPOSITORY_TOKEN,
-} from 'src/modules/quiz/infrastructure/repository/quiz-set.repository.interface';
+} from '@module/quiz/infrastructure/repository/quiz-set.repository.interface';
+import { Inject, Injectable } from '@nestjs/common';
 
 @Injectable()
 export class CreateQuizSetUseCase {

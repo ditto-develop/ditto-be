@@ -1,19 +1,17 @@
-import { Injectable, Inject } from '@nestjs/common';
-import { CommandHandler } from 'src/common/command/command-handler.decorator';
-import { ICommandHandler } from 'src/common/command/command-handler.interface';
-import { ICommandResult } from 'src/common/command/command.interface';
-import { QuizSetDto } from 'src/modules/quiz/application/dto/quiz-set.dto';
-import { GetQuizSetCommand } from 'src/modules/quiz/presentation/commands/get-quiz-set.command';
+import { CommandHandler } from '@common/command/command-handler.decorator';
+import { ICommandHandler } from '@common/command/command-handler.interface';
+import { ICommandResult } from '@common/command/command.interface';
+import { QuizSetDto } from '@module/quiz/application/dto/quiz-set.dto';
 import {
-  IQuizSetRepository,
   QUIZ_SET_REPOSITORY_TOKEN,
-} from 'src/modules/quiz/infrastructure/repository/quiz-set.repository.interface';
+  IQuizSetRepository,
+} from '@module/quiz/infrastructure/repository/quiz-set.repository.interface';
+import { GetQuizSetCommand } from '@module/quiz/presentation/commands/get-quiz-set.command';
+import { Injectable, Inject } from '@nestjs/common';
 
 @Injectable()
 @CommandHandler(GetQuizSetCommand)
-export class GetQuizSetHandler
-  implements ICommandHandler<GetQuizSetCommand, QuizSetDto>
-{
+export class GetQuizSetHandler implements ICommandHandler<GetQuizSetCommand, QuizSetDto> {
   constructor(
     @Inject(QUIZ_SET_REPOSITORY_TOKEN)
     private readonly quizSetRepository: IQuizSetRepository,
@@ -21,9 +19,7 @@ export class GetQuizSetHandler
     console.log('[GetQuizSetHandler] GetQuizSetHandler 초기화');
   }
 
-  async execute(
-    command: GetQuizSetCommand,
-  ): Promise<ICommandResult<QuizSetDto>> {
+  async execute(command: GetQuizSetCommand): Promise<ICommandResult<QuizSetDto>> {
     console.log(`[GetQuizSetHandler] Command 실행 시작: id=${command.id}`);
 
     try {
@@ -41,10 +37,7 @@ export class GetQuizSetHandler
         data: quizSetDto,
       };
     } catch (error) {
-      const errorMessage =
-        error instanceof Error
-          ? error.message
-          : '알 수 없는 오류가 발생했습니다.';
+      const errorMessage = error instanceof Error ? error.message : '알 수 없는 오류가 발생했습니다.';
       console.error(`[GetQuizSetHandler] Command 실행 실패:`, errorMessage);
       return {
         success: false,

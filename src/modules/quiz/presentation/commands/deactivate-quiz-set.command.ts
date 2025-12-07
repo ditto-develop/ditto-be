@@ -1,4 +1,4 @@
-import { ICommand } from 'src/common/command/command.interface';
+import { ICommand } from '@common/command/command.interface';
 
 export class DeactivateQuizSetCommand implements ICommand {
   readonly commandId?: string;
