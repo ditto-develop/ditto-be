@@ -26,6 +26,16 @@
 
 [Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
 
+## Prisma seed (SUPER_ADMIN)
+
+- 시드 실행: `pnpm prisma db seed` (package.json의 `prisma.seed` 사용)
+- 생성되는 계정(해당 계정은 개발용입니다. 운영에는 사용하지 않음):
+  - username: `admin`
+  - password: `1234`
+  - name/nickname: `홍길동` / `최고관리자`
+  - phone: `01012345678`, email: 없음, gender: `MALE`, age: `30`, birthDate: `1996-11-30`
+- 운영 배포 시 민감 정보는 반드시 변경하거나 환경 전용 스크립트로 관리하세요.
+
 ## Project setup
 
 ```bash
