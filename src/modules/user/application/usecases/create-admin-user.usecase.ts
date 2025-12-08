@@ -10,6 +10,7 @@ import {
   USER_REPOSITORY_TOKEN,
   IUserRepository,
 } from '@module/user/infrastructure/repository/user.repository.interface';
+import { AuthService } from '@module/user/application/services/auth.service';
 import { CreateAdminUserDto } from '@module/user/application/dto/user.dto';
 
 @Injectable()
@@ -17,6 +18,7 @@ export class CreateAdminUserUseCase {
   constructor(
     @Inject(USER_REPOSITORY_TOKEN) private readonly userRepo: IUserRepository,
     @Inject(ROLE_REPOSITORY_TOKEN) private readonly roleRepo: IRoleRepository,
+    private readonly authService: AuthService,
   ) {
     console.log('[CreateAdminUserUseCase] CreateAdminUserUseCase 초기화');
   }
@@ -41,6 +43,9 @@ export class CreateAdminUserUseCase {
       throw new BusinessRuleException('이미 존재하는 전화번호입니다.');
     }
 
+    // 비밀번호 해시화
+    const hashedPassword = await this.authService.hashPassword(dto.password);
+
     // 사용자 생성
     const user = User.create(
       crypto.randomUUID(), // 새로운 UUID 생성
@@ -49,7 +54,7 @@ export class CreateAdminUserUseCase {
       dto.phoneNumber,
       dto.email || null,
       dto.username,
-      dto.passwordHash,
+      hashedPassword,
       dto.gender as Gender,
       dto.age,
       dto.birthDate || null,

@@ -1210,9 +1210,9 @@
             "type": "string",
             "description": "관리자 사용자명"
           },
-          "passwordHash": {
+          "password": {
             "type": "string",
-            "description": "비밀번호 해시"
+            "description": "비밀번호"
           },
           "gender": {
             "type": "string",
@@ -1237,7 +1237,7 @@
           "nickname",
           "phoneNumber",
           "username",
-          "passwordHash",
+          "password",
           "gender",
           "age",
           "roleId"

@@ -145,9 +145,9 @@ export class CreateAdminUserDto {
   @IsString()
   username: string;
 
-  @ApiProperty({ description: '비밀번호 해시' })
+  @ApiProperty({ description: '비밀번호' })
   @IsString()
-  passwordHash: string;
+  password: string;
 
   @ApiProperty({ description: '성별' })
   @IsEnum(Gender)

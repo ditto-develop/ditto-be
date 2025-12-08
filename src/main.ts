@@ -44,15 +44,19 @@ async function bootstrap() {
 
   console.log('[Bootstrap] 서버 시작 중...');
   const port = configService.get<number>('port') || 4000;
+  const isDevelopment = configService.get('nodeEnv') === 'development';
 
-  if (configService.get('nodeEnv') === 'development') {
-    console.log(`[Bootstrap] Swagger 문서: http://localhost:${port}/docs`);
+  if (isDevelopment) {
     SwaggerModule.setup('docs', app, document);
   }
 
   writeFileSync('./docs/ditto-api.json', JSON.stringify(document, null, 2));
 
   await app.listen(port);
+
   console.log(`[Bootstrap] 서버가 포트 ${port}에서 실행 중입니다.`);
+  if (isDevelopment) {
+    console.log(`[Bootstrap] Swagger 문서: http://localhost:${port}/docs`);
+  }
 }
 void bootstrap();
