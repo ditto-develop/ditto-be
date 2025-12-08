@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards, Res, Req } from '@nestjs/common';
 import { ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { CommandBus } from '@common/command/command-bus';
 import { ApiCommandResponse } from '@common/command/api-response.decorator';
@@ -25,16 +25,27 @@ import { RemoveSocialAccountCommand } from '@module/user/presentation/commands/r
 import { UpdateUserCommand } from '@module/user/presentation/commands/update-user.command';
 import { LoginCommand } from '@module/user/presentation/commands/login.command';
 import { SocialLoginCommand } from '@module/user/presentation/commands/social-login.command';
+import { RefreshAccessTokenCommand } from '@module/user/presentation/commands/refresh-access-token.command';
+import { LogoutCommand } from '@module/user/presentation/commands/logout.command';
 import { JwtAuthGuard } from '@module/user/infrastructure/guards/jwt-auth.guard';
 import { RolesGuard } from '@module/user/infrastructure/guards/roles.guard';
 import { Roles } from '@module/user/infrastructure/decorators/roles.decorator';
 import { CurrentUser } from '@module/user/infrastructure/decorators/current-user.decorator';
 import { RoleCode } from '@module/role/domain/entities/role.entity';
+import { Response, Request } from 'express';
+import { ConfigService } from '@nestjs/config';
+import {
+  buildRefreshCookieOptions,
+  buildRefreshCookieClearOptions,
+} from '@module/user/infrastructure/utils/cookie.util';
 
 @ApiTags('User')
 @Controller('users')
 export class UserController {
-  constructor(private readonly commandBus: CommandBus) {
+  constructor(
+    private readonly commandBus: CommandBus,
+    private readonly configService: ConfigService,
+  ) {
     console.log('[UserController] UserController 초기화');
   }
 
@@ -174,19 +185,74 @@ export class UserController {
   @ApiOperation({ summary: '관리자 로그인', description: '관리자 계정으로 로그인합니다.' })
   @ApiCommandResponse(200, '로그인 성공', LoginResponseDto, false)
   @ApiCommandResponse(401, '인증 실패')
-  async login(@Body() dto: LoginDto): Promise<ICommandResult<LoginResponseDto>> {
+  async login(
+    @Body() dto: LoginDto,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<ICommandResult<LoginResponseDto>> {
     console.log('[UserController] 관리자 로그인 요청');
     const command = new LoginCommand(dto);
-    return await this.commandBus.execute<LoginResponseDto>(command);
+    const result = await this.commandBus.execute<LoginResponseDto>(command);
+
+    if (result.success && result.data?.refreshToken) {
+      res.cookie('refreshToken', result.data.refreshToken, buildRefreshCookieOptions(this.configService));
+      delete result.data.refreshToken;
+    }
+
+    return result;
   }
 
   @Post('/social-login')
   @ApiOperation({ summary: '소셜 로그인', description: '소셜 계정으로 로그인합니다.' })
   @ApiCommandResponse(200, '로그인 성공', LoginResponseDto, false)
   @ApiCommandResponse(401, '인증 실패')
-  async socialLogin(@Body() dto: SocialLoginDto): Promise<ICommandResult<LoginResponseDto>> {
+  async socialLogin(
+    @Body() dto: SocialLoginDto,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<ICommandResult<LoginResponseDto>> {
     console.log('[UserController] 소셜 로그인 요청');
     const command = new SocialLoginCommand(dto);
-    return await this.commandBus.execute<LoginResponseDto>(command);
+    const result = await this.commandBus.execute<LoginResponseDto>(command);
+
+    if (result.success && result.data?.refreshToken) {
+      res.cookie('refreshToken', result.data.refreshToken, buildRefreshCookieOptions(this.configService));
+      delete result.data.refreshToken;
+    }
+
+    return result;
+  }
+
+  @Post('/auth/refresh')
+  @ApiOperation({ summary: '토큰 재발급', description: '리프레시 토큰으로 새로운 액세스/리프레시 토큰을 발급합니다.' })
+  @ApiCommandResponse(200, '토큰 재발급 성공', LoginResponseDto, false)
+  @ApiCommandResponse(401, '리프레시 토큰 검증 실패')
+  async refreshToken(
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<ICommandResult<LoginResponseDto>> {
+    const refreshToken = req.cookies?.refreshToken;
+    const command = new RefreshAccessTokenCommand(refreshToken);
+    const result = await this.commandBus.execute<LoginResponseDto>(command);
+
+    if (result.success && result.data?.refreshToken) {
+      res.cookie('refreshToken', result.data.refreshToken, buildRefreshCookieOptions(this.configService));
+      delete result.data.refreshToken;
+    }
+
+    return result;
+  }
+
+  @Post('/auth/logout')
+  @ApiOperation({ summary: '로그아웃', description: '리프레시 토큰을 폐기하고 쿠키를 제거합니다.' })
+  @ApiCommandResponse(200, '로그아웃 성공')
+  async logout(@Req() req: Request, @Res({ passthrough: true }) res: Response): Promise<ICommandResult<void>> {
+    const refreshToken = req.cookies?.refreshToken;
+    const command = new LogoutCommand(refreshToken);
+    const result = await this.commandBus.execute<void>(command);
+
+    if (result.success) {
+      res.clearCookie('refreshToken', buildRefreshCookieClearOptions(this.configService));
+    }
+
+    return result;
   }
 }

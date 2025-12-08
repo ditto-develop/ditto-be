@@ -708,6 +708,95 @@
         ]
       }
     },
+    "/api/users/auth/refresh": {
+      "post": {
+        "description": "리프레시 토큰으로 새로운 액세스/리프레시 토큰을 발급합니다.",
+        "operationId": "UserController_refreshToken",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "토큰 재발급 성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/LoginResponseDto"
+                    },
+                    "error": {
+                      "type": "string",
+                      "example": "에러 메시지"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "리프레시 토큰 검증 실패",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "error": {
+                      "type": "string",
+                      "example": "에러 메시지"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "토큰 재발급",
+        "tags": [
+          "User"
+        ]
+      }
+    },
+    "/api/users/auth/logout": {
+      "post": {
+        "description": "리프레시 토큰을 폐기하고 쿠키를 제거합니다.",
+        "operationId": "UserController_logout",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "로그아웃 성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "error": {
+                      "type": "string",
+                      "example": "에러 메시지"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "로그아웃",
+        "tags": [
+          "User"
+        ]
+      }
+    },
     "/api/quizzes": {
       "post": {
         "operationId": "QuizController_create",
@@ -1348,6 +1437,10 @@
           "accessToken": {
             "type": "string",
             "description": "액세스 토큰"
+          },
+          "refreshToken": {
+            "type": "string",
+            "description": "리프레시 토큰 (쿠키로 설정)"
           },
           "user": {
             "description": "사용자 정보",

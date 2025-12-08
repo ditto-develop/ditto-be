@@ -3,6 +3,7 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
+import cookieParser from 'cookie-parser';
 import { writeFileSync } from 'node:fs';
 import { version } from '../package.json';
 import { GlobalExceptionFilter } from '@common/exceptions/exception.filter';
@@ -12,7 +13,11 @@ async function bootstrap() {
   const configService = app.get(ConfigService);
 
   app.setGlobalPrefix('api');
-  app.enableCors();
+  app.use(cookieParser());
+  app.enableCors({
+    origin: true,
+    credentials: true,
+  });
 
   app.useGlobalFilters(new GlobalExceptionFilter());
 

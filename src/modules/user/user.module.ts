@@ -20,6 +20,8 @@ import { GetUserByIdUseCase } from '@module/user/application/usecases/get-user-b
 import { LeaveUserUseCase } from '@module/user/application/usecases/leave-user.usecase';
 import { RemoveSocialAccountUseCase } from '@module/user/application/usecases/remove-social-account.usecase';
 import { UpdateUserUseCase } from '@module/user/application/usecases/update-user.usecase';
+import { RefreshAccessTokenUseCase } from '@module/user/application/usecases/refresh-access-token.usecase';
+import { LogoutUseCase } from '@module/user/application/usecases/logout.usecase';
 import { AddSocialAccountHandler } from '@module/user/presentation/commands/handlers/add-social-account.handler';
 import { CreateAdminUserHandler } from '@module/user/presentation/commands/handlers/create-admin-user.handler';
 import { CreateUserHandler } from '@module/user/presentation/commands/handlers/create-user.handler';
@@ -32,8 +34,11 @@ import { RemoveSocialAccountHandler } from '@module/user/presentation/commands/h
 import { UpdateUserHandler } from '@module/user/presentation/commands/handlers/update-user.handler';
 import { LoginHandler } from '@module/user/presentation/commands/handlers/login.handler';
 import { SocialLoginHandler } from '@module/user/presentation/commands/handlers/social-login.handler';
+import { RefreshAccessTokenHandler } from '@module/user/presentation/commands/handlers/refresh-access-token.handler';
+import { LogoutHandler } from '@module/user/presentation/commands/handlers/logout.handler';
 import { AuthService } from '@module/user/application/services/auth.service';
 import { LoginUseCase } from '@module/user/application/usecases/login.usecase';
+import { RefreshTokenService } from '@module/user/application/services/refresh-token.service';
 
 const UserRepositoryProvider = {
   provide: USER_REPOSITORY_TOKEN,
@@ -51,9 +56,9 @@ const UserSocialAccountRepositoryProvider = {
     RoleModule,
     JwtModule.registerAsync({
       useFactory: (configService: ConfigService): JwtModuleOptions => {
-        const expiresIn = configService.get<string>('jwt.expiresIn') || '24h';
+        const expiresIn = configService.get<string>('jwt.accessExpiresIn') || '15m';
         return {
-          secret: configService.get<string>('jwt.secret'),
+          secret: configService.get<string>('jwt.accessSecret'),
           signOptions: {
             expiresIn: expiresIn as any,
           },
@@ -70,6 +75,7 @@ const UserSocialAccountRepositoryProvider = {
 
     // Services
     AuthService,
+    RefreshTokenService,
 
     // UseCases
     CreateAdminUserUseCase,
@@ -83,6 +89,8 @@ const UserSocialAccountRepositoryProvider = {
     AddSocialAccountUseCase,
     RemoveSocialAccountUseCase,
     LoginUseCase,
+    RefreshAccessTokenUseCase,
+    LogoutUseCase,
 
     // Handlers
     CreateAdminUserHandler,
@@ -97,6 +105,8 @@ const UserSocialAccountRepositoryProvider = {
     RemoveSocialAccountHandler,
     LoginHandler,
     SocialLoginHandler,
+    RefreshAccessTokenHandler,
+    LogoutHandler,
   ],
   exports: [USER_REPOSITORY_TOKEN, USER_SOCIAL_ACCOUNT_REPOSITORY_TOKEN],
 })
@@ -115,6 +125,8 @@ export class UserModule implements OnModuleInit {
     private readonly removeSocialAccountHandler: RemoveSocialAccountHandler,
     private readonly loginHandler: LoginHandler,
     private readonly socialLoginHandler: SocialLoginHandler,
+    private readonly refreshAccessTokenHandler: RefreshAccessTokenHandler,
+    private readonly logoutHandler: LogoutHandler,
   ) {
     console.log('[UserModule] UserModule 초기화');
   }
@@ -135,6 +147,8 @@ export class UserModule implements OnModuleInit {
         { handler: this.removeSocialAccountHandler, class: RemoveSocialAccountHandler },
         { handler: this.loginHandler, class: LoginHandler },
         { handler: this.socialLoginHandler, class: SocialLoginHandler },
+        { handler: this.refreshAccessTokenHandler, class: RefreshAccessTokenHandler },
+        { handler: this.logoutHandler, class: LogoutHandler },
       ],
       'UserModule',
     );

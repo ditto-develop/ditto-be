@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Inject } from '@nestjs/common';
 import { AuthService } from '@module/user/application/services/auth.service';
+import { RefreshTokenService } from '@module/user/application/services/refresh-token.service';
 import {
   USER_REPOSITORY_TOKEN,
   IUserRepository,
@@ -13,6 +14,7 @@ export class LoginUseCase {
   constructor(
     @Inject(USER_REPOSITORY_TOKEN) private readonly userRepository: IUserRepository,
     private readonly authService: AuthService,
+    private readonly refreshTokenService: RefreshTokenService,
   ) {
     console.log('[LoginUseCase] LoginUseCase 초기화');
   }
@@ -50,12 +52,14 @@ export class LoginUseCase {
     }
 
     // JWT 토큰 생성
-    const accessToken = await this.authService.generateToken(user);
+    const accessToken = await this.authService.generateAccessToken(user);
+    const refreshToken = await this.refreshTokenService.generateRefreshToken(user.id);
 
     console.log(`[LoginUseCase] 관리자 로그인 성공: userId=${user.id}`);
 
     return {
       accessToken,
+      refreshToken,
       user: UserDto.fromDomain(user),
     };
   }
@@ -78,12 +82,14 @@ export class LoginUseCase {
     }
 
     // JWT 토큰 생성
-    const accessToken = await this.authService.generateToken(user);
+    const accessToken = await this.authService.generateAccessToken(user);
+    const refreshToken = await this.refreshTokenService.generateRefreshToken(user.id);
 
     console.log(`[LoginUseCase] 소셜 로그인 성공: userId=${user.id}`);
 
     return {
       accessToken,
+      refreshToken,
       user: UserDto.fromDomain(user),
     };
   }

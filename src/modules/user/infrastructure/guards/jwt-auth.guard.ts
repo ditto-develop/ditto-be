@@ -28,7 +28,7 @@ export class JwtAuthGuard implements CanActivate {
     try {
       const payload = await this.jwtService.verifyAsync(token);
 
-      if (!payload.sub) {
+      if (!payload.sub || payload.type !== 'access') {
         throw new UnauthorizedException('유효하지 않은 토큰입니다.');
       }
 

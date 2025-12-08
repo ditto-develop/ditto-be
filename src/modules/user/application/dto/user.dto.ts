@@ -255,6 +255,9 @@ export class LoginResponseDto {
   @ApiProperty({ description: '액세스 토큰' })
   accessToken: string;
 
+  @ApiProperty({ description: '리프레시 토큰 (쿠키로 설정)', required: false })
+  refreshToken?: string;
+
   @ApiProperty({ description: '사용자 정보' })
   user: UserDto;
 }
