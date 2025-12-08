@@ -39,6 +39,8 @@ export class UserController {
   }
 
   @Post('/admin')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(RoleCode.ADMIN, RoleCode.SUPER_ADMIN)
   @ApiOperation({ summary: '관리자 계정 생성', description: '관리자 계정을 생성합니다.' })
   @ApiCommandResponse(201, '관리자 계정 생성 성공', UserDto, false)
   async createAdmin(@Body() dto: CreateAdminUserDto): Promise<ICommandResult<UserDto>> {
