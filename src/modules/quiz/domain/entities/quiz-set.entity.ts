@@ -1,3 +1,5 @@
+import { ValidationException, BusinessRuleException } from '@common/exceptions/domain.exception';
+
 export class QuizSet {
   constructor(
     public readonly id: string,
@@ -26,19 +28,19 @@ export class QuizSet {
   ): QuizSet {
     // 비즈니스 규칙 검증
     if (week < 1) {
-      throw new Error('주차는 1 이상이어야 합니다.');
+      throw new BusinessRuleException('주차는 1 이상이어야 합니다.');
     }
 
     if (!category || category.trim() === '') {
-      throw new Error('카테고리는 필수 값입니다.');
+      throw new ValidationException('카테고리는 필수 값입니다.');
     }
 
     if (!title || title.trim() === '') {
-      throw new Error('제목은 필수 값입니다.');
+      throw new ValidationException('제목은 필수 값입니다.');
     }
 
     if (startDate >= endDate) {
-      throw new Error('종료일은 시작일보다 이후여야 합니다.');
+      throw new BusinessRuleException('종료일은 시작일보다 이후여야 합니다.');
     }
 
     return new QuizSet(id, week, category, title, description, startDate, endDate, isActive, createdAt, updatedAt);

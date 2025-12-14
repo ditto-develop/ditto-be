@@ -8,6 +8,7 @@ import {
 } from '@module/quiz/infrastructure/repository/quiz-set.repository.interface';
 import { GetQuizSetCommand } from '@module/quiz/presentation/commands/get-quiz-set.command';
 import { Injectable, Inject } from '@nestjs/common';
+import { QuizSetNotFoundException } from '@module/quiz/domain/exceptions/quiz.exceptions';
 
 @Injectable()
 @CommandHandler(GetQuizSetCommand)
@@ -15,9 +16,7 @@ export class GetQuizSetHandler implements ICommandHandler<GetQuizSetCommand, Qui
   constructor(
     @Inject(QUIZ_SET_REPOSITORY_TOKEN)
     private readonly quizSetRepository: IQuizSetRepository,
-  ) {
-    console.log('[GetQuizSetHandler] GetQuizSetHandler 초기화');
-  }
+  ) {}
 
   async execute(command: GetQuizSetCommand): Promise<ICommandResult<QuizSetDto>> {
     console.log(`[GetQuizSetHandler] Command 실행 시작: id=${command.id}`);
@@ -26,7 +25,7 @@ export class GetQuizSetHandler implements ICommandHandler<GetQuizSetCommand, Qui
       const quizSet = await this.quizSetRepository.findById(command.id);
 
       if (!quizSet) {
-        throw new Error(`퀴즈 세트를 찾을 수 없습니다: ${command.id}`);
+        throw new QuizSetNotFoundException(command.id);
       }
 
       const quizSetDto = QuizSetDto.fromDomain(quizSet);

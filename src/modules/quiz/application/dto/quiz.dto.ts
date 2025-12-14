@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsDate, IsInt, IsOptional, IsString } from 'class-validator';
+import { QuizChoiceDto } from './quiz-choice.dto';
 
 export class QuizDto {
   @ApiProperty({
@@ -22,6 +23,16 @@ export class QuizDto {
   })
   @IsString()
   quizSetId: string;
+
+  @ApiProperty({
+    description: '퀴즈 선택지들',
+    type: [QuizChoiceDto],
+    example: [
+      { id: 'choice-1', content: '사과', order: 1 },
+      { id: 'choice-2', content: '바나나', order: 2 },
+    ],
+  })
+  choices: QuizChoiceDto[];
 
   @ApiProperty({
     description: '퀴즈 순서',
@@ -47,10 +58,19 @@ export class QuizDto {
   @IsDate()
   updatedAt: Date;
 
-  constructor(id: string, question: string, quizSetId: string, order: number | null, createdAt: Date, updatedAt: Date) {
+  constructor(
+    id: string,
+    question: string,
+    quizSetId: string,
+    choices: QuizChoiceDto[],
+    order: number | null,
+    createdAt: Date,
+    updatedAt: Date,
+  ) {
     this.id = id;
     this.question = question;
     this.quizSetId = quizSetId;
+    this.choices = choices;
     this.order = order;
     this.createdAt = createdAt;
     this.updatedAt = updatedAt;
@@ -60,10 +80,12 @@ export class QuizDto {
     id: string;
     question: string;
     quizSetId: string;
+    choices: Array<{ id: string; content: string; order: number }>;
     order: number | null;
     createdAt: Date;
     updatedAt: Date;
   }) {
-    return new QuizDto(quiz.id, quiz.question, quiz.quizSetId, quiz.order, quiz.createdAt, quiz.updatedAt);
+    const choices = quiz.choices.map((choice) => QuizChoiceDto.fromDomain(choice));
+    return new QuizDto(quiz.id, quiz.question, quiz.quizSetId, choices, quiz.order, quiz.createdAt, quiz.updatedAt);
   }
 }

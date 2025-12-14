@@ -9,6 +9,31 @@ export interface IQuizRepository {
    * Quiz 생성
    */
   create(quiz: Quiz): Promise<Quiz>;
+
+  /**
+   * ID로 Quiz 조회
+   */
+  findById(id: string): Promise<Quiz | null>;
+
+  /**
+   * QuizSet ID로 모든 Quiz 조회
+   */
+  findByQuizSetId(quizSetId: string): Promise<Quiz[]>;
+
+  /**
+   * Quiz 수정
+   */
+  update(quiz: Quiz): Promise<Quiz>;
+
+  /**
+   * Quiz 삭제
+   */
+  delete(id: string): Promise<void>;
+
+  /**
+   * QuizSet의 최대 순서 조회
+   */
+  findMaxOrderByQuizSetId(quizSetId: string): Promise<number>;
 }
 
 export const QUIZ_REPOSITORY_TOKEN = Symbol('QuizRepository');

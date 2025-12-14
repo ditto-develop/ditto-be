@@ -817,13 +817,181 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/QuizDto"
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/QuizDto"
+                    },
+                    "error": {
+                      "type": "string",
+                      "example": "에러 메시지"
+                    }
+                  }
                 }
               }
             }
           }
         },
         "summary": "퀴즈 생성",
+        "tags": [
+          "Quizzes"
+        ]
+      }
+    },
+    "/api/quizzes/{id}": {
+      "get": {
+        "operationId": "QuizController_findById",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "퀴즈 조회 성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/QuizDto"
+                    },
+                    "error": {
+                      "type": "string",
+                      "example": "에러 메시지"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "퀴즈를 찾을 수 없음",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "error": {
+                      "type": "string",
+                      "example": "퀴즈를 찾을 수 없습니다."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "퀴즈 조회",
+        "tags": [
+          "Quizzes"
+        ]
+      },
+      "put": {
+        "operationId": "QuizController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateQuizDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "퀴즈 수정 성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/QuizDto"
+                    },
+                    "error": {
+                      "type": "string",
+                      "example": "에러 메시지"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "퀴즈 수정",
+        "tags": [
+          "Quizzes"
+        ]
+      },
+      "delete": {
+        "operationId": "QuizController_delete",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "퀴즈 삭제 성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "error": {
+                      "type": "string",
+                      "example": "에러 메시지"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "퀴즈 삭제",
         "tags": [
           "Quizzes"
         ]
@@ -1490,6 +1658,20 @@
           "providerUserId"
         ]
       },
+      "CreateQuizChoiceDto": {
+        "type": "object",
+        "properties": {
+          "content": {
+            "type": "string",
+            "description": "선택지 내용",
+            "example": "사과",
+            "maxLength": 500
+          }
+        },
+        "required": [
+          "content"
+        ]
+      },
       "CreateQuizDto": {
         "type": "object",
         "properties": {
@@ -1508,62 +1690,84 @@
             "description": "퀴즈 세트 ID",
             "example": "123e4567-e89b-12d3-a456-426614174000"
           },
-          "order": {
-            "type": "number",
-            "description": "퀴즈 순서",
-            "example": 1
-          }
-        },
-        "required": [
-          "id",
-          "question",
-          "quizSetId"
-        ]
-      },
-      "QuizDto": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "description": "퀴즈 ID",
-            "example": "123e4567-e89b-12d3-a456-426614174000"
-          },
-          "question": {
-            "type": "string",
-            "description": "퀴즈 질문",
-            "example": "사과 vs 바나나"
-          },
-          "quizSetId": {
-            "type": "string",
-            "description": "퀴즈 세트 ID",
-            "example": "123e4567-e89b-12d3-a456-426614174000"
+          "choices": {
+            "description": "퀴즈 선택지들 (정확히 2개)",
+            "example": [
+              {
+                "content": "사과"
+              },
+              {
+                "content": "바나나"
+              }
+            ],
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CreateQuizChoiceDto"
+            }
           },
           "order": {
             "type": "number",
-            "description": "퀴즈 순서",
-            "nullable": true,
+            "description": "퀴즈 순서 (미지정 시 자동 할당)",
             "example": 1
-          },
-          "createdAt": {
-            "format": "date-time",
-            "type": "string",
-            "description": "생성일",
-            "example": "2025-01-01T00:00:00.000Z"
-          },
-          "updatedAt": {
-            "format": "date-time",
-            "type": "string",
-            "description": "수정일",
-            "example": "2025-01-01T00:00:00.000Z"
           }
         },
         "required": [
           "id",
           "question",
           "quizSetId",
-          "createdAt",
-          "updatedAt"
+          "choices"
         ]
+      },
+      "UpdateQuizChoiceDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "선택지 ID (수정 시 기존 ID 유지)",
+            "example": "choice-123"
+          },
+          "content": {
+            "type": "string",
+            "description": "선택지 내용",
+            "example": "바나나",
+            "maxLength": 500
+          }
+        },
+        "required": [
+          "content"
+        ]
+      },
+      "UpdateQuizDto": {
+        "type": "object",
+        "properties": {
+          "question": {
+            "type": "string",
+            "description": "퀴즈 질문",
+            "example": "가장 좋아하는 과일은?"
+          },
+          "choices": {
+            "description": "퀴즈 선택지들 (정확히 2개, 모두 수정 시 필수)",
+            "example": [
+              {
+                "id": "choice-1",
+                "content": "사과"
+              },
+              {
+                "id": "choice-2",
+                "content": "바나나"
+              }
+            ],
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UpdateQuizChoiceDto"
+            }
+          },
+          "order": {
+            "type": "number",
+            "description": "퀴즈 순서",
+            "example": 2
+          }
+        }
       },
       "QuizSetDto": {
         "type": "object",

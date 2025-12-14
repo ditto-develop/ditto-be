@@ -11,9 +11,7 @@ export class GetQuizSetsUseCase {
   constructor(
     @Inject(QUIZ_SET_REPOSITORY_TOKEN)
     private readonly quizSetRepository: IQuizSetRepository,
-  ) {
-    console.log('[GetQuizSetsUseCase] GetQuizSetsUseCase 초기화');
-  }
+  ) {}
 
   async execute(query: QuizSetListQueryDto): Promise<QuizSet[]> {
     console.log(`[GetQuizSetsUseCase] 퀴즈 세트 목록 조회 시작: query=${JSON.stringify(query)}`);
