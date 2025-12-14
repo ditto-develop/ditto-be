@@ -13,36 +13,94 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model User {
+  id String @id @default(cuid())
+
+  // 사용자 정보
+  name        String
+  nickname    String
+  phoneNumber String  @unique
+  email       String? @unique
+
+  // 관리자 전용 로그인 계정
+  username     String? @unique
+  passwordHash String?
+
+  // 프로필 정보
+  gender    String
+  age       Int
+  birthDate DateTime?
+
+  // 가입/탈퇴 정보
+  joinedAt DateTime  @default(now())
+  leftAt   DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // 관계
+  roleId         Int
+  role           Role                @relation(fields: [roleId], references: [id])
+  socialAccounts UserSocialAccount[]
+
+  @@map("users")
+}
+
+model Role {
+  id   Int    @id @default(autoincrement())
+  name String
+  code String @unique
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  users User[]
+
+  @@map("roles")
+}
+
+model UserSocialAccount {
+  id             Int    @id @default(autoincrement())
+  userId         String
+  provider       String
+  providerUserId String
+  user           User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerUserId])
+  @@unique([userId, provider])
+  @@map("user_social_accounts")
+}
+
 model QuizSet {
   id          String   @id @default(cuid())
-  week        Int      // 주차 (1, 2, 3, ...)
-  category    String   // 카테고리
-  title       String   // 퀴즈 세트 제목
-  description String?  // 퀴즈 세트 설명
+  week        Int // 주차 (1, 2, 3, ...)
+  category    String // 카테고리
+  title       String // 퀴즈 세트 제목
+  description String? // 퀴즈 세트 설명
   startDate   DateTime // 시작일
   endDate     DateTime // 종료일 (시작일로부터 7일)
   isActive    Boolean  @default(true) // 활성화 여부
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-  
-  quizzes     Quiz[]
-  
+
+  quizzes Quiz[]
+
   @@unique([week, category])
   @@map("quiz_sets")
 }
 
 model Quiz {
-  id          String   @id @default(cuid())
-  question    String   // 퀴즈 질문
-  order       Int      // 퀴즈 순서
-  quizSetId   String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  
-  quizSet     QuizSet  @relation(fields: [quizSetId], references: [id], onDelete: Cascade)
-  choices     Choice[]
-  answers     QuizAnswer[]
-  
+  id        String   @id @default(cuid())
+  question  String // 퀴즈 질문
+  order     Int // 퀴즈 순서
+  quizSetId String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  quizSet QuizSet      @relation(fields: [quizSetId], references: [id], onDelete: Cascade)
+  choices Choice[]
+  answers QuizAnswer[]
+
   @@map("quizzes")
 }
 
@@ -50,23 +108,23 @@ model Choice {
   id     String @id @default(cuid())
   text   String // 선택지 내용
   quizId String
-  order  Int    // 선택지 순서
-  
-  quiz   Quiz   @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  order  Int // 선택지 순서
+
+  quiz    Quiz         @relation(fields: [quizId], references: [id], onDelete: Cascade)
   answers QuizAnswer[]
-  
+
   @@map("choices")
 }
 
 model QuizAnswer {
-  id       String   @id @default(cuid())
-  userId   String   // 사용자 식별자
-  quizId   String
-  choiceId String
+  id         String   @id @default(cuid())
+  userId     String // 사용자 식별자
+  quizId     String
+  choiceId   String
   answeredAt DateTime @default(now())
-  
-  quiz     Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
-  choice   Choice   @relation(fields: [choiceId], references: [id], onDelete: Cascade)
-  
+
+  quiz   Quiz   @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  choice Choice @relation(fields: [choiceId], references: [id], onDelete: Cascade)
+
   @@map("quiz_answers")
 }
