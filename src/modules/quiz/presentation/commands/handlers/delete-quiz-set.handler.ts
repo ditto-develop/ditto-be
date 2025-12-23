@@ -16,7 +16,7 @@ export class DeleteQuizSetHandler implements ICommandHandler<DeleteQuizSetComman
     console.log(`[DeleteQuizSetHandler] Command 실행 시작: id=${command.id}`);
 
     try {
-      await this.deleteQuizSetUseCase.execute(command.id);
+      await this.deleteQuizSetUseCase.execute(command.id, command.forcePassword);
 
       console.log('[DeleteQuizSetHandler] Command 실행 완료: 퀴즈 세트 삭제 성공');
       return {

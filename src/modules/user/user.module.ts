@@ -108,7 +108,7 @@ const UserSocialAccountRepositoryProvider = {
     RefreshAccessTokenHandler,
     LogoutHandler,
   ],
-  exports: [USER_REPOSITORY_TOKEN, USER_SOCIAL_ACCOUNT_REPOSITORY_TOKEN],
+  exports: [USER_REPOSITORY_TOKEN, USER_SOCIAL_ACCOUNT_REPOSITORY_TOKEN, JwtModule],
 })
 export class UserModule implements OnModuleInit {
   constructor(

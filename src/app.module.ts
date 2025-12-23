@@ -5,9 +5,11 @@ import { PrismaModule } from '@module/common/prisma/prisma.module';
 import { RedisModule } from '@module/common/redis/redis.module';
 import { QuizModule } from '@module/quiz/quiz.module';
 import { RoleModule } from '@module/role/role.module';
+import { SystemModule } from '@module/system/system.module';
 import { UserModule } from '@module/user/user.module';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { ScheduleModule } from '@nestjs/schedule';
 import { validate } from '@config/env.validation';
 
 @Module({
@@ -18,6 +20,7 @@ import { validate } from '@config/env.validation';
       validate,
       envFilePath: ['.env.local', '.env'],
     }),
+    ScheduleModule.forRoot(),
     PrismaModule,
     RedisModule,
     CommonModule,
@@ -25,6 +28,7 @@ import { validate } from '@config/env.validation';
     RoleModule,
     UserModule,
     QuizModule,
+    SystemModule,
   ],
 })
 export class AppModule {}

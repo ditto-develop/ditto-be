@@ -135,6 +135,28 @@ export class QuizRepository implements IQuizRepository {
     return result._max.order ?? 0;
   }
 
+  async updateOrders(quizSetId: string, updates: Array<{ id: string; order: number }>): Promise<void> {
+    const quizIdsToKeep = updates.map((u) => u.id);
+
+    await this.prisma.$transaction(async (tx) => {
+      // 1. 배열에 없는 퀴즈 삭제
+      await tx.quiz.deleteMany({
+        where: {
+          quizSetId,
+          id: { notIn: quizIdsToKeep },
+        },
+      });
+
+      // 2. 각 퀴즈 순서 업데이트
+      for (const update of updates) {
+        await tx.quiz.update({
+          where: { id: update.id },
+          data: { order: update.order },
+        });
+      }
+    });
+  }
+
   private toDomain(quiz: {
     id: string;
     question: string;

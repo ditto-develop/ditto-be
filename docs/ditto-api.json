@@ -888,11 +888,11 @@
                   "properties": {
                     "success": {
                       "type": "boolean",
-                      "example": false
+                      "example": true
                     },
                     "error": {
                       "type": "string",
-                      "example": "퀴즈를 찾을 수 없습니다."
+                      "example": "에러 메시지"
                     }
                   }
                 }
@@ -1045,6 +1045,26 @@
         "operationId": "QuizSetController_findAll",
         "parameters": [
           {
+            "name": "year",
+            "required": false,
+            "in": "query",
+            "description": "년도 필터",
+            "schema": {
+              "example": 2025,
+              "type": "number"
+            }
+          },
+          {
+            "name": "month",
+            "required": false,
+            "in": "query",
+            "description": "월 필터",
+            "schema": {
+              "example": 12,
+              "type": "number"
+            }
+          },
+          {
             "name": "week",
             "required": false,
             "in": "query",
@@ -1088,10 +1108,7 @@
                       "example": true
                     },
                     "data": {
-                      "type": "array",
-                      "items": {
-                        "$ref": "#/components/schemas/QuizSetDto"
-                      }
+                      "$ref": "#/components/schemas/QuizSetGroupedResponseDto"
                     },
                     "error": {
                       "type": "string",
@@ -1104,6 +1121,41 @@
           }
         },
         "summary": "퀴즈 세트 목록 조회",
+        "tags": [
+          "Quiz Sets"
+        ]
+      }
+    },
+    "/api/quiz-sets/current-week": {
+      "get": {
+        "operationId": "QuizSetController_getCurrentWeek",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "이번 주차 퀴즈 세트 조회 성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/CurrentWeekQuizSetsResponseDto"
+                    },
+                    "error": {
+                      "type": "string",
+                      "example": "에러 메시지"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "이번 주차 퀴즈 세트 조회",
         "tags": [
           "Quiz Sets"
         ]
@@ -1211,6 +1263,14 @@
             "name": "id",
             "required": true,
             "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "forcePassword",
+            "required": true,
+            "in": "query",
             "schema": {
               "type": "string"
             }
@@ -1326,6 +1386,245 @@
         "summary": "퀴즈 세트 비활성화",
         "tags": [
           "Quiz Sets"
+        ]
+      }
+    },
+    "/api/quiz-sets/{id}/reorder": {
+      "patch": {
+        "operationId": "QuizSetController_reorder",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReorderQuizzesDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "퀴즈 순서 변경 성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/QuizSetDto"
+                    },
+                    "error": {
+                      "type": "string",
+                      "example": "에러 메시지"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "퀴즈 순서 일괄 변경 및 관리",
+        "tags": [
+          "Quiz Sets"
+        ]
+      }
+    },
+    "/api/quiz-progress/answers": {
+      "post": {
+        "operationId": "QuizProgressController_submitAnswer",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SubmitQuizAnswerDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "답변 제출 성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "error": {
+                      "type": "string",
+                      "example": "에러 메시지"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "퀴즈 답변 제출/수정",
+        "tags": [
+          "Quiz Progress"
+        ]
+      }
+    },
+    "/api/quiz-progress/current": {
+      "get": {
+        "operationId": "QuizProgressController_getProgress",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "진행 상태 조회 성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/QuizProgressDto"
+                    },
+                    "error": {
+                      "type": "string",
+                      "example": "에러 메시지"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "현재 주차 퀴즈 진행 상태 조회",
+        "tags": [
+          "Quiz Progress"
+        ]
+      }
+    },
+    "/api/quiz-progress/reset": {
+      "post": {
+        "operationId": "QuizProgressController_resetProgress",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "초기화 성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "error": {
+                      "type": "string",
+                      "example": "에러 메시지"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "현재 주차 퀴즈 진행 상태 초기화",
+        "tags": [
+          "Quiz Progress"
+        ]
+      }
+    },
+    "/api/quiz-progress/quiz-sets/{id}": {
+      "get": {
+        "operationId": "QuizProgressController_getQuizSetWithProgress",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "퀴즈 세트 조회 성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "error": {
+                      "type": "string",
+                      "example": "에러 메시지"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "퀴즈 세트 조회 (진행 상태 포함)",
+        "tags": [
+          "Quiz Progress"
+        ]
+      }
+    },
+    "/api/system/state": {
+      "get": {
+        "operationId": "SystemController_getSystemState",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "시스템 상태 조회 성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/SystemStateDto"
+                    },
+                    "error": {
+                      "type": "string",
+                      "example": "에러 메시지"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "현재 시스템 주차 및 기간 상태 조회",
+        "tags": [
+          "System"
         ]
       }
     }
@@ -1658,6 +1957,98 @@
           "providerUserId"
         ]
       },
+      "QuizChoiceDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "선택지 ID",
+            "example": "choice-123"
+          },
+          "content": {
+            "type": "string",
+            "description": "선택지 내용",
+            "example": "사과"
+          },
+          "order": {
+            "type": "number",
+            "description": "선택지 순서 (1 또는 2)",
+            "example": 1,
+            "minimum": 1,
+            "maximum": 2
+          }
+        },
+        "required": [
+          "id",
+          "content",
+          "order"
+        ]
+      },
+      "QuizDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "퀴즈 ID",
+            "example": "123e4567-e89b-12d3-a456-426614174000"
+          },
+          "question": {
+            "type": "string",
+            "description": "퀴즈 질문",
+            "example": "사과 vs 바나나"
+          },
+          "quizSetId": {
+            "type": "string",
+            "description": "퀴즈 세트 ID",
+            "example": "123e4567-e89b-12d3-a456-426614174000"
+          },
+          "choices": {
+            "description": "퀴즈 선택지들",
+            "example": [
+              {
+                "id": "choice-1",
+                "content": "사과",
+                "order": 1
+              },
+              {
+                "id": "choice-2",
+                "content": "바나나",
+                "order": 2
+              }
+            ],
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/QuizChoiceDto"
+            }
+          },
+          "order": {
+            "type": "number",
+            "description": "퀴즈 순서",
+            "nullable": true,
+            "example": 1
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "생성일",
+            "example": "2025-01-01T00:00:00.000Z"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "수정일",
+            "example": "2025-01-01T00:00:00.000Z"
+          }
+        },
+        "required": [
+          "id",
+          "question",
+          "quizSetId",
+          "choices",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
       "CreateQuizChoiceDto": {
         "type": "object",
         "properties": {
@@ -1777,6 +2168,16 @@
             "description": "퀴즈 세트 ID",
             "example": "cuid"
           },
+          "year": {
+            "type": "number",
+            "description": "년도",
+            "example": 2025
+          },
+          "month": {
+            "type": "number",
+            "description": "월",
+            "example": 12
+          },
           "week": {
             "type": "number",
             "description": "주차",
@@ -1829,6 +2230,8 @@
         },
         "required": [
           "id",
+          "year",
+          "month",
           "week",
           "category",
           "title",
@@ -1842,6 +2245,16 @@
       "CreateQuizSetDto": {
         "type": "object",
         "properties": {
+          "year": {
+            "type": "number",
+            "description": "년도",
+            "example": 2025
+          },
+          "month": {
+            "type": "number",
+            "description": "월",
+            "example": 12
+          },
           "week": {
             "type": "number",
             "description": "주차",
@@ -1866,18 +2279,324 @@
             "type": "string",
             "description": "시작일",
             "example": "2025-12-01T00:00:00Z"
+          },
+          "forcePassword": {
+            "type": "string",
+            "description": "강제 적용 패스워드"
           }
         },
         "required": [
+          "year",
+          "month",
           "week",
           "category",
           "title",
           "startDate"
         ]
       },
+      "QuizSetListItemDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "퀴즈 세트 ID",
+            "example": "cuid"
+          },
+          "year": {
+            "type": "number",
+            "description": "년도",
+            "example": 2025
+          },
+          "month": {
+            "type": "number",
+            "description": "월",
+            "example": 12
+          },
+          "week": {
+            "type": "number",
+            "description": "주차",
+            "example": 1
+          },
+          "category": {
+            "type": "string",
+            "description": "카테고리",
+            "example": "일상"
+          },
+          "title": {
+            "type": "string",
+            "description": "퀴즈 세트 제목",
+            "example": "1주차 일상 퀴즈"
+          },
+          "description": {
+            "type": "string",
+            "description": "퀴즈 세트 설명",
+            "example": "일상생활에 관한 퀴즈 세트입니다."
+          },
+          "startDate": {
+            "format": "date-time",
+            "type": "string",
+            "description": "시작일",
+            "example": "2025-12-01T00:00:00Z"
+          },
+          "endDate": {
+            "format": "date-time",
+            "type": "string",
+            "description": "종료일",
+            "example": "2025-12-08T00:00:00Z"
+          },
+          "isActive": {
+            "type": "boolean",
+            "description": "활성화 여부",
+            "example": true
+          }
+        },
+        "required": [
+          "id",
+          "year",
+          "month",
+          "week",
+          "category",
+          "title",
+          "startDate",
+          "endDate",
+          "isActive"
+        ]
+      },
+      "CategoryGroupDto": {
+        "type": "object",
+        "properties": {
+          "category": {
+            "type": "string",
+            "description": "카테고리명",
+            "example": "금융"
+          },
+          "quizSets": {
+            "description": "퀴즈 세트 목록",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/QuizSetListItemDto"
+            }
+          }
+        },
+        "required": [
+          "category",
+          "quizSets"
+        ]
+      },
+      "WeekGroupDto": {
+        "type": "object",
+        "properties": {
+          "week": {
+            "type": "number",
+            "description": "주차",
+            "example": 1
+          },
+          "startDate": {
+            "format": "date-time",
+            "type": "string",
+            "description": "시작일",
+            "example": "2025-12-01T00:00:00Z"
+          },
+          "endDate": {
+            "format": "date-time",
+            "type": "string",
+            "description": "종료일",
+            "example": "2025-12-07T23:59:59.999Z"
+          },
+          "categories": {
+            "description": "카테고리별 그룹 목록",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CategoryGroupDto"
+            }
+          }
+        },
+        "required": [
+          "week",
+          "startDate",
+          "endDate",
+          "categories"
+        ]
+      },
+      "MonthGroupDto": {
+        "type": "object",
+        "properties": {
+          "month": {
+            "type": "number",
+            "description": "월",
+            "example": 12
+          },
+          "weeks": {
+            "description": "주차별 그룹 목록",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WeekGroupDto"
+            }
+          }
+        },
+        "required": [
+          "month",
+          "weeks"
+        ]
+      },
+      "YearGroupDto": {
+        "type": "object",
+        "properties": {
+          "year": {
+            "type": "number",
+            "description": "년도",
+            "example": 2025
+          },
+          "months": {
+            "description": "월별 그룹 목록",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MonthGroupDto"
+            }
+          }
+        },
+        "required": [
+          "year",
+          "months"
+        ]
+      },
+      "QuizSetGroupedResponseDto": {
+        "type": "object",
+        "properties": {
+          "years": {
+            "description": "년도별 그룹 목록",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/YearGroupDto"
+            }
+          }
+        },
+        "required": [
+          "years"
+        ]
+      },
+      "CurrentWeekQuizSetDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "퀴즈 세트 ID",
+            "example": "cuid"
+          },
+          "year": {
+            "type": "number",
+            "description": "년도",
+            "example": 2025
+          },
+          "month": {
+            "type": "number",
+            "description": "월",
+            "example": 12
+          },
+          "week": {
+            "type": "number",
+            "description": "주차",
+            "example": 1
+          },
+          "category": {
+            "type": "string",
+            "description": "카테고리",
+            "example": "일상"
+          },
+          "title": {
+            "type": "string",
+            "description": "퀴즈 세트 제목",
+            "example": "1주차 일상 퀴즈"
+          },
+          "description": {
+            "type": "string",
+            "description": "퀴즈 세트 설명",
+            "example": "일상생활에 관한 퀴즈 세트입니다."
+          },
+          "startDate": {
+            "format": "date-time",
+            "type": "string",
+            "description": "시작일",
+            "example": "2025-12-01T00:00:00Z"
+          },
+          "endDate": {
+            "format": "date-time",
+            "type": "string",
+            "description": "종료일",
+            "example": "2025-12-08T00:00:00Z"
+          },
+          "isActive": {
+            "type": "boolean",
+            "description": "활성화 여부",
+            "example": true
+          },
+          "quizzes": {
+            "description": "퀴즈 목록 (순서대로 정렬됨)",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/QuizDto"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "year",
+          "month",
+          "week",
+          "category",
+          "title",
+          "startDate",
+          "endDate",
+          "isActive",
+          "quizzes"
+        ]
+      },
+      "CurrentWeekQuizSetsResponseDto": {
+        "type": "object",
+        "properties": {
+          "year": {
+            "type": "number",
+            "description": "년도",
+            "example": 2025
+          },
+          "month": {
+            "type": "number",
+            "description": "월",
+            "example": 12
+          },
+          "week": {
+            "type": "number",
+            "description": "주차",
+            "example": 1
+          },
+          "quizSets": {
+            "description": "카테고리별 퀴즈 세트 목록",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CurrentWeekQuizSetDto"
+            }
+          }
+        },
+        "required": [
+          "year",
+          "month",
+          "week",
+          "quizSets"
+        ]
+      },
       "UpdateQuizSetDto": {
         "type": "object",
         "properties": {
+          "year": {
+            "type": "number",
+            "description": "년도",
+            "example": 2025
+          },
+          "month": {
+            "type": "number",
+            "description": "월",
+            "example": 12
+          },
           "week": {
             "type": "number",
             "description": "주차",
@@ -1907,8 +2626,131 @@
             "type": "boolean",
             "description": "활성화 여부",
             "example": true
+          },
+          "forcePassword": {
+            "type": "string",
+            "description": "강제 적용 패스워드"
           }
         }
+      },
+      "ReorderQuizzesDto": {
+        "type": "object",
+        "properties": {
+          "quizIds": {
+            "description": "순서대로 정렬된 퀴즈 ID 배열",
+            "example": [
+              "quiz-id-1",
+              "quiz-id-2",
+              "quiz-id-3"
+            ],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "quizIds"
+        ]
+      },
+      "SubmitQuizAnswerDto": {
+        "type": "object",
+        "properties": {
+          "quizId": {
+            "type": "string",
+            "description": "퀴즈 ID",
+            "example": "quiz-id-1"
+          },
+          "choiceId": {
+            "type": "string",
+            "description": "선택한 선택지 ID",
+            "example": "choice-id-1"
+          }
+        },
+        "required": [
+          "quizId",
+          "choiceId"
+        ]
+      },
+      "QuizProgressDto": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "description": "현재 진행 상태",
+            "enum": [
+              "NOT_STARTED",
+              "IN_PROGRESS",
+              "COMPLETED"
+            ],
+            "example": "IN_PROGRESS"
+          },
+          "quizSetId": {
+            "type": "string",
+            "description": "선택한 퀴즈 세트 ID",
+            "example": "quiz-set-id-1",
+            "nullable": true
+          },
+          "quizSetTitle": {
+            "type": "string",
+            "description": "선택한 퀴즈 세트 제목",
+            "example": "1주차 일상 퀴즈",
+            "nullable": true
+          },
+          "totalQuizzes": {
+            "type": "number",
+            "description": "전체 퀴즈 수",
+            "example": 10
+          },
+          "answeredQuizzes": {
+            "type": "number",
+            "description": "푼 퀴즈 수",
+            "example": 5
+          }
+        },
+        "required": [
+          "status",
+          "quizSetId",
+          "quizSetTitle",
+          "totalQuizzes",
+          "answeredQuizzes"
+        ]
+      },
+      "SystemStateDto": {
+        "type": "object",
+        "properties": {
+          "year": {
+            "type": "number",
+            "description": "현재 년도",
+            "example": 2025
+          },
+          "month": {
+            "type": "number",
+            "description": "현재 월",
+            "example": 12
+          },
+          "week": {
+            "type": "number",
+            "description": "현재 주차",
+            "example": 1
+          },
+          "period": {
+            "type": "string",
+            "description": "현재 시스템 기간 상태",
+            "enum": [
+              "QUIZ_PERIOD",
+              "MATCHING_PERIOD",
+              "CHATTING_PERIOD"
+            ],
+            "example": "QUIZ_PERIOD"
+          }
+        },
+        "required": [
+          "year",
+          "month",
+          "week",
+          "period"
+        ]
       }
     }
   }

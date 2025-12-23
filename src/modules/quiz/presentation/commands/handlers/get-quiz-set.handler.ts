@@ -2,38 +2,26 @@ import { CommandHandler } from '@common/command/command-handler.decorator';
 import { ICommandHandler } from '@common/command/command-handler.interface';
 import { ICommandResult } from '@common/command/command.interface';
 import { QuizSetDto } from '@module/quiz/application/dto/quiz-set.dto';
-import {
-  QUIZ_SET_REPOSITORY_TOKEN,
-  IQuizSetRepository,
-} from '@module/quiz/infrastructure/repository/quiz-set.repository.interface';
 import { GetQuizSetCommand } from '@module/quiz/presentation/commands/get-quiz-set.command';
-import { Injectable, Inject } from '@nestjs/common';
-import { QuizSetNotFoundException } from '@module/quiz/domain/exceptions/quiz.exceptions';
+import { Injectable } from '@nestjs/common';
+import { GetQuizSetUseCase } from '@module/quiz/application/usecases/get-quiz-set.usecase';
+import { QuizDto } from '@module/quiz/application/dto/quiz.dto';
 
 @Injectable()
 @CommandHandler(GetQuizSetCommand)
-export class GetQuizSetHandler implements ICommandHandler<GetQuizSetCommand, QuizSetDto> {
-  constructor(
-    @Inject(QUIZ_SET_REPOSITORY_TOKEN)
-    private readonly quizSetRepository: IQuizSetRepository,
-  ) {}
+export class GetQuizSetHandler implements ICommandHandler<GetQuizSetCommand, QuizSetDto & { quizzes?: QuizDto[] }> {
+  constructor(private readonly getQuizSetUseCase: GetQuizSetUseCase) {}
 
-  async execute(command: GetQuizSetCommand): Promise<ICommandResult<QuizSetDto>> {
+  async execute(command: GetQuizSetCommand): Promise<ICommandResult<QuizSetDto & { quizzes?: QuizDto[] }>> {
     console.log(`[GetQuizSetHandler] Command 실행 시작: id=${command.id}`);
 
     try {
-      const quizSet = await this.quizSetRepository.findById(command.id);
+      const result = await this.getQuizSetUseCase.execute(command.id, true);
 
-      if (!quizSet) {
-        throw new QuizSetNotFoundException(command.id);
-      }
-
-      const quizSetDto = QuizSetDto.fromDomain(quizSet);
-
-      console.log('[GetQuizSetHandler] Command 실행 완료: 퀴즈 세트 조회 성공');
+      console.log('[GetQuizSetHandler] Command 실행 완료: 퀴즈 세트 조회 성공 (퀴즈 포함)');
       return {
         success: true,
-        data: quizSetDto,
+        data: result,
       };
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : '알 수 없는 오류가 발생했습니다.';

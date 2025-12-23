@@ -17,7 +17,11 @@ export class UpdateQuizSetHandler implements ICommandHandler<UpdateQuizSetComman
     console.log(`[UpdateQuizSetHandler] Command 실행 시작: id=${command.id}`);
 
     try {
-      const quizSet = await this.updateQuizSetUseCase.execute(command.id, command.dto);
+      const quizSet = await this.updateQuizSetUseCase.execute(
+        command.id,
+        command.dto,
+        command.forcePassword,
+      );
       const quizSetDto = QuizSetDto.fromDomain(quizSet);
 
       console.log('[UpdateQuizSetHandler] Command 실행 완료: 퀴즈 세트 수정 성공');

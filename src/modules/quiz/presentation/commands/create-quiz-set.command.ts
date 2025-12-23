@@ -4,7 +4,10 @@ import { CreateQuizSetDto } from '@module/quiz/application/dto/create-quiz-set.d
 export class CreateQuizSetCommand implements ICommand {
   readonly commandId?: string;
 
-  constructor(public readonly dto: CreateQuizSetDto) {
+  constructor(
+    public readonly dto: CreateQuizSetDto,
+    public readonly forcePassword?: string,
+  ) {
     this.commandId = `create-quiz-set-${Date.now()}`;
   }
 }
