@@ -1,10 +1,8 @@
-import { Module, OnModuleInit } from '@nestjs/common';
+import { Module, OnModuleInit, forwardRef } from '@nestjs/common';
 import { CommandBus } from '@common/command/command-bus';
 import { CommandBusModule } from '@common/command/command-bus.module';
 import { registerCommandHandlers } from '@common/command/command-handler-registry.util';
 import { RoleModule } from '@module/role/role.module';
-import { JwtModule, JwtModuleOptions } from '@nestjs/jwt';
-import { ConfigService } from '@nestjs/config';
 import { UserRepository } from '@module/user/infrastructure/repository/user.repository';
 import { USER_REPOSITORY_TOKEN } from '@module/user/infrastructure/repository/user.repository.interface';
 import { UserSocialAccountRepository } from '@module/user/infrastructure/repository/user-social-account.repository';
@@ -53,19 +51,7 @@ const UserSocialAccountRepositoryProvider = {
 @Module({
   imports: [
     CommandBusModule,
-    RoleModule,
-    JwtModule.registerAsync({
-      useFactory: (configService: ConfigService): JwtModuleOptions => {
-        const expiresIn = configService.get<string>('jwt.accessExpiresIn') || '15m';
-        return {
-          secret: configService.get<string>('jwt.accessSecret'),
-          signOptions: {
-            expiresIn: expiresIn as any,
-          },
-        };
-      },
-      inject: [ConfigService],
-    }),
+    forwardRef(() => RoleModule),
   ],
   controllers: [UserController],
   providers: [
@@ -108,7 +94,7 @@ const UserSocialAccountRepositoryProvider = {
     RefreshAccessTokenHandler,
     LogoutHandler,
   ],
-  exports: [USER_REPOSITORY_TOKEN, USER_SOCIAL_ACCOUNT_REPOSITORY_TOKEN, JwtModule],
+  exports: [USER_REPOSITORY_TOKEN, USER_SOCIAL_ACCOUNT_REPOSITORY_TOKEN],
 })
 export class UserModule implements OnModuleInit {
   constructor(

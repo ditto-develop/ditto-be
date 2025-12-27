@@ -1,5 +1,5 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Put, Query } from '@nestjs/common';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Put, Query, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CommandBus } from '@common/command/command-bus';
 import { ApiCommandResponse } from '@common/command/api-response.decorator';
 import { QuizSetDto } from '@module/quiz/application/dto/quiz-set.dto';
@@ -19,9 +19,12 @@ import { DeactivateQuizSetCommand } from '@module/quiz/presentation/commands/dea
 import { QuizSetGroupedResponseDto } from '@module/quiz/application/dto/quiz-set-grouped-response.dto';
 import { ReorderQuizzesDto } from '@module/quiz/application/dto/reorder-quizzes.dto';
 import { ReorderQuizzesCommand } from '@module/quiz/presentation/commands/reorder-quizzes.command';
+import { JwtAuthGuard } from '@module/user/infrastructure/guards/jwt-auth.guard';
 
 @ApiTags('Quiz Sets')
 @Controller('quiz-sets')
+@ApiBearerAuth('access-token')
+@UseGuards(JwtAuthGuard)
 export class QuizSetController {
   constructor(private readonly commandBus: CommandBus) {}
 

@@ -1,5 +1,5 @@
 import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CommandBus } from '@common/command/command-bus';
 import { ApiCommandResponse } from '@common/command/api-response.decorator';
 import { ICommandResult } from '@common/command/command.interface';
@@ -15,6 +15,7 @@ import { GetQuizSetWithProgressCommand } from '../commands/get-quiz-set-with-pro
 
 @ApiTags('Quiz Progress')
 @Controller('quiz-progress')
+@ApiBearerAuth('access-token')
 @UseGuards(JwtAuthGuard)
 export class QuizProgressController {
   constructor(private readonly commandBus: CommandBus) {}

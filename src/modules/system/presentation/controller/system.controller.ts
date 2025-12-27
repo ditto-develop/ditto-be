@@ -1,5 +1,5 @@
 import { Controller, Get, UseGuards } from '@nestjs/common';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CommandBus } from '@common/command/command-bus';
 import { ApiCommandResponse } from '@common/command/api-response.decorator';
 import { ICommandResult } from '@common/command/command.interface';
@@ -9,6 +9,7 @@ import { GetSystemStateCommand } from '../commands/get-system-state.command';
 
 @ApiTags('System')
 @Controller('system')
+@ApiBearerAuth('access-token')
 @UseGuards(JwtAuthGuard)
 export class SystemController {
   constructor(private readonly commandBus: CommandBus) {}

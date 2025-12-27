@@ -8,12 +8,15 @@ import { CreateQuizCommand } from '@module/quiz/presentation/commands/create-qui
 import { DeleteQuizCommand } from '@module/quiz/presentation/commands/delete-quiz.command';
 import { GetQuizCommand } from '@module/quiz/presentation/commands/get-quiz.command';
 import { UpdateQuizCommand } from '@module/quiz/presentation/commands/update-quiz.command';
-import { Body, Controller, Delete, Get, Param, Post, Put, UsePipes, ValidationPipe } from '@nestjs/common';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { JwtAuthGuard } from '@module/user/infrastructure/guards/jwt-auth.guard';
 
 @ApiTags('Quizzes')
 @Controller('quizzes')
 @UsePipes(new ValidationPipe())
+@ApiBearerAuth('access-token')
+@UseGuards(JwtAuthGuard)
 export class QuizController {
   constructor(private readonly commandBus: CommandBus) {}
 

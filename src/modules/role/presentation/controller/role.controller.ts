@@ -1,14 +1,17 @@
-import { Controller, Get, Param, ParseIntPipe } from '@nestjs/common';
-import { ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
+import { Controller, Get, Param, ParseIntPipe, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { CommandBus } from '@common/command/command-bus';
 import { ApiCommandResponse } from '@common/command/api-response.decorator';
 import { ICommandResult } from '@common/command/command.interface';
 import { RoleDto } from '@module/role/application/dto/role.dto';
 import { GetAllRolesCommand } from '@module/role/presentation/commands/get-all-roles.command';
 import { GetRoleByIdCommand } from '@module/role/presentation/commands/get-role-by-id.command';
+import { JwtAuthGuard } from '@module/user/infrastructure/guards/jwt-auth.guard';
 
 @ApiTags('Role')
 @Controller('roles')
+@ApiBearerAuth('access-token')
+@UseGuards(JwtAuthGuard)
 export class RoleController {
   constructor(private readonly commandBus: CommandBus) {
     console.log('[RoleController] RoleController 초기화');

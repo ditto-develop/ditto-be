@@ -1,5 +1,5 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards, Res, Req } from '@nestjs/common';
-import { ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { CommandBus } from '@common/command/command-bus';
 import { ApiCommandResponse } from '@common/command/api-response.decorator';
 import { ICommandResult } from '@common/command/command.interface';
@@ -51,6 +51,7 @@ export class UserController {
 
   @Post('/admin')
   @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiBearerAuth('access-token')
   @Roles(RoleCode.ADMIN, RoleCode.SUPER_ADMIN)
   @ApiOperation({ summary: '관리자 계정 생성', description: '관리자 계정을 생성합니다.' })
   @ApiCommandResponse(201, '관리자 계정 생성 성공', UserDto, false)
@@ -72,6 +73,7 @@ export class UserController {
   @Get()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(RoleCode.ADMIN, RoleCode.SUPER_ADMIN)
+  @ApiBearerAuth('access-token')
   @ApiOperation({ summary: '모든 사용자 조회', description: '관리자가 모든 사용자를 조회합니다.' })
   @ApiCommandResponse(200, '사용자 목록 조회 성공', UserDto, true)
   async findAll(@CurrentUser() currentUser): Promise<ICommandResult<UserDto[]>> {
@@ -82,6 +84,7 @@ export class UserController {
 
   @Get(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiBearerAuth('access-token')
   @Roles(RoleCode.ADMIN, RoleCode.SUPER_ADMIN, RoleCode.USER)
   @ApiOperation({ summary: '사용자 상세 조회', description: '특정 사용자의 상세 정보를 조회합니다.' })
   @ApiParam({ name: 'id', type: 'string', description: '사용자 ID' })
@@ -96,6 +99,7 @@ export class UserController {
 
   @Get('/me/profile')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('access-token')
   @ApiOperation({ summary: '본인 정보 조회', description: '현재 로그인한 사용자의 정보를 조회합니다.' })
   @ApiCommandResponse(200, '본인 정보 조회 성공', UserDto, false)
   async getMyProfile(@CurrentUser() user): Promise<ICommandResult<UserDto>> {
@@ -106,6 +110,7 @@ export class UserController {
 
   @Patch(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiBearerAuth('access-token')
   @Roles(RoleCode.ADMIN, RoleCode.SUPER_ADMIN, RoleCode.USER)
   @ApiOperation({ summary: '사용자 정보 수정', description: '사용자 정보를 수정합니다.' })
   @ApiParam({ name: 'id', type: 'string', description: '사용자 ID' })
@@ -123,6 +128,7 @@ export class UserController {
 
   @Delete(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiBearerAuth('access-token')
   @Roles(RoleCode.ADMIN, RoleCode.SUPER_ADMIN)
   @ApiOperation({ summary: '사용자 영구 삭제', description: '관리자가 사용자를 영구 삭제합니다.' })
   @ApiParam({ name: 'id', type: 'string', description: '사용자 ID' })
@@ -135,6 +141,7 @@ export class UserController {
 
   @Post(':id/leave')
   @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiBearerAuth('access-token')
   @Roles(RoleCode.USER)
   @ApiOperation({ summary: '사용자 탈퇴', description: '사용자를 탈퇴 처리합니다.' })
   @ApiParam({ name: 'id', type: 'string', description: '사용자 ID' })
@@ -148,6 +155,7 @@ export class UserController {
 
   @Post(':id/social-accounts')
   @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiBearerAuth('access-token')
   @Roles(RoleCode.USER)
   @ApiOperation({ summary: '소셜 계정 추가', description: '사용자에게 소셜 계정을 추가합니다.' })
   @ApiParam({ name: 'id', type: 'string', description: '사용자 ID' })
@@ -165,6 +173,7 @@ export class UserController {
 
   @Delete(':id/social-accounts/:provider')
   @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiBearerAuth('access-token')
   @Roles(RoleCode.USER)
   @ApiOperation({ summary: '소셜 계정 제거', description: '사용자의 소셜 계정을 제거합니다.' })
   @ApiParam({ name: 'id', type: 'string', description: '사용자 ID' })
@@ -242,6 +251,8 @@ export class UserController {
   }
 
   @Post('/auth/logout')
+  @ApiBearerAuth('access-token')
+  @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: '로그아웃', description: '리프레시 토큰을 폐기하고 쿠키를 제거합니다.' })
   @ApiCommandResponse(200, '로그아웃 성공')
   async logout(@Req() req: Request, @Res({ passthrough: true }) res: Response): Promise<ICommandResult<void>> {

@@ -34,6 +34,11 @@
             }
           }
         },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
         "summary": "모든 Role 조회",
         "tags": [
           "Role"
@@ -100,6 +105,11 @@
             }
           }
         },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
         "summary": "Role 조회",
         "tags": [
           "Role"
@@ -146,6 +156,11 @@
             }
           }
         },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
         "summary": "관리자 계정 생성",
         "tags": [
           "User"
@@ -229,6 +244,11 @@
             }
           }
         },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
         "summary": "모든 사용자 조회",
         "tags": [
           "User"
@@ -295,6 +315,11 @@
             }
           }
         },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
         "summary": "사용자 상세 조회",
         "tags": [
           "User"
@@ -349,6 +374,11 @@
             }
           }
         },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
         "summary": "사용자 정보 수정",
         "tags": [
           "User"
@@ -390,6 +420,11 @@
             }
           }
         },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
         "summary": "사용자 영구 삭제",
         "tags": [
           "User"
@@ -426,6 +461,11 @@
             }
           }
         },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
         "summary": "본인 정보 조회",
         "tags": [
           "User"
@@ -472,6 +512,11 @@
             }
           }
         },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
         "summary": "사용자 탈퇴",
         "tags": [
           "User"
@@ -518,6 +563,11 @@
             }
           }
         },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
         "summary": "소셜 계정 추가",
         "tags": [
           "User"
@@ -570,6 +620,11 @@
             }
           }
         },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
         "summary": "소셜 계정 제거",
         "tags": [
           "User"
@@ -791,6 +846,11 @@
             }
           }
         },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
         "summary": "로그아웃",
         "tags": [
           "User"
@@ -836,6 +896,11 @@
             }
           }
         },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
         "summary": "퀴즈 생성",
         "tags": [
           "Quizzes"
@@ -900,6 +965,11 @@
             }
           }
         },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
         "summary": "퀴즈 조회",
         "tags": [
           "Quizzes"
@@ -952,6 +1022,11 @@
             }
           }
         },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
         "summary": "퀴즈 수정",
         "tags": [
           "Quizzes"
@@ -991,6 +1066,11 @@
             }
           }
         },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
         "summary": "퀴즈 삭제",
         "tags": [
           "Quizzes"
@@ -1036,6 +1116,11 @@
             }
           }
         },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
         "summary": "퀴즈 세트 생성",
         "tags": [
           "Quiz Sets"
@@ -1120,6 +1205,11 @@
             }
           }
         },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
         "summary": "퀴즈 세트 목록 조회",
         "tags": [
           "Quiz Sets"
@@ -1155,6 +1245,11 @@
             }
           }
         },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
         "summary": "이번 주차 퀴즈 세트 조회",
         "tags": [
           "Quiz Sets"
@@ -1199,6 +1294,11 @@
             }
           }
         },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
         "summary": "퀴즈 세트 조회",
         "tags": [
           "Quiz Sets"
@@ -1251,6 +1351,11 @@
             }
           }
         },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
         "summary": "퀴즈 세트 수정",
         "tags": [
           "Quiz Sets"
@@ -1298,6 +1403,11 @@
             }
           }
         },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
         "summary": "퀴즈 세트 삭제",
         "tags": [
           "Quiz Sets"
@@ -1342,6 +1452,11 @@
             }
           }
         },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
         "summary": "퀴즈 세트 활성화",
         "tags": [
           "Quiz Sets"
@@ -1383,6 +1498,11 @@
             }
           }
         },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
         "summary": "퀴즈 세트 비활성화",
         "tags": [
           "Quiz Sets"
@@ -1437,6 +1557,11 @@
             }
           }
         },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
         "summary": "퀴즈 순서 일괄 변경 및 관리",
         "tags": [
           "Quiz Sets"
@@ -1479,6 +1604,11 @@
             }
           }
         },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
         "summary": "퀴즈 답변 제출/수정",
         "tags": [
           "Quiz Progress"
@@ -1514,6 +1644,11 @@
             }
           }
         },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
         "summary": "현재 주차 퀴즈 진행 상태 조회",
         "tags": [
           "Quiz Progress"
@@ -1546,6 +1681,11 @@
             }
           }
         },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
         "summary": "현재 주차 퀴즈 진행 상태 초기화",
         "tags": [
           "Quiz Progress"
@@ -1587,6 +1727,11 @@
             }
           }
         },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
         "summary": "퀴즈 세트 조회 (진행 상태 포함)",
         "tags": [
           "Quiz Progress"
@@ -1622,6 +1767,11 @@
             }
           }
         },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
         "summary": "현재 시스템 주차 및 기간 상태 조회",
         "tags": [
           "System"
@@ -2066,11 +2216,6 @@
       "CreateQuizDto": {
         "type": "object",
         "properties": {
-          "id": {
-            "type": "string",
-            "description": "퀴즈 ID",
-            "example": "123e4567-e89b-12d3-a456-426614174000"
-          },
           "question": {
             "type": "string",
             "description": "퀴즈 질문",
@@ -2103,7 +2248,6 @@
           }
         },
         "required": [
-          "id",
           "question",
           "quizSetId",
           "choices"

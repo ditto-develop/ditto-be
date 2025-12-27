@@ -11,6 +11,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { ScheduleModule } from '@nestjs/schedule';
 import { validate } from '@config/env.validation';
+import { AuthModule } from '@module/auth/auth.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { validate } from '@config/env.validation';
       validate,
       envFilePath: ['.env.local', '.env'],
     }),
+    AuthModule,
     ScheduleModule.forRoot(),
     PrismaModule,
     RedisModule,
