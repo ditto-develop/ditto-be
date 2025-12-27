@@ -5,13 +5,6 @@ import { CreateQuizChoiceDto } from './quiz-choice.dto';
 
 export class CreateQuizDto {
   @ApiProperty({
-    description: '퀴즈 ID',
-    example: '123e4567-e89b-12d3-a456-426614174000',
-  })
-  @IsString()
-  id: string;
-
-  @ApiProperty({
     description: '퀴즈 질문',
     example: '사과 vs 바나나',
   })
