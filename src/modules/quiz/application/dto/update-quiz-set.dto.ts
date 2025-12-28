@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsBoolean, IsDateString, IsInt, IsOptional, IsString, Max, Min } from 'class-validator';
+import { IsBoolean, IsInt, IsOptional, IsString, Max, Min } from 'class-validator';
 
 export class UpdateQuizSetDto {
   @ApiProperty({
@@ -59,15 +59,6 @@ export class UpdateQuizSetDto {
   @IsOptional()
   @IsString()
   description?: string;
-
-  @ApiProperty({
-    description: '시작일',
-    example: '2025-12-01T00:00:00Z',
-    required: false,
-  })
-  @IsOptional()
-  @IsDateString()
-  startDate?: string;
 
   @ApiProperty({
     description: '활성화 여부',

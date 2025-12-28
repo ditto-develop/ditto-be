@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsDateString, IsInt, IsOptional, IsString, Max, Min } from 'class-validator';
+import { IsInt, IsOptional, IsString, Max, Min } from 'class-validator';
 
 export class CreateQuizSetDto {
   @ApiProperty({
@@ -49,13 +49,6 @@ export class CreateQuizSetDto {
   @IsOptional()
   @IsString()
   description?: string;
-
-  @ApiProperty({
-    description: '시작일',
-    example: '2025-12-01T00:00:00Z',
-  })
-  @IsDateString()
-  startDate: string;
 
   @ApiProperty({
     description: '강제 적용 패스워드',

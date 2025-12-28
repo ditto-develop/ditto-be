@@ -8,6 +8,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { BusinessRuleException } from '@common/exceptions/domain.exception';
 import { v4 as uuidv4 } from 'uuid';
 import { validateForcePassword } from '@module/common/utils/force-password.util';
+import { WeekCalculator } from '@module/quiz/domain/utils/week-calculator.util';
 
 @Injectable()
 export class CreateQuizSetUseCase {
@@ -19,15 +20,17 @@ export class CreateQuizSetUseCase {
   async execute(dto: CreateQuizSetDto, forcePassword?: string): Promise<QuizSet> {
     console.log(`[CreateQuizSetUseCase] QuizSet 생성 시작: title=${dto.title}`);
 
+    // 주차 기반 시작일 계산
+    const startDate = WeekCalculator.getWeekStartDate(dto.year, dto.month, dto.week);
+
     // 강제 적용 패스워드가 유효하면 모든 검증 우회
     const isForced = validateForcePassword(forcePassword);
 
     if (!isForced) {
-      // 시작일이 현재 날짜 이후인지 확인
-      const startDate = new Date(dto.startDate);
+      // 계산된 시작일이 현재 날짜 이후인지 확인
       const now = new Date();
       if (startDate < now) {
-        throw new BusinessRuleException('시작일은 현재 날짜 이후여야 합니다.');
+        throw new BusinessRuleException('해당 주차의 시작일(월요일)은 현재 날짜 이후여야 합니다.');
       }
 
       // 동일한 년, 월, 주차, 카테고리에 이미 퀴즈 세트가 있는지 확인
@@ -44,7 +47,6 @@ export class CreateQuizSetUseCase {
       }
     }
 
-    const startDate = new Date(dto.startDate);
     // ID 생성
     const id = uuidv4();
 

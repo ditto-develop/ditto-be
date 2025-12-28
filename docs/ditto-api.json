@@ -2419,11 +2419,6 @@
             "description": "퀴즈 세트 설명",
             "example": "일상생활에 관한 퀴즈 세트입니다."
           },
-          "startDate": {
-            "type": "string",
-            "description": "시작일",
-            "example": "2025-12-01T00:00:00Z"
-          },
           "forcePassword": {
             "type": "string",
             "description": "강제 적용 패스워드"
@@ -2434,8 +2429,7 @@
           "month",
           "week",
           "category",
-          "title",
-          "startDate"
+          "title"
         ]
       },
       "QuizSetListItemDto": {
@@ -2760,11 +2754,6 @@
             "type": "string",
             "description": "퀴즈 세트 설명",
             "example": "일상생활에 관한 퀴즈 세트입니다."
-          },
-          "startDate": {
-            "type": "string",
-            "description": "시작일",
-            "example": "2025-12-01T00:00:00Z"
           },
           "isActive": {
             "type": "boolean",

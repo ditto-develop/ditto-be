@@ -8,6 +8,7 @@ import {
 } from '@module/quiz/infrastructure/repository/quiz-set.repository.interface';
 import { Inject, Injectable } from '@nestjs/common';
 import { validateForcePassword } from '@module/common/utils/force-password.util';
+import { WeekCalculator } from '@module/quiz/domain/utils/week-calculator.util';
 
 @Injectable()
 export class UpdateQuizSetUseCase {
@@ -34,6 +35,20 @@ export class UpdateQuizSetUseCase {
     const newWeek = dto.week !== undefined ? dto.week : existingQuizSet.week;
     const newCategory = dto.category !== undefined ? dto.category : existingQuizSet.category;
 
+    // 주차 정보 변경 여부 확인
+    const isWeekInfoChanged =
+      newYear !== existingQuizSet.year || newMonth !== existingQuizSet.month || newWeek !== existingQuizSet.week;
+
+    let updatedStartDate = existingQuizSet.startDate;
+    let updatedEndDate = existingQuizSet.endDate;
+
+    // 주차 정보가 변경된 경우 시작일과 종료일 재계산
+    if (isWeekInfoChanged) {
+      updatedStartDate = WeekCalculator.getWeekStartDate(newYear, newMonth, newWeek);
+      updatedEndDate = new Date(updatedStartDate);
+      updatedEndDate.setDate(updatedEndDate.getDate() + 7);
+    }
+
     if (!isForced) {
       // 활성화 상태이며 시작일이 오늘 이전인 경우 수정 불가
       const now = new Date();
@@ -43,8 +58,12 @@ export class UpdateQuizSetUseCase {
         throw new BusinessRuleException('활성화 상태이며 시작일이 오늘 이전인 퀴즈 세트는 수정할 수 없습니다.');
       }
 
-      // 년, 월, 주차, 카테고리가 변경되는 경우, 동일한 위치에 이미 다른 퀴즈 세트가 있는지 확인
+      // 주차가 변경된 경우, 새로운 주차 시작일이 현재 날짜 이후인지 확인
+      if (isWeekInfoChanged && updatedStartDate < now) {
+        throw new BusinessRuleException('해당 주차의 시작일(월요일)은 현재 날짜 이후여야 합니다.');
+      }
 
+      // 년, 월, 주차, 카테고리가 변경되는 경우, 동일한 위치에 이미 다른 퀴즈 세트가 있는지 확인
       if (
         newYear !== existingQuizSet.year ||
         newMonth !== existingQuizSet.month ||
@@ -63,14 +82,6 @@ export class UpdateQuizSetUseCase {
           );
         }
       }
-
-      // 시작일이 변경되는 경우, 유효성 검증
-      if (dto.startDate !== undefined) {
-        const startDate = new Date(dto.startDate);
-        if (startDate < now) {
-          throw new BusinessRuleException('시작일은 현재 날짜 이후여야 합니다.');
-        }
-      }
     }
 
     // 기존 값과 새로운 값을 조합하여 업데이트
@@ -78,16 +89,6 @@ export class UpdateQuizSetUseCase {
     const updatedTitle = dto.title !== undefined ? dto.title : existingQuizSet.title;
     const updatedDescription = dto.description !== undefined ? dto.description : existingQuizSet.description;
     const updatedIsActive = dto.isActive !== undefined ? dto.isActive : existingQuizSet.isActive;
-    let updatedStartDate = existingQuizSet.startDate;
-    let updatedEndDate = existingQuizSet.endDate;
-
-    // 시작일이 변경된 경우, 종료일도 함께 업데이트
-    if (dto.startDate !== undefined) {
-      updatedStartDate = new Date(dto.startDate);
-      // 종료일은 시작일로부터 7일 후로 자동 설정
-      updatedEndDate = new Date(updatedStartDate);
-      updatedEndDate.setDate(updatedEndDate.getDate() + 7);
-    }
 
     // QuizSet 업데이트
     const updatedQuizSet = existingQuizSet.update(
