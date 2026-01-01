@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards, Res, Req } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards, Res, Req, HttpCode } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { CommandBus } from '@common/command/command-bus';
 import { ApiCommandResponse } from '@common/command/api-response.decorator';
@@ -230,6 +230,7 @@ export class UserController {
     return result;
   }
 
+  @HttpCode(200)
   @Post('/auth/refresh')
   @ApiOperation({ summary: '토큰 재발급', description: '리프레시 토큰으로 새로운 액세스/리프레시 토큰을 발급합니다.' })
   @ApiCommandResponse(200, '토큰 재발급 성공', LoginResponseDto, false)
