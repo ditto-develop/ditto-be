@@ -17,7 +17,7 @@ export class GetRoleByIdUseCase {
     const role = await this.roleRepo.findById(id);
 
     if (!role) {
-      throw new EntityNotFoundException('Role', id);
+      throw new EntityNotFoundException('역할', id);
     }
 
     return role;

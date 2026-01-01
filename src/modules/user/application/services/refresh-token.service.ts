@@ -1,9 +1,10 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { JwtService, JwtSignOptions } from '@nestjs/jwt';
 import { SignOptions } from 'jsonwebtoken';
 import { ConfigService } from '@nestjs/config';
 import { RedisService } from '@module/common/redis/redis.service';
 import { randomUUID } from 'crypto';
+import { UnauthorizedException } from '@common/exceptions/application.exception';
 
 @Injectable()
 export class RefreshTokenService {
