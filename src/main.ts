@@ -9,6 +9,8 @@ import { version } from '../package.json';
 import { GlobalExceptionFilter } from '@common/exceptions/exception.filter';
 import { TraceIdMiddleware } from '@common/logging/middleware/trace-id.middleware';
 import { HttpLoggingInterceptor } from '@common/logging/interceptors/http-logging.interceptor';
+import path from 'node:path';
+import fs from 'node:fs';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -73,7 +75,11 @@ async function bootstrap() {
   SwaggerModule.setup('api/docs', app, document);
   // }
 
-  writeFileSync('./docs/ditto-api.json', JSON.stringify(document, null, 2));
+  const outputDir = path.join(process.cwd(), 'docs');
+  if (!fs.existsSync(outputDir)) {
+    fs.mkdirSync(outputDir, { recursive: true });
+  }
+  writeFileSync(path.join(outputDir, 'ditto-api.json'), JSON.stringify(document, null, 2));
 
   await app.listen(port);
 
