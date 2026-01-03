@@ -2,6 +2,7 @@ import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards, Res, Req,
 import { ApiBearerAuth, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { CommandBus } from '@common/command/command-bus';
 import { ApiCommandResponse } from '@common/command/api-response.decorator';
+import { ApiCommonErrorResponses, ApiNotFoundResponse, ApiNoContentResponse, ApiUnauthorizedResponse } from '@common/command/api-error-response.decorator';
 import { ICommandResult } from '@common/command/command.interface';
 import {
   UserDto,
@@ -41,6 +42,7 @@ import {
 
 @ApiTags('User')
 @Controller('users')
+@ApiCommonErrorResponses()
 export class UserController {
   constructor(
     private readonly commandBus: CommandBus,
@@ -89,7 +91,7 @@ export class UserController {
   @ApiOperation({ summary: '사용자 상세 조회', description: '특정 사용자의 상세 정보를 조회합니다.' })
   @ApiParam({ name: 'id', type: 'string', description: '사용자 ID' })
   @ApiCommandResponse(200, '사용자 조회 성공', UserDto, false)
-  @ApiCommandResponse(404, '사용자를 찾을 수 없음')
+  @ApiNotFoundResponse('사용자를 찾을 수 없음')
   async findById(@Param('id') id: string, @CurrentUser() currentUser): Promise<ICommandResult<UserDto>> {
     console.log(`[UserController] 사용자 조회 요청: id=${id}`);
 
@@ -115,6 +117,7 @@ export class UserController {
   @ApiOperation({ summary: '사용자 정보 수정', description: '사용자 정보를 수정합니다.' })
   @ApiParam({ name: 'id', type: 'string', description: '사용자 ID' })
   @ApiCommandResponse(200, '사용자 정보 수정 성공', UserDto, false)
+  @ApiNotFoundResponse('사용자를 찾을 수 없음')
   async update(
     @Param('id') id: string,
     @Body() dto: UpdateUserDto,
@@ -127,12 +130,13 @@ export class UserController {
   }
 
   @Delete(':id')
+  @HttpCode(204)
   @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiBearerAuth('access-token')
   @Roles(RoleCode.ADMIN, RoleCode.SUPER_ADMIN)
   @ApiOperation({ summary: '사용자 영구 삭제', description: '관리자가 사용자를 영구 삭제합니다.' })
   @ApiParam({ name: 'id', type: 'string', description: '사용자 ID' })
-  @ApiCommandResponse(200, '사용자 삭제 성공')
+  @ApiNoContentResponse('사용자 삭제 성공')
   async delete(@Param('id') id: string, @CurrentUser() currentUser): Promise<ICommandResult<void>> {
     console.log(`[UserController] 사용자 삭제 요청: id=${id}`);
     const command = new DeleteUserCommand(id, currentUser.id);
@@ -146,6 +150,7 @@ export class UserController {
   @ApiOperation({ summary: '사용자 탈퇴', description: '사용자를 탈퇴 처리합니다.' })
   @ApiParam({ name: 'id', type: 'string', description: '사용자 ID' })
   @ApiCommandResponse(200, '사용자 탈퇴 처리 성공', UserDto, false)
+  @ApiNotFoundResponse('사용자를 찾을 수 없음')
   async leave(@Param('id') id: string, @CurrentUser() currentUser): Promise<ICommandResult<UserDto>> {
     console.log(`[UserController] 사용자 탈퇴 요청: id=${id}`);
 
@@ -160,6 +165,7 @@ export class UserController {
   @ApiOperation({ summary: '소셜 계정 추가', description: '사용자에게 소셜 계정을 추가합니다.' })
   @ApiParam({ name: 'id', type: 'string', description: '사용자 ID' })
   @ApiCommandResponse(201, '소셜 계정 추가 성공', UserSocialAccountDto, false)
+  @ApiNotFoundResponse('사용자를 찾을 수 없음')
   async addSocialAccount(
     @Param('id') userId: string,
     @Body() dto: { provider: string; providerUserId: string },
@@ -172,13 +178,14 @@ export class UserController {
   }
 
   @Delete(':id/social-accounts/:provider')
+  @HttpCode(204)
   @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiBearerAuth('access-token')
   @Roles(RoleCode.USER)
   @ApiOperation({ summary: '소셜 계정 제거', description: '사용자의 소셜 계정을 제거합니다.' })
   @ApiParam({ name: 'id', type: 'string', description: '사용자 ID' })
   @ApiParam({ name: 'provider', type: 'string', description: '소셜 로그인 제공자' })
-  @ApiCommandResponse(200, '소셜 계정 제거 성공')
+  @ApiNoContentResponse('소셜 계정 제거 성공')
   async removeSocialAccount(
     @Param('id') userId: string,
     @Param('provider') provider: string,
@@ -193,7 +200,7 @@ export class UserController {
   @Post('/login')
   @ApiOperation({ summary: '관리자 로그인', description: '관리자 계정으로 로그인합니다.' })
   @ApiCommandResponse(200, '로그인 성공', LoginResponseDto, false)
-  @ApiCommandResponse(401, '인증 실패')
+  @ApiUnauthorizedResponse('인증 실패')
   async login(
     @Body() dto: LoginDto,
     @Res({ passthrough: true }) res: Response,
@@ -213,7 +220,7 @@ export class UserController {
   @Post('/social-login')
   @ApiOperation({ summary: '소셜 로그인', description: '소셜 계정으로 로그인합니다.' })
   @ApiCommandResponse(200, '로그인 성공', LoginResponseDto, false)
-  @ApiCommandResponse(401, '인증 실패')
+  @ApiUnauthorizedResponse('인증 실패')
   async socialLogin(
     @Body() dto: SocialLoginDto,
     @Res({ passthrough: true }) res: Response,
@@ -234,7 +241,7 @@ export class UserController {
   @Post('/auth/refresh')
   @ApiOperation({ summary: '토큰 재발급', description: '리프레시 토큰으로 새로운 액세스/리프레시 토큰을 발급합니다.' })
   @ApiCommandResponse(200, '토큰 재발급 성공', LoginResponseDto, false)
-  @ApiCommandResponse(401, '리프레시 토큰 검증 실패')
+  @ApiUnauthorizedResponse('리프레시 토큰 검증 실패')
   async refreshToken(
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,

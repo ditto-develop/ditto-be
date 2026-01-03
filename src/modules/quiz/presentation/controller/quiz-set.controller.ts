@@ -1,7 +1,8 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Put, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Put, Query, UseGuards, HttpCode } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CommandBus } from '@common/command/command-bus';
 import { ApiCommandResponse } from '@common/command/api-response.decorator';
+import { ApiCommonErrorResponses, ApiNotFoundResponse, ApiNoContentResponse } from '@common/command/api-error-response.decorator';
 import { QuizSetDto } from '@module/quiz/application/dto/quiz-set.dto';
 import { ICommandResult } from '@common/command/command.interface';
 import { CreateQuizSetDto } from '@module/quiz/application/dto/create-quiz-set.dto';
@@ -25,6 +26,7 @@ import { JwtAuthGuard } from '@module/user/infrastructure/guards/jwt-auth.guard'
 @Controller('quiz-sets')
 @ApiBearerAuth('access-token')
 @UseGuards(JwtAuthGuard)
+@ApiCommonErrorResponses()
 export class QuizSetController {
   constructor(private readonly commandBus: CommandBus) {}
 
@@ -58,6 +60,7 @@ export class QuizSetController {
   @Get(':id')
   @ApiOperation({ summary: '퀴즈 세트 조회' })
   @ApiCommandResponse(200, '퀴즈 세트 조회 성공', QuizSetDto)
+  @ApiNotFoundResponse('퀴즈 세트를 찾을 수 없음')
   async findById(@Param('id') id: string): Promise<ICommandResult<QuizSetDto>> {
     console.log(`[QuizSetController] QuizSet 조회: id=${id}`);
     const command = new GetQuizSetCommand(id);
@@ -67,6 +70,7 @@ export class QuizSetController {
   @Put(':id')
   @ApiOperation({ summary: '퀴즈 세트 수정' })
   @ApiCommandResponse(200, '퀴즈 세트 수정 성공', QuizSetDto)
+  @ApiNotFoundResponse('퀴즈 세트를 찾을 수 없음')
   async update(@Param('id') id: string, @Body() dto: UpdateQuizSetDto): Promise<ICommandResult<QuizSetDto>> {
     console.log(`[QuizSetController] QuizSet 수정: id=${id}`);
     const command = new UpdateQuizSetCommand(id, dto, dto.forcePassword);
@@ -74,8 +78,9 @@ export class QuizSetController {
   }
 
   @Delete(':id')
+  @HttpCode(204)
   @ApiOperation({ summary: '퀴즈 세트 삭제' })
-  @ApiCommandResponse(200, '퀴즈 세트 삭제 성공')
+  @ApiNoContentResponse('퀴즈 세트 삭제 성공')
   async delete(@Param('id') id: string, @Query('forcePassword') forcePassword?: string): Promise<ICommandResult<void>> {
     console.log(`[QuizSetController] QuizSet 삭제: id=${id}`);
     const command = new DeleteQuizSetCommand(id, forcePassword);
@@ -85,6 +90,7 @@ export class QuizSetController {
   @Post(':id/activate')
   @ApiOperation({ summary: '퀴즈 세트 활성화' })
   @ApiCommandResponse(200, '퀴즈 세트 활성화 성공', QuizSetDto)
+  @ApiNotFoundResponse('퀴즈 세트를 찾을 수 없음')
   async activate(@Param('id') id: string): Promise<ICommandResult<QuizSetDto>> {
     console.log(`[QuizSetController] QuizSet 활성화: id=${id}`);
     const command = new ActivateQuizSetCommand(id);
@@ -94,6 +100,7 @@ export class QuizSetController {
   @Post(':id/deactivate')
   @ApiOperation({ summary: '퀴즈 세트 비활성화' })
   @ApiCommandResponse(200, '퀴즈 세트 비활성화 성공')
+  @ApiNotFoundResponse('퀴즈 세트를 찾을 수 없음')
   async deactivate(@Param('id') id: string): Promise<ICommandResult<void>> {
     console.log(`[QuizSetController] QuizSet 비활성화: id=${id}`);
     const command = new DeactivateQuizSetCommand(id);
@@ -103,6 +110,7 @@ export class QuizSetController {
   @Patch(':id/reorder')
   @ApiOperation({ summary: '퀴즈 순서 일괄 변경 및 관리' })
   @ApiCommandResponse(200, '퀴즈 순서 변경 성공', QuizSetDto)
+  @ApiNotFoundResponse('퀴즈 세트를 찾을 수 없음')
   async reorder(@Param('id') id: string, @Body() dto: ReorderQuizzesDto): Promise<ICommandResult<QuizSetDto>> {
     console.log(`[QuizSetController] 퀴즈 순서 재정렬: id=${id}`);
     const command = new ReorderQuizzesCommand(id, dto);
