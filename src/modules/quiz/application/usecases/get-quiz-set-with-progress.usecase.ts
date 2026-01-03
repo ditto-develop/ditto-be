@@ -15,6 +15,7 @@ import { QuizSetNotFoundException } from '@module/quiz/domain/exceptions/quiz.ex
 import { QuizWithAnswerDto } from '../dto/quiz-with-answer.dto';
 import { QuizDto } from '../dto/quiz.dto';
 import { QuizAnswerDto } from '../dto/quiz-answer.dto';
+import { GetQuizSetWithProgressResponseDto } from '../dto/get-quiz-set-with-progress-response.dto';
 
 @Injectable()
 export class GetQuizSetWithProgressUseCase {
@@ -27,7 +28,7 @@ export class GetQuizSetWithProgressUseCase {
     private readonly quizSetRepository: IQuizSetRepository,
   ) {}
 
-  async execute(userId: string, quizSetId: string): Promise<{ quizzes: QuizWithAnswerDto[]; totalCount: number }> {
+  async execute(userId: string, quizSetId: string): Promise<GetQuizSetWithProgressResponseDto> {
     const quizSet = await this.quizSetRepository.findById(quizSetId);
     if (!quizSet) {
       throw new QuizSetNotFoundException(quizSetId);
@@ -49,6 +50,6 @@ export class GetQuizSetWithProgressUseCase {
     return {
       quizzes: quizzesWithAnswers,
       totalCount: quizzes.length,
-    };
+    } as GetQuizSetWithProgressResponseDto;
   }
 }
