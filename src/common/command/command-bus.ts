@@ -1,6 +1,7 @@
 import { ICommandHandler } from '@common/command/command-handler.interface';
 import { ICommand, ICommandResult } from '@common/command/command.interface';
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Inject } from '@nestjs/common';
+import { ILOGGER_SERVICE_TOKEN, ILoggerService } from '@common/logging/interfaces/logger.interface';
 
 /**
  * CommandBus
@@ -8,8 +9,11 @@ import { Injectable, Logger } from '@nestjs/common';
  */
 @Injectable()
 export class CommandBus {
-  private readonly logger = new Logger(CommandBus.name);
   private readonly handlers = new Map<string, ICommandHandler<ICommand, unknown>>();
+
+  constructor(
+    @Inject(ILOGGER_SERVICE_TOKEN) private readonly logger: ILoggerService,
+  ) {}
 
   /**
    * Command 핸들러를 등록합니다.
@@ -34,8 +38,7 @@ export class CommandBus {
 
     if (!handler) {
       const error = `핸들러를 찾을 수 없습니다. ${commandType}`;
-      this.logger.error(error);
-      console.error(`[CommandBus] ${error}`);
+      this.logger.error(error, CommandBus.name);
       return {
         success: false,
         error,
@@ -50,8 +53,7 @@ export class CommandBus {
       return result as ICommandResult<TResult>;
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : '알 수 없는 오류가 발생했습니다.';
-      this.logger.error(`Command 실행 중 오류 발생: ${commandType}`, error);
-      console.error(`[CommandBus] Command 실행 중 오류 발생: ${commandType}`, errorMessage);
+      this.logger.error(`Command 실행 중 오류 발생: ${commandType}`, CommandBus.name, { error });
       return {
         success: false,
         error: errorMessage,
