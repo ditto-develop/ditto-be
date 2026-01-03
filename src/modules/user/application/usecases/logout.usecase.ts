@@ -1,5 +1,6 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { RefreshTokenService } from '@module/user/application/services/refresh-token.service';
+import { UnauthorizedException } from '@common/exceptions/application.exception';
 
 @Injectable()
 export class LogoutUseCase {

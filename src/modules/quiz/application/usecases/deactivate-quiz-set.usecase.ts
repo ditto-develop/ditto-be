@@ -4,15 +4,15 @@ import {
   QUIZ_SET_REPOSITORY_TOKEN,
 } from '@module/quiz/infrastructure/repository/quiz-set.repository.interface';
 import { Inject, Injectable } from '@nestjs/common';
+import { QuizSetNotFoundException } from '@module/quiz/domain/exceptions/quiz.exceptions';
+import { BusinessRuleException } from '@common/exceptions/domain.exception';
 
 @Injectable()
 export class DeactivateQuizSetUseCase {
   constructor(
     @Inject(QUIZ_SET_REPOSITORY_TOKEN)
     private readonly quizSetRepository: IQuizSetRepository,
-  ) {
-    console.log('[DeactivateQuizSetUseCase] DeactivateQuizSetUseCase 초기화');
-  }
+  ) {}
 
   async execute(id: string): Promise<QuizSet> {
     console.log(`[DeactivateQuizSetUseCase] QuizSet 비활성화 시작: id=${id}`);
@@ -20,12 +20,12 @@ export class DeactivateQuizSetUseCase {
     // QuizSet이 존재하는지 확인
     const quizSet = await this.quizSetRepository.findById(id);
     if (!quizSet) {
-      throw new Error(`퀴즈 세트를 찾을 수 없습니다: ${id}`);
+      throw new QuizSetNotFoundException(id);
     }
 
     // 이미 비활성화된 경우
     if (!quizSet.isActive) {
-      throw new Error(`퀴즈 세트가 이미 비활성화되어 있습니다: ${id}`);
+      throw new BusinessRuleException(`퀴즈 세트가 이미 비활성화되어 있습니다: ${id}`);
     }
 
     // QuizSet 비활성화

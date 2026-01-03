@@ -1,6 +1,10 @@
+import { ValidationException, BusinessRuleException } from '@common/exceptions/domain.exception';
+
 export class QuizSet {
   constructor(
     public readonly id: string,
+    public readonly year: number,
+    public readonly month: number,
     public readonly week: number,
     public readonly category: string,
     public readonly title: string,
@@ -14,6 +18,8 @@ export class QuizSet {
 
   static create(
     id: string,
+    year: number,
+    month: number,
     week: number,
     category: string,
     title: string,
@@ -25,27 +31,50 @@ export class QuizSet {
     updatedAt: Date = new Date(),
   ): QuizSet {
     // 비즈니스 규칙 검증
+    if (year < 2000) {
+      throw new BusinessRuleException('년도는 2000 이상이어야 합니다.');
+    }
+
+    if (month < 1 || month > 12) {
+      throw new BusinessRuleException('월은 1에서 12 사이여야 합니다.');
+    }
+
     if (week < 1) {
-      throw new Error('주차는 1 이상이어야 합니다.');
+      throw new BusinessRuleException('주차는 1 이상이어야 합니다.');
     }
 
     if (!category || category.trim() === '') {
-      throw new Error('카테고리는 필수 값입니다.');
+      throw new ValidationException('카테고리는 필수 값입니다.');
     }
 
     if (!title || title.trim() === '') {
-      throw new Error('제목은 필수 값입니다.');
+      throw new ValidationException('제목은 필수 값입니다.');
     }
 
     if (startDate >= endDate) {
-      throw new Error('종료일은 시작일보다 이후여야 합니다.');
+      throw new BusinessRuleException('종료일은 시작일보다 이후여야 합니다.');
     }
 
-    return new QuizSet(id, week, category, title, description, startDate, endDate, isActive, createdAt, updatedAt);
+    return new QuizSet(
+      id,
+      year,
+      month,
+      week,
+      category,
+      title,
+      description,
+      startDate,
+      endDate,
+      isActive,
+      createdAt,
+      updatedAt,
+    );
   }
 
   static createWithEndDate(
     id: string,
+    year: number,
+    month: number,
     week: number,
     category: string,
     title: string,
@@ -59,10 +88,25 @@ export class QuizSet {
     const endDate = new Date(startDate);
     endDate.setDate(endDate.getDate() + 7);
 
-    return QuizSet.create(id, week, category, title, description, startDate, endDate, isActive, createdAt, updatedAt);
+    return QuizSet.create(
+      id,
+      year,
+      month,
+      week,
+      category,
+      title,
+      description,
+      startDate,
+      endDate,
+      isActive,
+      createdAt,
+      updatedAt,
+    );
   }
 
   update(
+    year: number,
+    month: number,
     week: number,
     category: string,
     title: string,
@@ -73,6 +117,8 @@ export class QuizSet {
   ): QuizSet {
     return new QuizSet(
       this.id,
+      year,
+      month,
       week,
       category,
       title,
@@ -88,6 +134,8 @@ export class QuizSet {
   activate(): QuizSet {
     return new QuizSet(
       this.id,
+      this.year,
+      this.month,
       this.week,
       this.category,
       this.title,
@@ -103,6 +151,8 @@ export class QuizSet {
   deactivate(): QuizSet {
     return new QuizSet(
       this.id,
+      this.year,
+      this.month,
       this.week,
       this.category,
       this.title,

@@ -7,6 +7,7 @@ export class UpdateQuizSetCommand implements ICommand {
   constructor(
     public readonly id: string,
     public readonly dto: UpdateQuizSetDto,
+    public readonly forcePassword?: string,
   ) {
     this.commandId = `update-quiz-set-${Date.now()}`;
   }

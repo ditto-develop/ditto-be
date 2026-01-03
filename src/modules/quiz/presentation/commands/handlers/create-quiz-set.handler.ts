@@ -17,7 +17,7 @@ export class CreateQuizSetHandler implements ICommandHandler<CreateQuizSetComman
     console.log(`[CreateQuizSetHandler] Command 실행 시작: title=${command.dto.title}`);
 
     try {
-      const quizSet = await this.createQuizSetUseCase.execute(command.dto);
+      const quizSet = await this.createQuizSetUseCase.execute(command.dto, command.forcePassword);
       const quizSetDto = QuizSetDto.fromDomain(quizSet);
 
       console.log('[CreateQuizSetHandler] Command 실행 완료: 퀴즈 세트 생성 성공');

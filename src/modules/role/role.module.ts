@@ -8,7 +8,8 @@ import { ROLE_REPOSITORY_TOKEN } from '@module/role/infrastructure/repository/ro
 import { GetAllRolesHandler } from '@module/role/presentation/commands/handlers/get-all-roles.handler';
 import { GetRoleByIdHandler } from '@module/role/presentation/commands/handlers/get-role-by-id.handler';
 import { RoleController } from '@module/role/presentation/controller/role.controller';
-import { Module, OnModuleInit } from '@nestjs/common';
+import { Module, OnModuleInit, forwardRef } from '@nestjs/common';
+import { UserModule } from '@module/user/user.module';
 
 const RoleRepositoryProvider = {
   provide: ROLE_REPOSITORY_TOKEN,
@@ -16,7 +17,7 @@ const RoleRepositoryProvider = {
 };
 
 @Module({
-  imports: [CommandBusModule],
+  imports: [CommandBusModule, forwardRef(() => UserModule)],
   controllers: [RoleController],
   providers: [
     // Repositories

@@ -1,5 +1,13 @@
 import { DomainException } from '@common/exceptions/domain.exception';
-import { ArgumentsHost, Catch, ExceptionFilter, HttpStatus, Logger } from '@nestjs/common';
+import { BadRequestException } from '@common/exceptions/presentation.exception';
+import {
+  ArgumentsHost,
+  BadRequestException as NestBadRequestException,
+  Catch,
+  ExceptionFilter,
+  HttpStatus,
+  Logger,
+} from '@nestjs/common';
 import { Response, Request } from 'express';
 
 @Catch()
@@ -12,6 +20,14 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     const request = ctx.getRequest<Request>();
 
     console.log(`[GlobalExceptionFilter] 예외 발생: ${request.url}`);
+
+    // NestJS ValidationPipe에서 던지는 BadRequestException을 도메인 예외로 변환
+    if (exception instanceof NestBadRequestException) {
+      const res = exception.getResponse() as any;
+      const messages = Array.isArray(res?.message) ? res.message : [res?.message ?? exception.message];
+      const message = messages.filter(Boolean).join(', ') || '잘못된 요청입니다.';
+      exception = new BadRequestException(message);
+    }
 
     if (exception instanceof DomainException) {
       const status = exception.statusCode || HttpStatus.BAD_REQUEST;

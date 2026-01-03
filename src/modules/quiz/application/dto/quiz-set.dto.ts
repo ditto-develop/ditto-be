@@ -1,5 +1,7 @@
 import { QuizSet } from '@module/quiz/domain/entities/quiz-set.entity';
 import { ApiProperty } from '@nestjs/swagger';
+import { QuizDto } from './quiz.dto';
+import { QuizSetListItemDto } from './quiz-set-list-item.dto';
 
 export class QuizSetDto {
   @ApiProperty({
@@ -7,6 +9,18 @@ export class QuizSetDto {
     example: 'cuid',
   })
   id: string;
+
+  @ApiProperty({
+    description: '년도',
+    example: 2025,
+  })
+  year: number;
+
+  @ApiProperty({
+    description: '월',
+    example: 12,
+  })
+  month: number;
 
   @ApiProperty({
     description: '주차',
@@ -66,6 +80,8 @@ export class QuizSetDto {
   static fromDomain(quizSet: QuizSet): QuizSetDto {
     return {
       id: quizSet.id,
+      year: quizSet.year,
+      month: quizSet.month,
       week: quizSet.week,
       category: quizSet.category,
       title: quizSet.title,
@@ -76,5 +92,38 @@ export class QuizSetDto {
       createdAt: quizSet.createdAt,
       updatedAt: quizSet.updatedAt,
     };
+  }
+
+  /**
+   * 도메인 엔티티에서 목록용 DTO로 변환 (타임스탬프 제외)
+   */
+  static fromDomainForList(quizSet: QuizSet): QuizSetListItemDto {
+    return {
+      id: quizSet.id,
+      year: quizSet.year,
+      month: quizSet.month,
+      week: quizSet.week,
+      category: quizSet.category,
+      title: quizSet.title,
+      description: quizSet.description,
+      startDate: quizSet.startDate,
+      endDate: quizSet.endDate,
+      isActive: quizSet.isActive,
+    };
+  }
+
+  /**
+   * 도메인 엔티티에서 퀴즈 목록을 포함한 DTO로 변환
+   */
+  static fromDomainWithQuizzes(
+    quizSet: QuizSet,
+    quizzes: QuizDto[],
+    excludeTimestamps = false,
+  ): QuizSetDto & { quizzes: QuizDto[] } {
+    const base = excludeTimestamps ? this.fromDomainForList(quizSet) : this.fromDomain(quizSet);
+    return {
+      ...base,
+      quizzes,
+    } as QuizSetDto & { quizzes: QuizDto[] };
   }
 }

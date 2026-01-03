@@ -42,6 +42,7 @@ model User {
   roleId         Int
   role           Role                @relation(fields: [roleId], references: [id])
   socialAccounts UserSocialAccount[]
+  quizProgresses UserQuizProgress[]
 
   @@map("users")
 }
@@ -73,6 +74,8 @@ model UserSocialAccount {
 
 model QuizSet {
   id          String   @id @default(cuid())
+  year        Int      @default(2025) // 년도 추가
+  month       Int      @default(12) // 월 추가
   week        Int // 주차 (1, 2, 3, ...)
   category    String // 카테고리
   title       String // 퀴즈 세트 제목
@@ -83,9 +86,10 @@ model QuizSet {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  quizzes Quiz[]
+  quizzes        Quiz[]
+  quizProgresses UserQuizProgress[]
 
-  @@unique([week, category])
+  @@unique([year, month, week, category])
   @@map("quiz_sets")
 }
 
@@ -122,9 +126,36 @@ model QuizAnswer {
   quizId     String
   choiceId   String
   answeredAt DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 
   quiz   Quiz   @relation(fields: [quizId], references: [id], onDelete: Cascade)
   choice Choice @relation(fields: [choiceId], references: [id], onDelete: Cascade)
 
   @@map("quiz_answers")
+}
+
+enum QuizProgressStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  COMPLETED
+}
+
+model UserQuizProgress {
+  id          String             @id @default(cuid())
+  userId      String
+  year        Int                @default(2025) // 년도 추가
+  month       Int                @default(12) // 월 추가
+  week        Int
+  quizSetId   String
+  status      QuizProgressStatus @default(NOT_STARTED)
+  selectedAt  DateTime           @default(now())
+  completedAt DateTime?
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  quizSet QuizSet @relation(fields: [quizSetId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, year, month, week])
+  @@map("user_quiz_progresses")
 }

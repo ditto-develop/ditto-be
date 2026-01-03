@@ -31,7 +31,22 @@ export interface IQuizSetRepository {
   delete(id: string): Promise<void>;
 
   /**
-   * 주차로 QuizSet 조회
+   * 년, 월, 주차로 QuizSet 조회
+   */
+  findByYearMonthWeek(year: number, month: number, week: number): Promise<QuizSet | null>;
+
+  /**
+   * 년, 월, 주차, 카테고리로 QuizSet 조회
+   */
+  findByYearMonthWeekCategory(
+    year: number,
+    month: number,
+    week: number,
+    category: string,
+  ): Promise<QuizSet | null>;
+
+  /**
+   * 주차로 QuizSet 조회 (하위 호환성을 위해 유지하되 내부적으로 년, 월 고려 필요)
    */
   findByWeek(week: number): Promise<QuizSet | null>;
 
@@ -63,7 +78,13 @@ export interface IQuizSetRepository {
   /**
    * 다중 필터로 QuizSet 목록 조회
    */
-  findByFilters(week?: number, category?: string, isActive?: boolean): Promise<QuizSet[]>;
+  findByFilters(
+    year?: number,
+    month?: number,
+    week?: number,
+    category?: string,
+    isActive?: boolean,
+  ): Promise<QuizSet[]>;
 }
 
 export const QUIZ_SET_REPOSITORY_TOKEN = Symbol('QuizSetRepository');
