@@ -8,6 +8,7 @@ import { CurrentUser } from '@module/user/infrastructure/decorators/current-user
 import { User } from '@module/user/domain/entities/user.entity';
 import { SubmitQuizAnswerDto } from '@module/quiz/application/dto/submit-quiz-answer.dto';
 import { QuizProgressDto } from '@module/quiz/application/dto/quiz-progress.dto';
+import { GetQuizSetWithProgressResponseDto } from '@module/quiz/application/dto/get-quiz-set-with-progress-response.dto';
 import { SubmitQuizAnswerCommand } from '../commands/submit-quiz-answer.command';
 import { GetQuizProgressCommand } from '../commands/get-quiz-progress.command';
 import { ResetWeekProgressCommand } from '../commands/reset-week-progress.command';
@@ -46,11 +47,11 @@ export class QuizProgressController {
 
   @Get('quiz-sets/:id')
   @ApiOperation({ summary: '퀴즈 세트 조회 (진행 상태 포함)' })
-  @ApiCommandResponse(200, '퀴즈 세트 조회 성공')
+  @ApiCommandResponse(200, '퀴즈 세트 조회 성공', GetQuizSetWithProgressResponseDto)
   async getQuizSetWithProgress(
     @CurrentUser() user: User,
     @Param('id') quizSetId: string,
-  ): Promise<ICommandResult<any>> {
+  ): Promise<ICommandResult<GetQuizSetWithProgressResponseDto>> {
     const command = new GetQuizSetWithProgressCommand(user.id, quizSetId);
     return await this.commandBus.execute<any>(command);
   }
