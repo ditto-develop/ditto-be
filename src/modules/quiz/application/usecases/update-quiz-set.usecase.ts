@@ -9,20 +9,29 @@ import {
 import { Inject, Injectable } from '@nestjs/common';
 import { validateForcePassword } from '@module/common/utils/force-password.util';
 import { WeekCalculator } from '@module/quiz/domain/utils/week-calculator.util';
+import { ILOGGER_SERVICE_TOKEN, ILoggerService } from '@common/logging/interfaces/logger.interface';
 
 @Injectable()
 export class UpdateQuizSetUseCase {
   constructor(
     @Inject(QUIZ_SET_REPOSITORY_TOKEN)
     private readonly quizSetRepository: IQuizSetRepository,
-  ) {}
+    @Inject(ILOGGER_SERVICE_TOKEN) private readonly logger: ILoggerService,
+  ) {
+    this.logger.log('UpdateQuizSetUseCase 초기화', 'UpdateQuizSetUseCase');
+  }
 
   async execute(id: string, dto: UpdateQuizSetDto, forcePassword?: string): Promise<QuizSet> {
-    console.log(`[UpdateQuizSetUseCase] QuizSet 수정 시작: id=${id}`);
+    this.logger.log('QuizSet 수정 시작', 'UpdateQuizSetUseCase', {
+      quizSetId: id,
+      updates: dto,
+      isForced: validateForcePassword(forcePassword),
+    });
 
     // 기존 QuizSet 조회
     const existingQuizSet = await this.quizSetRepository.findById(id);
     if (!existingQuizSet) {
+      this.logger.warn('QuizSet 수정 실패: 퀴즈 세트를 찾을 수 없음', 'UpdateQuizSetUseCase', { quizSetId: id });
       throw new QuizSetNotFoundException(id);
     }
 
@@ -55,11 +64,21 @@ export class UpdateQuizSetUseCase {
       const todayEnd = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
 
       if (existingQuizSet.isActive && existingQuizSet.startDate <= todayEnd) {
+        this.logger.warn('QuizSet 수정 실패: 활성 상태의 과거 퀴즈 세트', 'UpdateQuizSetUseCase', {
+          quizSetId: id,
+          isActive: existingQuizSet.isActive,
+          startDate: existingQuizSet.startDate,
+        });
         throw new BusinessRuleException('활성화 상태이며 시작일이 오늘 이전인 퀴즈 세트는 수정할 수 없습니다.');
       }
 
       // 주차가 변경된 경우, 새로운 주차 시작일이 현재 날짜 이후인지 확인
       if (isWeekInfoChanged && updatedStartDate < now) {
+        this.logger.warn('QuizSet 수정 실패: 새로운 시작일이 과거임', 'UpdateQuizSetUseCase', {
+          quizSetId: id,
+          newStartDate: updatedStartDate,
+          currentDate: now,
+        });
         throw new BusinessRuleException('해당 주차의 시작일(월요일)은 현재 날짜 이후여야 합니다.');
       }
 
@@ -77,6 +96,14 @@ export class UpdateQuizSetUseCase {
           newCategory,
         );
         if (quizSetWithSameWeek && quizSetWithSameWeek.id !== id) {
+          this.logger.warn('QuizSet 수정 실패: 동일 주차에 다른 퀴즈 세트 존재', 'UpdateQuizSetUseCase', {
+            quizSetId: id,
+            year: newYear,
+            month: newMonth,
+            week: newWeek,
+            category: newCategory,
+            conflictingQuizSetId: quizSetWithSameWeek.id,
+          });
           throw new BusinessRuleException(
             `${newYear}년 ${newMonth}월 ${newWeek}주차 ${newCategory} 카테고리에 이미 다른 퀴즈 세트가 존재합니다.`,
           );
@@ -105,7 +132,23 @@ export class UpdateQuizSetUseCase {
 
     const saved = await this.quizSetRepository.update(updatedQuizSet);
 
-    console.log(`[UpdateQuizSetUseCase] QuizSet 수정 완료: id=${saved.id}`);
+    this.logger.log('QuizSet 수정 완료', 'UpdateQuizSetUseCase', {
+      quizSetId: saved.id,
+      title: saved.title,
+      year: saved.year,
+      month: saved.month,
+      week: saved.week,
+      category: saved.category,
+      isActive: saved.isActive,
+      changes: {
+        isWeekInfoChanged,
+        categoryChanged: dto.category !== undefined,
+        titleChanged: dto.title !== undefined,
+        descriptionChanged: dto.description !== undefined,
+        isActiveChanged: dto.isActive !== undefined,
+      },
+    });
+
     return saved;
   }
 }

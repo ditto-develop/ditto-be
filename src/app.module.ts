@@ -1,6 +1,7 @@
 import { CommandBusModule } from '@common/command/command-bus.module';
 import configuration from '@config/configuration';
 import { CommonModule } from '@module/common/common.module';
+import { LoggingModule } from '@common/logging/logging.module';
 import { PrismaModule } from '@module/common/prisma/prisma.module';
 import { RedisModule } from '@module/common/redis/redis.module';
 import { QuizModule } from '@module/quiz/quiz.module';
@@ -21,6 +22,7 @@ import { AuthModule } from '@module/auth/auth.module';
       validate,
       envFilePath: ['.env.local', '.env'],
     }),
+    LoggingModule.forRoot(), // 로깅 모듈 (가장 먼저 로드되어야 함)
     AuthModule,
     ScheduleModule.forRoot(),
     PrismaModule,

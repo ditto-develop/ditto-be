@@ -9,16 +9,27 @@ import { BusinessRuleException } from '@common/exceptions/domain.exception';
 import { v4 as uuidv4 } from 'uuid';
 import { validateForcePassword } from '@module/common/utils/force-password.util';
 import { WeekCalculator } from '@module/quiz/domain/utils/week-calculator.util';
+import { ILOGGER_SERVICE_TOKEN, ILoggerService } from '@common/logging/interfaces/logger.interface';
 
 @Injectable()
 export class CreateQuizSetUseCase {
   constructor(
     @Inject(QUIZ_SET_REPOSITORY_TOKEN)
     private readonly quizSetRepository: IQuizSetRepository,
-  ) {}
+    @Inject(ILOGGER_SERVICE_TOKEN) private readonly logger: ILoggerService,
+  ) {
+    this.logger.log('CreateQuizSetUseCase 초기화', 'CreateQuizSetUseCase');
+  }
 
   async execute(dto: CreateQuizSetDto, forcePassword?: string): Promise<QuizSet> {
-    console.log(`[CreateQuizSetUseCase] QuizSet 생성 시작: title=${dto.title}`);
+    this.logger.log('QuizSet 생성 시작', 'CreateQuizSetUseCase', {
+      title: dto.title,
+      year: dto.year,
+      month: dto.month,
+      week: dto.week,
+      category: dto.category,
+      isForced: validateForcePassword(forcePassword),
+    });
 
     // 주차 기반 시작일 계산
     const startDate = WeekCalculator.getWeekStartDate(dto.year, dto.month, dto.week);
@@ -30,6 +41,14 @@ export class CreateQuizSetUseCase {
       // 계산된 시작일이 현재 날짜 이후인지 확인
       const now = new Date();
       if (startDate < now) {
+        this.logger.warn('QuizSet 생성 실패: 시작일이 과거임', 'CreateQuizSetUseCase', {
+          title: dto.title,
+          year: dto.year,
+          month: dto.month,
+          week: dto.week,
+          startDate,
+          currentDate: now,
+        });
         throw new BusinessRuleException('해당 주차의 시작일(월요일)은 현재 날짜 이후여야 합니다.');
       }
 
@@ -41,6 +60,14 @@ export class CreateQuizSetUseCase {
         dto.category,
       );
       if (existingQuizSet) {
+        this.logger.warn('QuizSet 생성 실패: 중복 퀴즈 세트', 'CreateQuizSetUseCase', {
+          title: dto.title,
+          year: dto.year,
+          month: dto.month,
+          week: dto.week,
+          category: dto.category,
+          existingQuizSetId: existingQuizSet.id,
+        });
         throw new BusinessRuleException(
           `${dto.year}년 ${dto.month}월 ${dto.week}주차 ${dto.category} 카테고리에 이미 퀴즈 세트가 존재합니다.`,
         );
@@ -64,7 +91,15 @@ export class CreateQuizSetUseCase {
 
     const created = await this.quizSetRepository.create(quizSet);
 
-    console.log(`[CreateQuizSetUseCase] QuizSet 생성 완료: id=${created.id}`);
+    this.logger.log('QuizSet 생성 완료', 'CreateQuizSetUseCase', {
+      quizSetId: created.id,
+      title: created.title,
+      year: created.year,
+      month: created.month,
+      week: created.week,
+      category: created.category,
+    });
+
     return created;
   }
 }

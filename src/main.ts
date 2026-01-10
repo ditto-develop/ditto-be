@@ -7,19 +7,35 @@ import cookieParser from 'cookie-parser';
 import { writeFileSync } from 'node:fs';
 import { version } from '../package.json';
 import { GlobalExceptionFilter } from '@common/exceptions/exception.filter';
+import { TraceIdMiddleware } from '@common/logging/middleware/trace-id.middleware';
+import { HttpLoggingInterceptor } from '@common/logging/interceptors/http-logging.interceptor';
+import path from 'node:path';
+import fs from 'node:fs';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const configService = app.get(ConfigService);
+  const logger = app.get('LoggerService');
+
+  // 커스텀 로거를 NestJS 기본 로거로 설정
+  app.useLogger(logger);
 
   app.setGlobalPrefix('api');
+
+  // 트레이스 ID 미들웨어 적용 (로깅 전에 적용되어야 함)
+  const traceIdMiddleware = app.get(TraceIdMiddleware);
+  app.use(traceIdMiddleware.use.bind(traceIdMiddleware));
+
   app.use(cookieParser());
   app.enableCors({
     origin: true,
     credentials: true,
   });
 
-  app.useGlobalFilters(new GlobalExceptionFilter());
+  app.useGlobalFilters(app.get(GlobalExceptionFilter));
+
+  // HTTP 로깅 Interceptor 전역 적용
+  app.useGlobalInterceptors(app.get(HttpLoggingInterceptor));
 
   // DTO 유효성 검사 및 타입 자동 변환을 위한 글로벌 ValidationPipe 설정
   app.useGlobalPipes(
@@ -30,7 +46,7 @@ async function bootstrap() {
     }),
   );
 
-  const config = new DocumentBuilder()
+  const configBuilder = new DocumentBuilder()
     .setTitle('Ditto API')
     .setDescription('Start Game -> Solve Quiz -> Match Results -> Save Email -> Share (MVP)')
     .setVersion(version)
@@ -41,27 +57,35 @@ async function bootstrap() {
         bearerFormat: 'JWT',
       },
       'access-token',
-    )
-    .addServer('http://localhost:4000')
-    .addServer('https://www.ditto.pics')
-    .build();
+    );
+  
+  const isDevelopment = configService.get('nodeEnv') === 'development';
+  if (isDevelopment) {
+    configBuilder.addServer('http://localhost:4000');
+  } else {
+    configBuilder.addServer('https://ditto.pics:10000');
+  }
+  const config = configBuilder.build();
   const document = SwaggerModule.createDocument(app, config);
 
   console.log('[Bootstrap] 서버 시작 중...');
   const port = configService.get<number>('port') || 4000;
-  const isDevelopment = configService.get('nodeEnv') === 'development';
 
-  if (isDevelopment) {
-    SwaggerModule.setup('docs', app, document);
+  // if (isDevelopment) {
+  SwaggerModule.setup('api/docs', app, document);
+  // }
+
+  const outputDir = path.join(process.cwd(), 'docs');
+  if (!fs.existsSync(outputDir)) {
+    fs.mkdirSync(outputDir, { recursive: true });
   }
-
-  writeFileSync('./docs/ditto-api.json', JSON.stringify(document, null, 2));
+  writeFileSync(path.join(outputDir, 'ditto-api.json'), JSON.stringify(document, null, 2));
 
   await app.listen(port);
 
   console.log(`[Bootstrap] 서버가 포트 ${port}에서 실행 중입니다.`);
   if (isDevelopment) {
-    console.log(`[Bootstrap] Swagger 문서: http://localhost:${port}/docs`);
+    console.log(`[Bootstrap] Swagger 문서: http://localhost:${port}/api/docs`);
   }
 }
 void bootstrap();

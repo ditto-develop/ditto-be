@@ -36,4 +36,11 @@ export default () => ({
   encryption: {
     key: process.env.ENCRYPTION_KEY || 'your-secret-key-change-in-production',
   },
+  loki: {
+    host: process.env.LOKI_HOST,
+    labels: {
+      app: process.env.LOKI_LABELS_APP || 'ditto-be',
+      service: process.env.LOKI_LABELS_SERVICE || 'api',
+    },
+  },
 });
