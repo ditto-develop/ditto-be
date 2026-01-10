@@ -8,6 +8,7 @@ import { UpdateQuizDto } from '@module/quiz/application/dto/update-quiz.dto';
 import { CreateQuizCommand } from '@module/quiz/presentation/commands/create-quiz.command';
 import { DeleteQuizCommand } from '@module/quiz/presentation/commands/delete-quiz.command';
 import { GetQuizCommand } from '@module/quiz/presentation/commands/get-quiz.command';
+import { GetAllQuizzesCommand } from '@module/quiz/presentation/commands/get-all-quizzes.command';
 import { UpdateQuizCommand } from '@module/quiz/presentation/commands/update-quiz.command';
 import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards, UsePipes, ValidationPipe, HttpCode } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
@@ -21,6 +22,15 @@ import { JwtAuthGuard } from '@module/user/infrastructure/guards/jwt-auth.guard'
 @ApiCommonErrorResponses()
 export class QuizController {
   constructor(private readonly commandBus: CommandBus) {}
+
+  @Get()
+  @ApiOperation({ summary: '모든 퀴즈 조회' })
+  @ApiCommandResponse(200, '퀴즈 목록 조회 성공', QuizDto, true)
+  async findAll(): Promise<ICommandResult<QuizDto[]>> {
+    console.log(`[QuizController] 모든 Quiz 조회`);
+    const command = new GetAllQuizzesCommand();
+    return await this.commandBus.execute<QuizDto[]>(command);
+  }
 
   @Post()
   @ApiOperation({ summary: '퀴즈 생성' })

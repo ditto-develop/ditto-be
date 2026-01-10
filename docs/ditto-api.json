@@ -3553,6 +3553,47 @@
       }
     },
     "/api/quizzes": {
+      "get": {
+        "operationId": "QuizController_findAll",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "퀴즈 목록 조회 성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/QuizDto"
+                      }
+                    },
+                    "error": {
+                      "type": "string",
+                      "example": "에러 메시지"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
+        "summary": "모든 퀴즈 조회",
+        "tags": [
+          "Quizzes"
+        ]
+      },
       "post": {
         "operationId": "QuizController_create",
         "parameters": [],
@@ -8530,7 +8571,7 @@
         "type": "object",
         "properties": {
           "quizIds": {
-            "description": "순서대로 정렬된 퀴즈 ID 배열",
+            "description": "순서대로 정렬된 퀴즈 ID 배열 (빈 배열 가능)",
             "example": [
               "quiz-id-1",
               "quiz-id-2",

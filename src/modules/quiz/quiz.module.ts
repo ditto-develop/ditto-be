@@ -12,6 +12,7 @@ import { DeleteQuizSetUseCase } from '@module/quiz/application/usecases/delete-q
 import { DeleteQuizUseCase } from '@module/quiz/application/usecases/delete-quiz.usecase';
 import { GetQuizSetsUseCase } from '@module/quiz/application/usecases/get-quiz-sets.usecase';
 import { GetQuizUseCase } from '@module/quiz/application/usecases/get-quiz.usecase';
+import { GetAllQuizzesUseCase } from '@module/quiz/application/usecases/get-all-quizzes.usecase';
 import { GetQuizzesBySetUseCase } from '@module/quiz/application/usecases/get-quizzes-by-set.usecase';
 import { GetQuizSetUseCase } from '@module/quiz/application/usecases/get-quiz-set.usecase';
 import { GetCurrentWeekQuizSetsUseCase } from '@module/quiz/application/usecases/get-current-week-quiz-sets.usecase';
@@ -38,6 +39,7 @@ import { DeactivateQuizSetHandler } from '@module/quiz/presentation/commands/han
 import { DeleteQuizHandler } from '@module/quiz/presentation/commands/handlers/delete-quiz.handler';
 import { DeleteQuizSetHandler } from '@module/quiz/presentation/commands/handlers/delete-quiz-set.handler';
 import { GetQuizHandler } from '@module/quiz/presentation/commands/handlers/get-quiz.handler';
+import { GetAllQuizzesHandler } from '@module/quiz/presentation/commands/handlers/get-all-quizzes.handler';
 import { GetQuizSetHandler } from '@module/quiz/presentation/commands/handlers/get-quiz-set.handler';
 import { GetCurrentWeekQuizSetsHandler } from '@module/quiz/presentation/commands/handlers/get-current-week-quiz-sets.handler';
 import { GetQuizSetsHandler } from '@module/quiz/presentation/commands/handlers/get-quiz-sets.handler';
@@ -94,6 +96,7 @@ const QuizAnswerRepositoryProvider = {
     // UseCases
     CreateQuizUseCase,
     GetQuizUseCase,
+    GetAllQuizzesUseCase,
     GetQuizzesBySetUseCase,
     UpdateQuizUseCase,
     DeleteQuizUseCase,
@@ -114,6 +117,7 @@ const QuizAnswerRepositoryProvider = {
     // Handlers
     CreateQuizHandler,
     GetQuizHandler,
+    GetAllQuizzesHandler,
     GetQuizzesBySetHandler,
     UpdateQuizHandler,
     DeleteQuizHandler,
@@ -138,6 +142,7 @@ export class QuizModule implements OnModuleInit {
     private readonly commandBus: CommandBus,
     private readonly createQuizHandler: CreateQuizHandler,
     private readonly getQuizHandler: GetQuizHandler,
+    private readonly getAllQuizzesHandler: GetAllQuizzesHandler,
     private readonly getQuizzesBySetHandler: GetQuizzesBySetHandler,
     private readonly updateQuizHandler: UpdateQuizHandler,
     private readonly deleteQuizHandler: DeleteQuizHandler,
@@ -162,6 +167,7 @@ export class QuizModule implements OnModuleInit {
       [
         { handler: this.createQuizHandler, class: CreateQuizHandler },
         { handler: this.getQuizHandler, class: GetQuizHandler },
+        { handler: this.getAllQuizzesHandler, class: GetAllQuizzesHandler },
         { handler: this.getQuizzesBySetHandler, class: GetQuizzesBySetHandler },
         { handler: this.updateQuizHandler, class: UpdateQuizHandler },
         { handler: this.deleteQuizHandler, class: DeleteQuizHandler },

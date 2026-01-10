@@ -16,6 +16,11 @@ export interface IQuizRepository {
   findById(id: string): Promise<Quiz | null>;
 
   /**
+   * 모든 Quiz 조회
+   */
+  findAll(): Promise<Quiz[]>;
+
+  /**
    * QuizSet ID로 모든 Quiz 조회
    */
   findByQuizSetId(quizSetId: string): Promise<Quiz[]>;
