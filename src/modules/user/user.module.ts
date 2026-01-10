@@ -9,6 +9,7 @@ import { UserSocialAccountRepository } from '@module/user/infrastructure/reposit
 import { USER_SOCIAL_ACCOUNT_REPOSITORY_TOKEN } from '@module/user/infrastructure/repository/user-social-account.repository.interface';
 import { UserController } from '@module/user/presentation/controller/user.controller';
 import { AddSocialAccountUseCase } from '@module/user/application/usecases/add-social-account.usecase';
+import { CheckNicknameAvailabilityUseCase } from '@module/user/application/usecases/check-nickname-availability.usecase';
 import { CreateAdminUserUseCase } from '@module/user/application/usecases/create-admin-user.usecase';
 import { CreateUserUseCase } from '@module/user/application/usecases/create-user.usecase';
 import { DeleteUserUseCase } from '@module/user/application/usecases/delete-user.usecase';
@@ -21,6 +22,7 @@ import { UpdateUserUseCase } from '@module/user/application/usecases/update-user
 import { RefreshAccessTokenUseCase } from '@module/user/application/usecases/refresh-access-token.usecase';
 import { LogoutUseCase } from '@module/user/application/usecases/logout.usecase';
 import { AddSocialAccountHandler } from '@module/user/presentation/commands/handlers/add-social-account.handler';
+import { CheckNicknameAvailabilityHandler } from '@module/user/presentation/commands/handlers/check-nickname-availability.handler';
 import { CreateAdminUserHandler } from '@module/user/presentation/commands/handlers/create-admin-user.handler';
 import { CreateUserHandler } from '@module/user/presentation/commands/handlers/create-user.handler';
 import { DeleteUserHandler } from '@module/user/presentation/commands/handlers/delete-user.handler';
@@ -64,6 +66,7 @@ const UserSocialAccountRepositoryProvider = {
     RefreshTokenService,
 
     // UseCases
+    CheckNicknameAvailabilityUseCase,
     CreateAdminUserUseCase,
     CreateUserUseCase,
     GetAllUsersUseCase,
@@ -79,6 +82,7 @@ const UserSocialAccountRepositoryProvider = {
     LogoutUseCase,
 
     // Handlers
+    CheckNicknameAvailabilityHandler,
     CreateAdminUserHandler,
     CreateUserHandler,
     GetAllUsersHandler,
@@ -99,6 +103,7 @@ const UserSocialAccountRepositoryProvider = {
 export class UserModule implements OnModuleInit {
   constructor(
     private readonly commandBus: CommandBus,
+    private readonly checkNicknameAvailabilityHandler: CheckNicknameAvailabilityHandler,
     private readonly createAdminUserHandler: CreateAdminUserHandler,
     private readonly createUserHandler: CreateUserHandler,
     private readonly getAllUsersHandler: GetAllUsersHandler,
@@ -121,6 +126,7 @@ export class UserModule implements OnModuleInit {
     registerCommandHandlers(
       this.commandBus,
       [
+        { handler: this.checkNicknameAvailabilityHandler, class: CheckNicknameAvailabilityHandler },
         { handler: this.createAdminUserHandler, class: CreateAdminUserHandler },
         { handler: this.createUserHandler, class: CreateUserHandler },
         { handler: this.getAllUsersHandler, class: GetAllUsersHandler },

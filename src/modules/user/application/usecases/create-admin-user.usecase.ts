@@ -42,6 +42,9 @@ export class CreateAdminUserUseCase {
     if (await this.userRepo.findByPhoneNumber(dto.phoneNumber)) {
       throw new BusinessRuleException('이미 존재하는 전화번호입니다.');
     }
+    if (await this.userRepo.findByNickname(dto.nickname)) {
+      throw new BusinessRuleException('이미 존재하는 닉네임입니다.');
+    }
 
     // 비밀번호 해시화
     const hashedPassword = await this.authService.hashPassword(dto.password);

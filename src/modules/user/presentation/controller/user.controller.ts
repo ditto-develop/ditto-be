@@ -14,6 +14,7 @@ import {
   SocialLoginDto,
   LoginResponseDto,
 } from '@module/user/application/dto/user.dto';
+import { CheckNicknameAvailabilityCommand } from '@module/user/presentation/commands/check-nickname-availability.command';
 import { CreateAdminUserCommand } from '@module/user/presentation/commands/create-admin-user.command';
 import { CreateUserCommand } from '@module/user/presentation/commands/create-user.command';
 import { GetAllUsersCommand } from '@module/user/presentation/commands/get-all-users.command';
@@ -273,5 +274,15 @@ export class UserController {
     }
 
     return result;
+  }
+
+  @Get('/nickname/:nickname/availability')
+  @ApiOperation({ summary: '닉네임 사용 가능 여부 확인', description: '닉네임이 사용 가능한지 확인합니다.' })
+  @ApiParam({ name: 'nickname', type: 'string', description: '확인할 닉네임' })
+  @ApiCommandResponse(200, '닉네임 사용 가능 여부 확인 성공', Object, false)
+  async checkNicknameAvailability(@Param('nickname') nickname: string): Promise<ICommandResult<{ available: boolean }>> {
+    console.log(`[UserController] 닉네임 사용 가능 여부 확인 요청: nickname=${nickname}`);
+    const command = new CheckNicknameAvailabilityCommand(nickname);
+    return await this.commandBus.execute<{ available: boolean }>(command);
   }
 }

@@ -17,6 +17,11 @@ export interface IUserRepository {
   findByEmail(email: string): Promise<User | null>;
 
   /**
+   * 닉네임으로 사용자 조회
+   */
+  findByNickname(nickname: string): Promise<User | null>;
+
+  /**
    * 전화번호로 사용자 조회
    */
   findByPhoneNumber(phoneNumber: string): Promise<User | null>;

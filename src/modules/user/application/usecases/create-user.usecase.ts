@@ -49,6 +49,11 @@ export class CreateUserUseCase {
       throw new BusinessRuleException('이미 존재하는 이메일입니다.');
     }
 
+    // 닉네임 중복 검증
+    if (await this.userRepo.findByNickname(dto.nickname)) {
+      throw new BusinessRuleException('이미 존재하는 닉네임입니다.');
+    }
+
     // 소셜 계정 생성
     const socialAccount = UserSocialAccount.create(
       0, // ID는 DB에서 자동 생성

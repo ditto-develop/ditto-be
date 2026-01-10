@@ -47,6 +47,18 @@ export class UserRepository implements IUserRepository {
     return user ? this.toDomain(user) : null;
   }
 
+  async findByNickname(nickname: string): Promise<User | null> {
+    console.log(`[UserRepository] 사용자 조회: nickname=${nickname}`);
+    const user = await this.prisma.user.findFirst({
+      where: { nickname },
+      include: {
+        role: true,
+        socialAccounts: true,
+      },
+    });
+    return user ? this.toDomain(user) : null;
+  }
+
   async findByPhoneNumber(phoneNumber: string): Promise<User | null> {
     console.log(`[UserRepository] 사용자 조회: phoneNumber=${phoneNumber}`);
     const user = await this.prisma.user.findUnique({

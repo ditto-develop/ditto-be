@@ -251,6 +251,12 @@ export class SocialLoginDto {
   providerUserId: string;
 }
 
+export class CheckNicknameAvailabilityDto {
+  @ApiProperty({ description: '닉네임' })
+  @IsString()
+  nickname: string;
+}
+
 export class LoginResponseDto {
   @ApiProperty({ description: '액세스 토큰' })
   accessToken: string;
