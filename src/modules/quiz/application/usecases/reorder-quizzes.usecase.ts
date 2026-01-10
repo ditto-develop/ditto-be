@@ -30,7 +30,15 @@ export class ReorderQuizzesUseCase {
       throw new QuizSetNotFoundException(quizSetId);
     }
 
-    // 2. 전달받은 퀴즈들이 존재하는지, 그리고 해당 세트에 속해있는지 검증
+    // 2. 빈 배열인 경우 모든 퀴즈 삭제 후 종료
+    if (dto.quizIds.length === 0) {
+      console.log(`[ReorderQuizzesUseCase] 빈 배열 전달됨 - 모든 퀴즈 삭제: quizSetId=${quizSetId}`);
+      await this.quizRepository.updateOrders(quizSetId, []);
+      console.log(`[ReorderQuizzesUseCase] 퀴즈 순서 재정렬 완료: quizSetId=${quizSetId}`);
+      return quizSet;
+    }
+
+    // 3. 전달받은 퀴즈들이 존재하는지, 그리고 해당 세트에 속해있는지 검증
     const existingQuizzes = await this.quizRepository.findByQuizSetId(quizSetId);
     const existingQuizIds = existingQuizzes.map((q) => q.id);
 
@@ -40,19 +48,18 @@ export class ReorderQuizzesUseCase {
       }
     }
 
-    // 3. 업데이트 데이터 준비 (인덱스 기반 order 할당)
+    // 4. 업데이트 데이터 준비 (인덱스 기반 order 할당)
     const updates = dto.quizIds.map((id, index) => ({
       id,
       order: index + 1,
     }));
 
-    // 4. 리포지토리를 통한 일괄 업데이트 및 삭제
+    // 5. 리포지토리를 통한 일괄 업데이트 및 삭제
     await this.quizRepository.updateOrders(quizSetId, updates);
 
     console.log(`[ReorderQuizzesUseCase] 퀴즈 순서 재정렬 완료: quizSetId=${quizSetId}`);
-    
+
     // 최종 상태의 퀴즈 세트 반환
     return quizSet;
   }
 }
-

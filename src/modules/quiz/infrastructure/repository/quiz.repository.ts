@@ -52,6 +52,22 @@ export class QuizRepository implements IQuizRepository {
     return quiz ? this.toDomain(quiz) : null;
   }
 
+  async findAll(): Promise<Quiz[]> {
+    const quizzes = await this.prisma.quiz.findMany({
+      include: {
+        choices: {
+          orderBy: { order: 'asc' },
+        },
+      },
+      orderBy: [
+        { quizSetId: 'asc' },
+        { order: 'asc' },
+      ],
+    });
+
+    return quizzes.map((quiz) => this.toDomain(quiz));
+  }
+
   async findByQuizSetId(quizSetId: string): Promise<Quiz[]> {
     const quizzes = await this.prisma.quiz.findMany({
       where: { quizSetId },
