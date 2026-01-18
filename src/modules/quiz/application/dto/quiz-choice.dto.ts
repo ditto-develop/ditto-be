@@ -59,14 +59,14 @@ export class QuizChoiceDto {
   content: string;
 
   @ApiProperty({
-    description: '선택지 순서 (1 또는 2)',
-    example: 1,
-    minimum: 1,
-    maximum: 2,
+    description: '선택지 순서 (0 또는 1)',
+    example: 0,
+    minimum: 0,
+    maximum: 1,
   })
   @IsInt()
-  @Min(1)
-  @Max(2)
+  @Min(0)
+  @Max(1)
   order: number;
 
   constructor(id: string, content: string, order: number) {

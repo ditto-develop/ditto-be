@@ -36,8 +36,8 @@ export class QuizChoice {
       throw new ValidationException('선택지 내용은 500자를 초과할 수 없습니다.');
     }
 
-    if (this.order < 1 || this.order > 2) {
-      throw new ValidationException('선택지 순서는 1 또는 2여야 합니다.');
+    if (this.order < 0 || this.order > 1) {
+      throw new ValidationException('선택지 순서는 0 또는 1이어야 합니다.');
     }
   }
 

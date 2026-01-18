@@ -135,7 +135,7 @@ const QuizAnswerRepositoryProvider = {
     GetQuizSetWithProgressHandler,
     ReorderQuizzesHandler,
   ],
-  exports: [USER_QUIZ_PROGRESS_REPOSITORY_TOKEN, QUIZ_ANSWER_REPOSITORY_TOKEN, SystemStateService],
+  exports: [QUIZ_SET_REPOSITORY_TOKEN, USER_QUIZ_PROGRESS_REPOSITORY_TOKEN, QUIZ_ANSWER_REPOSITORY_TOKEN, SystemStateService],
 })
 export class QuizModule implements OnModuleInit {
   constructor(

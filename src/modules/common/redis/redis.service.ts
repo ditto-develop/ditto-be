@@ -60,4 +60,59 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
 
     return deleted;
   }
+
+  // Hash 관련 메서드
+  async hset(key: string, field: string, value: string): Promise<number> {
+    return this.redis.hset(key, field, value);
+  }
+
+  async hget(key: string, field: string): Promise<string | null> {
+    return this.redis.hget(key, field);
+  }
+
+  async hgetall(key: string): Promise<Record<string, string>> {
+    return this.redis.hgetall(key);
+  }
+
+  async hdel(key: string, ...fields: string[]): Promise<number> {
+    return this.redis.hdel(key, ...fields);
+  }
+
+  async hexists(key: string, field: string): Promise<number> {
+    return this.redis.hexists(key, field);
+  }
+
+  // Set 관련 메서드
+  async sadd(key: string, ...members: string[]): Promise<number> {
+    return this.redis.sadd(key, ...members);
+  }
+
+  async srem(key: string, ...members: string[]): Promise<number> {
+    return this.redis.srem(key, ...members);
+  }
+
+  async smembers(key: string): Promise<string[]> {
+    return this.redis.smembers(key);
+  }
+
+  async sismember(key: string, member: string): Promise<number> {
+    return this.redis.sismember(key, member);
+  }
+
+  async scard(key: string): Promise<number> {
+    return this.redis.scard(key);
+  }
+
+  // 분산 락 관련 메서드 (SET if Not eXists)
+  async setnx(key: string, value: string, ttlSeconds?: number): Promise<string | number> {
+    if (ttlSeconds) {
+      return this.redis.set(key, value, 'EX', ttlSeconds, 'NX');
+    } else {
+      return this.redis.set(key, value, 'NX');
+    }
+  }
+
+  async pexpire(key: string, ttlMs: number): Promise<number> {
+    return this.redis.pexpire(key, ttlMs);
+  }
 }

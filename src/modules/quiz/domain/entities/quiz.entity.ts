@@ -46,9 +46,9 @@ export class Quiz {
       throw new InvalidQuizChoicesException('퀴즈는 정확히 2개의 선택지를 가져야 합니다.');
     }
 
-    // 선택지 순서가 1과 2인지 확인
+    // 선택지 순서가 0과 1인지 확인
     const orders = this.choices.map((choice) => choice.order).sort();
-    if (orders[0] !== 1 || orders[1] !== 2) {
+    if (orders[0] !== 0 || orders[1] !== 1) {
       throw new InvalidQuizOrderException();
     }
 

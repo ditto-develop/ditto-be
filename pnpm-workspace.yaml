@@ -4,4 +4,6 @@ onlyBuiltDependencies:
   - '@prisma/engines'
   - '@swc/core'
   - bcrypt
+  - msgpackr-extract
   - prisma
+  - protobufjs

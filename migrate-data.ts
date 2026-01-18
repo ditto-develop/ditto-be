@@ -42,6 +42,27 @@ async function migrate() {
     });
   }
 
+  // 3. Choice.order 마이그레이션 (1,2 → 0,1)
+  const choices = await prisma.choice.findMany();
+  console.log(`${choices.length}개의 Choice 처리 중...`);
+
+  for (const choice of choices) {
+    let newOrder = choice.order;
+
+    if (choice.order === 1) {
+      newOrder = 0;
+    } else if (choice.order === 2) {
+      newOrder = 1;
+    }
+
+    if (newOrder !== choice.order) {
+      await prisma.choice.update({
+        where: { id: choice.id },
+        data: { order: newOrder },
+      });
+    }
+  }
+
   console.log('데이터 마이그레이션 완료!');
 }
 

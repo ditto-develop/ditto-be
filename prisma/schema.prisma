@@ -44,6 +44,10 @@ model User {
   role           Role                @relation(fields: [roleId], references: [id])
   socialAccounts UserSocialAccount[]
   quizProgresses UserQuizProgress[]
+  matchingOpportunities MatchingOpportunity[] @relation("UserMatchingOpportunities")
+  matchedUserOpportunities MatchingOpportunity[] @relation("MatchedUserOpportunities")
+  matchingRecords MatchingRecord[] @relation("UserMatchingRecords")
+  matchedUserRecords MatchingRecord[] @relation("MatchedUserRecords")
 
   @@map("users")
 }
@@ -89,6 +93,8 @@ model QuizSet {
 
   quizzes        Quiz[]
   quizProgresses UserQuizProgress[]
+  matchingOpportunities MatchingOpportunity[]
+  matchingRecords MatchingRecord[]
 
   @@unique([year, month, week, category])
   @@map("quiz_sets")
@@ -113,7 +119,7 @@ model Choice {
   id     String @id @default(cuid())
   text   String // 선택지 내용
   quizId String
-  order  Int // 선택지 순서
+  order  Int // 0 또는 1 (기존 1, 2에서 변경)
 
   quiz    Quiz         @relation(fields: [quizId], references: [id], onDelete: Cascade)
   answers QuizAnswer[]
@@ -159,4 +165,48 @@ model UserQuizProgress {
 
   @@unique([userId, year, month, week])
   @@map("user_quiz_progresses")
+}
+
+// 매칭 기회 테이블 (양방향 자동 생성)
+model MatchingOpportunity {
+  id           String   @id @default(cuid())
+  userId       String   // 사용자 ID
+  matchedUserId String  // 매칭된 사용자 ID
+  quizSetId    String   // 퀴즈 세트 ID
+  year         Int
+  month        Int
+  week         Int
+  matchScore   Int      // 동일 답안 개수 (0~12)
+  createdAt    DateTime @default(now())
+
+  user         User     @relation("UserMatchingOpportunities", fields: [userId], references: [id])
+  matchedUser  User     @relation("MatchedUserOpportunities", fields: [matchedUserId], references: [id])
+  quizSet      QuizSet  @relation(fields: [quizSetId], references: [id])
+
+  @@unique([userId, matchedUserId, quizSetId, year, month, week])
+  @@index([userId, quizSetId, year, month, week])
+  @@index([quizSetId, year, month, week])
+  @@map("matching_opportunities")
+}
+
+// 매칭 기록 테이블 (사용자가 선택한 매칭)
+model MatchingRecord {
+  id           String   @id @default(cuid())
+  userId       String
+  matchedUserId String
+  quizSetId    String
+  year         Int
+  month        Int
+  week         Int
+  isMatched    Boolean  @default(false) // 양방향 선택 여부
+  matchedAt    DateTime @default(now())
+
+  user         User     @relation("UserMatchingRecords", fields: [userId], references: [id])
+  matchedUser  User     @relation("MatchedUserRecords", fields: [matchedUserId], references: [id])
+  quizSet      QuizSet  @relation(fields: [quizSetId], references: [id])
+
+  @@unique([userId, matchedUserId, quizSetId, year, month, week])
+  @@index([userId, quizSetId, year, month, week])
+  @@index([quizSetId, year, month, week])
+  @@map("matching_records")
 }
