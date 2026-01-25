@@ -2,6 +2,7 @@ import { Injectable, Inject } from '@nestjs/common';
 import { PrismaService } from '@module/common/prisma/prisma.service';
 import { MatchingRedisService } from './matching-redis.service';
 import { SystemStateService } from '@module/quiz/infrastructure/services/system-state.service';
+import { ILOGGER_SERVICE_TOKEN, ILoggerService } from '@common/logging/interfaces/logger.interface';
 import {
   IUserQuizProgressRepository,
   USER_QUIZ_PROGRESS_REPOSITORY_TOKEN,
@@ -17,6 +18,8 @@ export class MatchingDataCollectionService {
     private readonly prisma: PrismaService,
     private readonly matchingRedisService: MatchingRedisService,
     private readonly systemStateService: SystemStateService,
+    @Inject(ILOGGER_SERVICE_TOKEN)
+    private readonly logger: ILoggerService,
     @Inject(USER_QUIZ_PROGRESS_REPOSITORY_TOKEN)
     private readonly userQuizProgressRepository: IUserQuizProgressRepository,
     @Inject(USER_REPOSITORY_TOKEN)
@@ -51,7 +54,7 @@ export class MatchingDataCollectionService {
         // 사용자 정보 조회 (gender 포함)
         const user = await this.userRepository.findById(userId);
         if (!user) {
-          console.warn(`사용자를 찾을 수 없음: ${userId}`);
+          this.logger.warn(`사용자를 찾을 수 없음`, 'MatchingDataCollectionService', { userId });
           continue;
         }
 
@@ -78,7 +81,7 @@ export class MatchingDataCollectionService {
         });
 
         if (answers.length !== 12) {
-          console.warn(`답안 개수가 12개가 아님 (사용자: ${userId}, 답안 수: ${answers.length})`);
+          this.logger.warn(`답안 개수가 12개가 아님`, 'MatchingDataCollectionService', { userId, answerCount: answers.length });
           continue;
         }
 
@@ -96,7 +99,7 @@ export class MatchingDataCollectionService {
 
         collectedCount++;
       } catch (error) {
-        console.error(`사용자 답안 데이터 수집 실패 (사용자: ${userId}):`, error);
+        this.logger.error(`사용자 답안 데이터 수집 실패`, 'MatchingDataCollectionService', { userId, error: error instanceof Error ? error.message : String(error) });
       }
     }
 

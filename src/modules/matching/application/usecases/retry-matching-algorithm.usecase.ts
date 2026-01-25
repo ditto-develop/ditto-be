@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { MatchingRedisService } from '@module/matching/infrastructure/services/matching-redis.service';
 import { RunMatchingAlgorithmUseCase } from './run-matching-algorithm.usecase';
+import { MatchingAlgorithmRetryException } from '@module/matching/domain/exceptions/matching.exceptions';
 
 @Injectable()
 export class RetryMatchingAlgorithmUseCase {
@@ -14,7 +15,7 @@ export class RetryMatchingAlgorithmUseCase {
     const currentStatus = await this.matchingRedisService.getMatchingStatus(quizSetId);
 
     if (currentStatus !== 'failed') {
-      throw new Error(`재실행할 수 없는 상태입니다. 현재 상태: ${currentStatus}`);
+      throw new MatchingAlgorithmRetryException(currentStatus);
     }
 
     // 2. 기존 매칭 알고리즘 실행 (재실행 로직 포함)

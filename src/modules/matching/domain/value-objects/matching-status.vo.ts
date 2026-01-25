@@ -1,3 +1,5 @@
+import { ValidationException } from '@common/exceptions/domain.exception';
+
 /**
  * 매칭 상태 값 객체
  */
@@ -16,7 +18,7 @@ export class MatchingStatusValueObject {
   static create(status: string): MatchingStatusValueObject {
     const validStatuses = Object.values(MatchingStatus);
     if (!validStatuses.includes(status as MatchingStatus)) {
-      throw new Error(`Invalid matching status: ${status}`);
+      throw new ValidationException(`유효하지 않은 매칭 상태입니다: ${status}`);
     }
     return new MatchingStatusValueObject(status as MatchingStatus);
   }

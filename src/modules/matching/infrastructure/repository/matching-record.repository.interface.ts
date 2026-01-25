@@ -1,8 +1,10 @@
 import { MatchingRecord } from '@module/matching/domain/entities/matching-record.entity';
+import { MatchingRecordWithRelations } from './matching-record.repository';
 
 export interface IMatchingRecordRepository {
   create(record: Omit<MatchingRecord, 'id' | 'matchedAt'>): Promise<MatchingRecord>;
   findByUserIdAndYearMonthWeek(userId: string, year: number, month: number, week: number): Promise<MatchingRecord[]>;
+  findByUserIdAndYearMonthWeekWithRelations(userId: string, year: number, month: number, week: number): Promise<MatchingRecordWithRelations[]>;
   findByUserIdAndMatchedUserIdAndYearMonthWeek(
     userId: string,
     matchedUserId: string,

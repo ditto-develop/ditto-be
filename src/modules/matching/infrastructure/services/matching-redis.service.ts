@@ -1,5 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Inject } from '@nestjs/common';
 import { RedisService } from '@module/common/redis/redis.service';
+import { ILOGGER_SERVICE_TOKEN, ILoggerService } from '@common/logging/interfaces/logger.interface';
 
 export interface UserAnswerData {
   bitmask: string;
@@ -10,7 +11,11 @@ export interface UserAnswerData {
 export class MatchingRedisService {
   private readonly TTL_SECONDS = 14 * 24 * 60 * 60; // 14일
 
-  constructor(private readonly redisService: RedisService) {}
+  constructor(
+    private readonly redisService: RedisService,
+    @Inject(ILOGGER_SERVICE_TOKEN)
+    private readonly logger: ILoggerService,
+  ) {}
 
   /**
    * 사용자 답안 데이터를 저장 (비트마스크 + 성별)
@@ -36,7 +41,7 @@ export class MatchingRedisService {
         result[userId] = JSON.parse(dataStr);
       } catch (error) {
         // 잘못된 JSON 데이터는 무시
-        console.warn(`Invalid JSON data for user ${userId}:`, dataStr);
+        this.logger.warn(`잘못된 JSON 데이터`, 'MatchingRedisService', { userId, dataStr });
       }
     }
 

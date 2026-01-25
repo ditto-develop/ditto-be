@@ -53,3 +53,24 @@ export class MatchingAlgorithmInProgressException extends BusinessRuleException 
     super(`퀴즈 세트 ${quizSetId}에 대한 매칭 알고리즘이 현재 실행 중입니다.`, 'MATCHING_ALGORITHM_IN_PROGRESS');
   }
 }
+
+/**
+ * 매칭 알고리즘 재실행 불가 상태 예외
+ */
+export class MatchingAlgorithmRetryException extends BusinessRuleException {
+  constructor(currentStatus: string | null) {
+    let message: string;
+
+    if (currentStatus === null) {
+      message = '재실행할 수 없습니다. 아직 실행한 적이 없습니다.';
+    } else if (currentStatus === 'processing') {
+      message = '재실행할 수 없습니다. 현재 실행 중입니다.';
+    } else if (currentStatus === 'completed') {
+      message = '재실행할 수 없습니다. 이미 완료되었습니다.';
+    } else {
+      message = `재실행할 수 없습니다. 현재 상태: ${currentStatus}`;
+    }
+
+    super(message, 'MATCHING_ALGORITHM_RETRY_INVALID_STATUS');
+  }
+}

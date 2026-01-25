@@ -1,7 +1,23 @@
 import { Injectable } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 import { PrismaService } from '@module/common/prisma/prisma.service';
 import { MatchingOpportunity } from '@module/matching/domain/entities/matching-opportunity.entity';
 import { IMatchingOpportunityRepository } from './matching-opportunity.repository.interface';
+
+// MatchingOpportunity with relations
+export type MatchingOpportunityWithRelations = Prisma.MatchingOpportunityGetPayload<{
+  include: {
+    matchedUser: {
+      select: { id: true; nickname: true; gender: true };
+    };
+    quizSet: {
+      select: { id: true; title: true; category: true };
+    };
+  };
+}>;
+
+// Basic MatchingOpportunity from Prisma (without relations)
+export type MatchingOpportunityBasic = Prisma.MatchingOpportunityGetPayload<{}>;
 
 @Injectable()
 export class MatchingOpportunityRepository implements IMatchingOpportunityRepository {
@@ -39,6 +55,27 @@ export class MatchingOpportunityRepository implements IMatchingOpportunityReposi
         month,
         week,
       },
+      orderBy: {
+        matchScore: 'desc',
+      },
+    });
+
+    return opportunities.map(this.toDomain);
+  }
+
+  async findByUserIdAndYearMonthWeekWithRelations(
+    userId: string,
+    year: number,
+    month: number,
+    week: number,
+  ): Promise<MatchingOpportunityWithRelations[]> {
+    const opportunities = await this.prisma.matchingOpportunity.findMany({
+      where: {
+        userId,
+        year,
+        month,
+        week,
+      },
       include: {
         matchedUser: {
           select: {
@@ -60,7 +97,7 @@ export class MatchingOpportunityRepository implements IMatchingOpportunityReposi
       },
     });
 
-    return opportunities.map(this.toDomain);
+    return opportunities;
   }
 
   async existsByQuizSetId(quizSetId: string): Promise<boolean> {
@@ -81,7 +118,7 @@ export class MatchingOpportunityRepository implements IMatchingOpportunityReposi
     return result.count;
   }
 
-  private toDomain(raw: any): MatchingOpportunity {
+  private toDomain(raw: MatchingOpportunityBasic): MatchingOpportunity {
     return MatchingOpportunity.create(
       raw.id,
       raw.userId,

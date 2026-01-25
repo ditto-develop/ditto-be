@@ -1,7 +1,23 @@
 import { Injectable } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 import { PrismaService } from '@module/common/prisma/prisma.service';
 import { MatchingRecord } from '@module/matching/domain/entities/matching-record.entity';
 import { IMatchingRecordRepository } from './matching-record.repository.interface';
+
+// MatchingRecord with relations
+export type MatchingRecordWithRelations = Prisma.MatchingRecordGetPayload<{
+  include: {
+    matchedUser: {
+      select: { id: true; nickname: true; gender: true };
+    };
+    quizSet: {
+      select: { id: true; title: true; category: true };
+    };
+  };
+}>;
+
+// Basic MatchingRecord from Prisma (without relations)
+export type MatchingRecordBasic = Prisma.MatchingRecordGetPayload<{}>;
 
 @Injectable()
 export class MatchingRecordRepository implements IMatchingRecordRepository {
@@ -18,22 +34,6 @@ export class MatchingRecordRepository implements IMatchingRecordRepository {
         week: record.week,
         isMatched: record.isMatched,
       },
-      include: {
-        matchedUser: {
-          select: {
-            id: true,
-            nickname: true,
-            gender: true,
-          },
-        },
-        quizSet: {
-          select: {
-            id: true,
-            title: true,
-            category: true,
-          },
-        },
-      },
     });
 
     return this.toDomain(created);
@@ -45,6 +45,27 @@ export class MatchingRecordRepository implements IMatchingRecordRepository {
     month: number,
     week: number,
   ): Promise<MatchingRecord[]> {
+    const records = await this.prisma.matchingRecord.findMany({
+      where: {
+        userId,
+        year,
+        month,
+        week,
+      },
+      orderBy: {
+        matchedAt: 'desc',
+      },
+    });
+
+    return records.map(this.toDomain);
+  }
+
+  async findByUserIdAndYearMonthWeekWithRelations(
+    userId: string,
+    year: number,
+    month: number,
+    week: number,
+  ): Promise<MatchingRecordWithRelations[]> {
     const records = await this.prisma.matchingRecord.findMany({
       where: {
         userId,
@@ -73,7 +94,7 @@ export class MatchingRecordRepository implements IMatchingRecordRepository {
       },
     });
 
-    return records.map(this.toDomain);
+    return records;
   }
 
   async findByUserIdAndMatchedUserIdAndYearMonthWeek(
@@ -137,7 +158,7 @@ export class MatchingRecordRepository implements IMatchingRecordRepository {
     });
   }
 
-  private toDomain(raw: any): MatchingRecord {
+  private toDomain(raw: MatchingRecordBasic): MatchingRecord {
     return MatchingRecord.create(
       raw.id,
       raw.userId,

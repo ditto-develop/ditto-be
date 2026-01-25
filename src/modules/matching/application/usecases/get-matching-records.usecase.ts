@@ -1,5 +1,6 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { IMatchingRecordRepository, MATCHING_RECORD_REPOSITORY_TOKEN } from '@module/matching/infrastructure/repository/matching-record.repository.interface';
+import { MatchingRecordWithRelations } from '@module/matching/infrastructure/repository/matching-record.repository';
 import { SystemStateService } from '@module/quiz/infrastructure/services/system-state.service';
 
 export interface MatchingRecordWithUser {
@@ -30,7 +31,7 @@ export class GetMatchingRecordsUseCase {
     const week = await this.systemStateService.getCurrentWeek();
 
     // 현재 주차의 매칭 기록 조회
-    const records = await this.matchingRecordRepository.findByUserIdAndYearMonthWeek(
+    const records = await this.matchingRecordRepository.findByUserIdAndYearMonthWeekWithRelations(
       userId,
       year,
       month,
@@ -43,7 +44,7 @@ export class GetMatchingRecordsUseCase {
       : records;
 
     // 사용자 정보와 함께 변환
-    return filteredRecords.map((record: any) => ({
+    return filteredRecords.map((record: MatchingRecordWithRelations): MatchingRecordWithUser => ({
       id: record.id,
       matchedUserId: record.matchedUserId,
       matchedUser: record.matchedUser ? {

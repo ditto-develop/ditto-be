@@ -1,5 +1,6 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { IMatchingOpportunityRepository, MATCHING_OPPORTUNITY_REPOSITORY_TOKEN } from '@module/matching/infrastructure/repository/matching-opportunity.repository.interface';
+import { MatchingOpportunityWithRelations } from '@module/matching/infrastructure/repository/matching-opportunity.repository';
 import { SystemStateService } from '@module/quiz/infrastructure/services/system-state.service';
 
 export interface MatchingOpportunityWithUser {
@@ -30,7 +31,7 @@ export class GetMatchingOpportunitiesUseCase {
     const week = await this.systemStateService.getCurrentWeek();
 
     // 현재 주차의 매칭 기회만 조회 (이전 주차 제외)
-    const opportunities = await this.matchingOpportunityRepository.findByUserIdAndYearMonthWeek(
+    const opportunities = await this.matchingOpportunityRepository.findByUserIdAndYearMonthWeekWithRelations(
       userId,
       year,
       month,
@@ -43,7 +44,7 @@ export class GetMatchingOpportunitiesUseCase {
       : opportunities;
 
     // 사용자 정보와 함께 변환
-    return filteredOpportunities.map((opp: any) => ({
+    return filteredOpportunities.map((opp: MatchingOpportunityWithRelations): MatchingOpportunityWithUser => ({
       id: opp.id,
       matchedUserId: opp.matchedUserId,
       matchedUser: opp.matchedUser ? {

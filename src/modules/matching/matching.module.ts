@@ -1,4 +1,4 @@
-import { Module, OnModuleInit } from '@nestjs/common';
+import { Module, OnModuleInit, Logger } from '@nestjs/common';
 import { CommandBus } from '@common/command/command-bus';
 import { CommandBusModule } from '@common/command/command-bus.module';
 import { registerCommandHandlers } from '@common/command/command-handler-registry.util';
@@ -55,9 +55,11 @@ const MatchingRecordRepositoryProvider = {
 const MatchingNotificationServiceProvider = {
   provide: MATCHING_NOTIFICATION_SERVICE_TOKEN,
   useClass: class implements IMatchingNotificationService {
+    private readonly logger = new Logger('MatchingNotificationService');
+
     async notifyMatchingSuccess(userId: string, matchedUserId: string, quizSetId: string): Promise<void> {
       // TODO: 실제 알림 로직 구현 (푸시 알림, 이메일 등)
-      console.log(`매칭 성사 알림: ${userId} ↔ ${matchedUserId} (퀴즈 세트: ${quizSetId})`);
+      this.logger.log(`매칭 성사 알림: ${userId} ↔ ${matchedUserId} (퀴즈 세트: ${quizSetId})`);
     }
   },
 };
@@ -121,6 +123,8 @@ const MatchingNotificationServiceProvider = {
   ],
 })
 export class MatchingModule implements OnModuleInit {
+  private readonly logger = new Logger(MatchingModule.name);
+
   constructor(
     private readonly commandBus: CommandBus,
     private readonly runMatchingAlgorithmHandler: RunMatchingAlgorithmHandler,
@@ -129,7 +133,7 @@ export class MatchingModule implements OnModuleInit {
     private readonly getMatchingRecordsHandler: GetMatchingRecordsHandler,
     private readonly retryMatchingAlgorithmHandler: RetryMatchingAlgorithmHandler,
   ) {
-    console.log('[MatchingModule] MatchingModule 초기화');
+    this.logger.log('MatchingModule 초기화');
   }
 
   onModuleInit(): void {

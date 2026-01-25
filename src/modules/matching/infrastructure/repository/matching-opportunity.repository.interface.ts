@@ -1,8 +1,10 @@
 import { MatchingOpportunity } from '@module/matching/domain/entities/matching-opportunity.entity';
+import { MatchingOpportunityWithRelations } from './matching-opportunity.repository';
 
 export interface IMatchingOpportunityRepository {
   createMany(opportunities: Omit<MatchingOpportunity, 'id' | 'createdAt'>[]): Promise<void>;
   findByUserIdAndYearMonthWeek(userId: string, year: number, month: number, week: number): Promise<MatchingOpportunity[]>;
+  findByUserIdAndYearMonthWeekWithRelations(userId: string, year: number, month: number, week: number): Promise<MatchingOpportunityWithRelations[]>;
   existsByQuizSetId(quizSetId: string): Promise<boolean>;
   deleteOlderThan(date: Date): Promise<number>;
 }

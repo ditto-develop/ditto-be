@@ -14,6 +14,13 @@ export interface PatternGroup {
   [patternGender: string]: string[]; // key: `${pattern}_${gender}`, value: userIds
 }
 
+export interface LightweightCandidate {
+  userId: string;
+  matchedUserId: string;
+  score: number;
+  pairId: string; // 중복 방지용 (ex: "minId:maxId")
+}
+
 @Injectable()
 export class MatchingAlgorithmService {
   constructor(private readonly redisService: MatchingRedisService) {}
@@ -47,21 +54,40 @@ export class MatchingAlgorithmService {
     const top20PercentCount = Math.ceil(patternPairs.length * 0.2);
     const topPatternPairs = this.getTopPatternPairs(patternPairs, top20PercentCount);
 
-    // 6. Hard Limit 적용 (5명 고정, 양방향 원칙 보장 + Shuffle)
-    const allOpportunities = this.generateMatchingOpportunities(
-      topPatternPairs,
-      patternGroups,
+    // 디버깅: 중간 결과 확인
+    if (process.env.NODE_ENV === 'test' || process.env.DEBUG_MATCHING) {
+      console.log(`[MatchingAlgorithm] 패턴 쌍 수: ${patternPairs.length}, 상위 20% 쌍 수: ${topPatternPairs.length}`);
+    }
+
+    // 6. 가벼운 매칭 후보 생성 (메모리 효율성)
+    const candidates = this.generateLightweightCandidates(topPatternPairs, patternGroups);
+
+    // 디버깅: 중간 결과 확인
+    if (process.env.NODE_ENV === 'test' || process.env.DEBUG_MATCHING) {
+      console.log(`[MatchingAlgorithm] 생성된 후보 수: ${candidates.length}`);
+    }
+
+    // 7. Global Greedy Matching 실행 (Hard Limit과 양방향 일관성 동시 보장)
+    const finalPairs = this.executeGlobalGreedyMatching(candidates, 5); // Hard Limit: 5명
+
+    // 디버깅: 중간 결과 확인
+    if (process.env.NODE_ENV === 'test' || process.env.DEBUG_MATCHING) {
+      console.log(`[MatchingAlgorithm] 최종 매칭 쌍 수: ${finalPairs.length}`);
+    }
+
+    // 8. 최종 확정된 쌍에 대해서만 MatchingOpportunity 엔티티 생성
+    const finalOpportunities = this.createMatchingOpportunitiesFromPairs(
+      finalPairs,
       quizSetId,
       year,
       month,
       week,
     );
 
-    // 7. Hard Limit 적용 및 양방향 일관성 보장
-    const finalOpportunities = this.applyHardLimitAndBidirectionalConsistency(
-      allOpportunities,
-      5, // Hard Limit: 5명
-    );
+    // 디버깅: 최종 결과 확인
+    if (process.env.NODE_ENV === 'test' || process.env.DEBUG_MATCHING) {
+      console.log(`[MatchingAlgorithm] 최종 매칭 기회 수: ${finalOpportunities.length}`);
+    }
 
     return finalOpportunities;
   }
@@ -97,7 +123,8 @@ export class MatchingAlgorithmService {
       const patternA: number = parseInt(partsA[0], 10);
       const genderA: string = partsA[1];
 
-      for (let j = 0; j < groupKeys.length; j++) {
+      // j = i부터 시작하여 중복 패턴 쌍 제거
+      for (let j = i; j < groupKeys.length; j++) {
         const partsB = groupKeys[j].split('_');
         const patternB: number = parseInt(partsB[0], 10);
         const genderB: string = partsB[1];
@@ -169,17 +196,32 @@ export class MatchingAlgorithmService {
   }
 
   /**
-   * 매칭 기회 생성 (패턴+성별 그룹 기반)
+   * 가벼운 매칭 후보 생성 (메모리 효율성을 위한 Plain Object만 생성)
    */
-  private generateMatchingOpportunities(
+  private generateLightweightCandidates(
     topPatternPairs: PatternPair[],
     patternGroups: PatternGroup,
-    quizSetId: string,
-    year: number,
-    month: number,
-    week: number,
-  ): MatchingOpportunity[] {
-    const opportunities: MatchingOpportunity[] = [];
+  ): LightweightCandidate[] {
+    const candidates: LightweightCandidate[] = [];
+
+    // 디버깅: 패턴 그룹 키 확인
+    if (process.env.NODE_ENV === 'test' || process.env.DEBUG_MATCHING) {
+      const patternGroupKeys = Object.keys(patternGroups);
+      console.log(`[generateLightweightCandidates] 패턴 그룹 키 수: ${patternGroupKeys.length}`);
+      if (topPatternPairs.length > 0) {
+        const firstPair = topPatternPairs[0];
+        const groupAKey = `${firstPair.patternA}_${firstPair.genderA}`;
+        const groupBKey = `${firstPair.patternB}_${firstPair.genderB}`;
+        console.log(`[generateLightweightCandidates] 첫 번째 쌍 키: ${groupAKey}, ${groupBKey}`);
+        console.log(`[generateLightweightCandidates] 그룹 A 존재: ${patternGroups[groupAKey] ? '있음' : '없음'}, 그룹 B 존재: ${patternGroups[groupBKey] ? '있음' : '없음'}`);
+        if (patternGroups[groupAKey]) {
+          console.log(`[generateLightweightCandidates] 그룹 A 사용자 수: ${patternGroups[groupAKey].length}`);
+        }
+        if (patternGroups[groupBKey]) {
+          console.log(`[generateLightweightCandidates] 그룹 B 사용자 수: ${patternGroups[groupBKey].length}`);
+        }
+      }
+    }
 
     for (const pair of topPatternPairs) {
       const groupAKey = `${pair.patternA}_${pair.genderA}`;
@@ -188,127 +230,128 @@ export class MatchingAlgorithmService {
       const usersA = patternGroups[groupAKey] || [];
       const usersB = patternGroups[groupBKey] || [];
 
-      // 그룹 간 모든 사용자 쌍에 대해 매칭 기회 생성
+      // 그룹 간 모든 사용자 쌍에 대해 가벼운 후보 생성
       for (const userA of usersA) {
         for (const userB of usersB) {
-          // 중복 방지: userA < userB인 경우만 생성
-          if (userA < userB) {
-            const opportunity1 = MatchingOpportunity.create(
-              `opp_${userA}_${userB}_${quizSetId}`,
-              userA,
-              userB,
-              quizSetId,
-              year,
-              month,
-              week,
-              pair.score,
-            );
-
-            const opportunity2 = MatchingOpportunity.create(
-              `opp_${userB}_${userA}_${quizSetId}`,
-              userB,
-              userA,
-              quizSetId,
-              year,
-              month,
-              week,
-              pair.score,
-            );
-
-            opportunities.push(opportunity1, opportunity2);
+          // 중복 방지: userA와 userB가 다른 경우만 생성
+          if (userA !== userB) {
+            // ID 대소비교로 유니크 키 생성 (양방향 중 하나만 생성)
+            const [minId, maxId] = userA < userB ? [userA, userB] : [userB, userA];
+            const pairId = this.getPairKey(userA, userB);
+            
+            candidates.push({
+              userId: minId,
+              matchedUserId: maxId,
+              score: pair.score,
+              pairId,
+            });
           }
         }
       }
     }
 
+    // 디버깅: 생성된 후보 수 확인
+    if (process.env.NODE_ENV === 'test' || process.env.DEBUG_MATCHING) {
+      console.log(`[generateLightweightCandidates] 생성된 후보 수: ${candidates.length}`);
+    }
+
+    return candidates;
+  }
+
+  /**
+   * Global Greedy Matching 실행 (Hard Limit과 양방향 일관성을 한 번의 패스로 보장)
+   */
+  private executeGlobalGreedyMatching(
+    candidates: LightweightCandidate[],
+    limit: number,
+  ): LightweightCandidate[] {
+    // 1. 점수별로 그룹핑 (동점자 처리)
+    const scoreGroups = new Map<number, LightweightCandidate[]>();
+    for (const candidate of candidates) {
+      if (!scoreGroups.has(candidate.score)) {
+        scoreGroups.set(candidate.score, []);
+      }
+      scoreGroups.get(candidate.score)!.push(candidate);
+    }
+
+    // 2. 점수 내림차순으로 정렬된 그룹 리스트 생성
+    const sortedScores = Array.from(scoreGroups.keys()).sort((a, b) => b - a);
+    
+    // 3. 각 점수 그룹 내에서 Shuffle (공정성 보장)
+    const shuffledCandidates: LightweightCandidate[] = [];
+    for (const score of sortedScores) {
+      const group = scoreGroups.get(score)!;
+      const shuffled = this.shuffleArray([...group]);
+      shuffledCandidates.push(...shuffled);
+    }
+
+    // 4. Global Greedy Matching 실행
+    const userMatchCounts = new Map<string, number>();
+    const finalResults: LightweightCandidate[] = [];
+
+    for (const candidate of shuffledCandidates) {
+      const countA = userMatchCounts.get(candidate.userId) || 0;
+      const countB = userMatchCounts.get(candidate.matchedUserId) || 0;
+
+      // 두 사용자 모두 슬롯이 남아있을 때만 매칭 성사 (양방향 일관성과 Hard Limit 동시 만족)
+      if (countA < limit && countB < limit) {
+        finalResults.push(candidate);
+        
+        userMatchCounts.set(candidate.userId, countA + 1);
+        userMatchCounts.set(candidate.matchedUserId, countB + 1);
+      }
+    }
+
+    // 디버깅: 최종 매칭 결과 확인
+    if (process.env.NODE_ENV === 'test' || process.env.DEBUG_MATCHING) {
+      console.log(`[executeGlobalGreedyMatching] 최종 매칭 쌍 수: ${finalResults.length}`);
+    }
+
+    return finalResults;
+  }
+
+  /**
+   * 최종 확정된 쌍에 대해서만 MatchingOpportunity 엔티티 생성
+   */
+  private createMatchingOpportunitiesFromPairs(
+    finalPairs: LightweightCandidate[],
+    quizSetId: string,
+    year: number,
+    month: number,
+    week: number,
+  ): MatchingOpportunity[] {
+    const opportunities: MatchingOpportunity[] = [];
+
+    for (const pair of finalPairs) {
+      // 양방향 MatchingOpportunity 생성
+      const opp1 = MatchingOpportunity.create(
+        `opp_${pair.userId}_${pair.matchedUserId}_${quizSetId}`,
+        pair.userId,
+        pair.matchedUserId,
+        quizSetId,
+        year,
+        month,
+        week,
+        pair.score,
+      );
+
+      const opp2 = MatchingOpportunity.create(
+        `opp_${pair.matchedUserId}_${pair.userId}_${quizSetId}`,
+        pair.matchedUserId,
+        pair.userId,
+        quizSetId,
+        year,
+        month,
+        week,
+        pair.score,
+      );
+
+      opportunities.push(opp1, opp2);
+    }
+
     return opportunities;
   }
 
-  /**
-   * Hard Limit 적용 및 양방향 일관성 보장
-   */
-  private applyHardLimitAndBidirectionalConsistency(
-    allOpportunities: MatchingOpportunity[],
-    maxMatchesPerUser: number,
-  ): MatchingOpportunity[] {
-    // 사용자별 매칭 기회를 그룹핑
-    const opportunitiesByUser = new Map<string, MatchingOpportunity[]>();
-
-    for (const opp of allOpportunities) {
-      if (!opportunitiesByUser.has(opp.userId)) {
-        opportunitiesByUser.set(opp.userId, []);
-      }
-      opportunitiesByUser.get(opp.userId)!.push(opp);
-    }
-
-    // 각 사용자별로 점수 정렬 및 Hard Limit 적용
-    const selectedPairs = new Set<string>();
-    const userSelections = new Map<string, MatchingOpportunity[]>();
-
-    for (const [userId, matches] of opportunitiesByUser.entries()) {
-      // 점수 내림차순 정렬
-      matches.sort((a, b) => b.matchScore - a.matchScore);
-
-      // 점수 그룹별로 Shuffle하여 공정성 보장
-      const shuffledMatches = this.shuffleByScoreGroup(matches);
-
-      const userSelection: MatchingOpportunity[] = [];
-      let count = 0;
-
-      for (const match of shuffledMatches) {
-        if (count >= maxMatchesPerUser) break;
-
-        const pairKey = this.getPairKey(match.userId, match.matchedUserId);
-
-        if (!selectedPairs.has(pairKey)) {
-          userSelection.push(match);
-          selectedPairs.add(pairKey);
-          count++;
-        }
-      }
-
-      userSelections.set(userId, userSelection);
-    }
-
-    // 양방향 일관성 재확인 및 보정
-    this.ensureBidirectionalConsistency(userSelections);
-
-    // 최종 매칭 기회 목록 생성
-    const finalOpportunities: MatchingOpportunity[] = [];
-
-    for (const [_userId, selections] of userSelections.entries()) {
-      finalOpportunities.push(...selections);
-    }
-
-    return finalOpportunities;
-  }
-
-  /**
-   * 점수 그룹별로 Shuffle하여 공정성 보장
-   */
-  private shuffleByScoreGroup(matches: MatchingOpportunity[]): MatchingOpportunity[] {
-    // 점수별로 그룹핑
-    const scoreGroups = new Map<number, MatchingOpportunity[]>();
-
-    for (const match of matches) {
-      if (!scoreGroups.has(match.matchScore)) {
-        scoreGroups.set(match.matchScore, []);
-      }
-      scoreGroups.get(match.matchScore)!.push(match);
-    }
-
-    // 각 점수 그룹 내에서 Shuffle
-    const shuffled: MatchingOpportunity[] = [];
-    for (const [_score, group] of scoreGroups.entries()) {
-      const shuffledGroup = this.shuffleArray([...group]);
-      shuffled.push(...shuffledGroup);
-    }
-
-    // 점수 내림차순으로 재정렬 (Shuffle은 같은 점수 내에서만)
-    shuffled.sort((a, b) => b.matchScore - a.matchScore);
-
-    return shuffled;
-  }
 
   /**
    * Fisher-Yates Shuffle 알고리즘
@@ -327,55 +370,5 @@ export class MatchingAlgorithmService {
    */
   private getPairKey(userId1: string, userId2: string): string {
     return userId1 < userId2 ? `${userId1}:${userId2}` : `${userId2}:${userId1}`;
-  }
-
-  /**
-   * 양방향 일관성 보장
-   */
-  private ensureBidirectionalConsistency(
-    userSelections: Map<string, MatchingOpportunity[]>,
-  ): void {
-    const allSelections = new Map<string, boolean>();
-
-    // 모든 선택된 쌍을 기록
-    for (const [_userId, selections] of userSelections.entries()) {
-      for (const selection of selections) {
-        const pairKey = this.getPairKey(selection.userId, selection.matchedUserId);
-        allSelections.set(pairKey, true);
-      }
-    }
-
-    // 누락된 역방향 선택 추가
-    for (const [pairKey, _] of allSelections.entries()) {
-      const [user1, user2] = pairKey.split(':');
-
-      // user1 → user2가 있는지 확인
-      const user1Selections = userSelections.get(user1) || [];
-      const hasForward = user1Selections.some(s => s.matchedUserId === user2);
-
-      // user2 → user1이 있는지 확인
-      const user2Selections = userSelections.get(user2) || [];
-      const hasBackward = user2Selections.some(s => s.matchedUserId === user1);
-
-      if (hasForward && !hasBackward) {
-        // user2 → user1 추가
-        const forwardOpp = user1Selections.find(s => s.matchedUserId === user2)!;
-        const reverseOpp = MatchingOpportunity.create(
-          `opp_${user2}_${user1}_${forwardOpp.quizSetId}`,
-          user2,
-          user1,
-          forwardOpp.quizSetId,
-          forwardOpp.year,
-          forwardOpp.month,
-          forwardOpp.week,
-          forwardOpp.matchScore,
-        );
-
-        if (!userSelections.has(user2)) {
-          userSelections.set(user2, []);
-        }
-        userSelections.get(user2)!.push(reverseOpp);
-      }
-    }
   }
 }
