@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsInt, IsOptional, IsString, Max, Min } from 'class-validator';
+import { IsEnum, IsInt, IsOptional, IsString, Max, Min } from 'class-validator';
 
 export class CreateQuizSetDto {
   @ApiProperty({
@@ -49,6 +49,17 @@ export class CreateQuizSetDto {
   @IsOptional()
   @IsString()
   description?: string;
+
+  @ApiProperty({
+    description: '매칭 타입 (ONE_TO_ONE: 1대1 매칭, GROUP: 그룹 매칭)',
+    example: 'ONE_TO_ONE',
+    enum: ['ONE_TO_ONE', 'GROUP'],
+    default: 'ONE_TO_ONE',
+    required: false,
+  })
+  @IsOptional()
+  @IsEnum(['ONE_TO_ONE', 'GROUP'])
+  matchingType?: 'ONE_TO_ONE' | 'GROUP';
 
   @ApiProperty({
     description: '강제 적용 패스워드',
