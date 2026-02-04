@@ -7955,24 +7955,41 @@
     },
     "/api/matching/opportunities": {
       "get": {
-        "description": "현재 주차의 매칭 기회를 조회합니다. 이전 주차의 매칭 기회는 조회되지 않습니다.",
+        "description": "사용자가 푼 이번 주차의 퀴즈 세트에 대한 매칭 기회를 조회합니다.",
         "operationId": "MatchingController_getMatchingOpportunities",
-        "parameters": [
-          {
-            "name": "quizSetId",
-            "required": true,
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
+        "parameters": [],
         "responses": {
           "200": {
-            "description": "매칭 기회 조회 성공"
+            "description": "매칭 기회 조회 성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/MatchingOpportunityWithUserDto"
+                      }
+                    },
+                    "error": {
+                      "type": "string",
+                      "example": "에러 메시지"
+                    }
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
+          {
+            "access-token": []
+          },
           {
             "bearer": []
           }
@@ -8000,13 +8017,36 @@
         },
         "responses": {
           "201": {
-            "description": "매칭 선택 성공"
+            "description": "매칭 선택 성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/MatchingRecordWithUserDto"
+                    },
+                    "error": {
+                      "type": "string",
+                      "example": "에러 메시지"
+                    }
+                  }
+                }
+              }
+            }
           },
           "400": {
             "description": "한 주차에 이미 선택했거나 유효하지 않은 요청"
           }
         },
         "security": [
+          {
+            "access-token": []
+          },
           {
             "bearer": []
           }
@@ -8017,24 +8057,41 @@
         ]
       },
       "get": {
-        "description": "현재 주차의 매칭 기록을 조회합니다.",
+        "description": "사용자가 푼 이번 주차의 퀴즈 세트에 대한 매칭 기록을 조회합니다.",
         "operationId": "MatchingController_getMatchingRecords",
-        "parameters": [
-          {
-            "name": "quizSetId",
-            "required": true,
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
+        "parameters": [],
         "responses": {
           "200": {
-            "description": "매칭 기록 조회 성공"
+            "description": "매칭 기록 조회 성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/MatchingRecordWithUserDto"
+                      }
+                    },
+                    "error": {
+                      "type": "string",
+                      "example": "에러 메시지"
+                    }
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
+          {
+            "access-token": []
+          },
           {
             "bearer": []
           }
@@ -8061,10 +8118,20 @@
         ],
         "responses": {
           "200": {
-            "description": "상태 조회 성공"
+            "description": "상태 조회 성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MatchingStatusResponseDto"
+                }
+              }
+            }
           }
         },
         "security": [
+          {
+            "access-token": []
+          },
           {
             "bearer": []
           }
@@ -8091,13 +8158,36 @@
         ],
         "responses": {
           "200": {
-            "description": "재실행 요청 성공"
+            "description": "재실행 요청 성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/RetryMatchingAlgorithmResponseDto"
+                    },
+                    "error": {
+                      "type": "string",
+                      "example": "에러 메시지"
+                    }
+                  }
+                }
+              }
+            }
           },
           "403": {
             "description": "관리자 권한 필요"
           }
         },
         "security": [
+          {
+            "access-token": []
+          },
           {
             "bearer": []
           }
@@ -9405,9 +9495,185 @@
           "period"
         ]
       },
+      "MatchedUserDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "사용자 ID",
+            "example": "user-id-123"
+          },
+          "nickname": {
+            "type": "string",
+            "description": "닉네임",
+            "example": "매칭상대"
+          },
+          "gender": {
+            "type": "string",
+            "description": "성별",
+            "example": "male",
+            "enum": [
+              "male",
+              "female"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "nickname",
+          "gender"
+        ]
+      },
+      "MatchingOpportunityWithUserDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "매칭 기회 ID",
+            "example": "matching-opportunity-id-123"
+          },
+          "matchedUserId": {
+            "type": "string",
+            "description": "매칭된 사용자 ID",
+            "example": "matched-user-id-456"
+          },
+          "matchedUser": {
+            "description": "매칭된 사용자 정보",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/MatchedUserDto"
+              }
+            ]
+          },
+          "quizSetId": {
+            "type": "string",
+            "description": "퀴즈 세트 ID",
+            "example": "quiz-set-id-789"
+          },
+          "matchScore": {
+            "type": "number",
+            "description": "매칭 점수 (0-12)",
+            "example": 8,
+            "minimum": 0,
+            "maximum": 12
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "생성 시간",
+            "example": "2025-02-04T10:00:00.000Z"
+          }
+        },
+        "required": [
+          "id",
+          "matchedUserId",
+          "matchedUser",
+          "quizSetId",
+          "matchScore",
+          "createdAt"
+        ]
+      },
+      "MatchingRecordWithUserDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "매칭 기록 ID",
+            "example": "matching-record-id-123"
+          },
+          "matchedUserId": {
+            "type": "string",
+            "description": "매칭된 사용자 ID",
+            "example": "matched-user-id-456"
+          },
+          "matchedUser": {
+            "description": "매칭된 사용자 정보",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/MatchedUserDto"
+              }
+            ]
+          },
+          "quizSetId": {
+            "type": "string",
+            "description": "퀴즈 세트 ID",
+            "example": "quiz-set-id-789"
+          },
+          "isMatched": {
+            "type": "boolean",
+            "description": "매칭 성사 여부",
+            "example": true
+          },
+          "matchedAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "매칭 선택 시간",
+            "example": "2025-02-04T10:00:00.000Z"
+          }
+        },
+        "required": [
+          "id",
+          "matchedUserId",
+          "matchedUser",
+          "quizSetId",
+          "isMatched",
+          "matchedAt"
+        ]
+      },
       "CreateMatchingRecordDto": {
         "type": "object",
         "properties": {}
+      },
+      "MatchingStatusResponseDto": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "description": "매칭 알고리즘 실행 상태",
+            "example": "completed",
+            "enum": [
+              "pending",
+              "processing",
+              "completed",
+              "failed"
+            ]
+          },
+          "quizSetId": {
+            "type": "string",
+            "description": "퀴즈 세트 ID",
+            "example": "quiz-set-id-789"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "업데이트 시간",
+            "example": "2025-02-04T10:00:00.000Z"
+          }
+        },
+        "required": [
+          "status",
+          "quizSetId",
+          "updatedAt"
+        ]
+      },
+      "RetryMatchingAlgorithmResponseDto": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "성공 메시지",
+            "example": "매칭 알고리즘 재실행이 큐에 추가되었습니다."
+          },
+          "quizSetId": {
+            "type": "string",
+            "description": "퀴즈 세트 ID",
+            "example": "quiz-set-id-789"
+          }
+        },
+        "required": [
+          "message",
+          "quizSetId"
+        ]
       }
     }
   }

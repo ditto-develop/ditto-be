@@ -5,7 +5,6 @@ export class GetMatchingRecordsCommand implements ICommand {
 
   constructor(
     public readonly userId: string,
-    public readonly quizSetId?: string,
   ) {
     this.commandId = `get-matching-records-${userId}-${Date.now()}`;
   }

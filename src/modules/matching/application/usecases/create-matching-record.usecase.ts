@@ -1,5 +1,5 @@
 import { Injectable, Inject } from '@nestjs/common';
-import { IMatchingRecordRepository, MATCHING_RECORD_REPOSITORY_TOKEN } from '@module/matching/infrastructure/repository/matching-record.repository.interface';
+// import { IMatchingRecordRepository, MATCHING_RECORD_REPOSITORY_TOKEN } from '@module/matching/infrastructure/repository/matching-record.repository.interface';
 import { MatchingRecord } from '@module/matching/domain/entities/matching-record.entity';
 import { MatchingAlreadySelectedException } from '@module/matching/domain/exceptions/matching.exceptions';
 import { SystemStateService } from '@module/quiz/infrastructure/services/system-state.service';
@@ -10,8 +10,8 @@ import { ILOGGER_SERVICE_TOKEN, ILoggerService } from '@common/logging/interface
 @Injectable()
 export class CreateMatchingRecordUseCase {
   constructor(
-    @Inject(MATCHING_RECORD_REPOSITORY_TOKEN)
-    private readonly matchingRecordRepository: IMatchingRecordRepository,
+    // @Inject(MATCHING_RECORD_REPOSITORY_TOKEN)
+    // private readonly matchingRecordRepository: IMatchingRecordRepository,
     private readonly systemStateService: SystemStateService,
     @Inject(MATCHING_NOTIFICATION_SERVICE_TOKEN)
     private readonly matchingNotificationService: IMatchingNotificationService,

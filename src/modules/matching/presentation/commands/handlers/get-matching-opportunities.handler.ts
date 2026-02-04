@@ -13,10 +13,10 @@ export class GetMatchingOpportunitiesHandler implements ICommandHandler<GetMatch
   ) {}
 
   async execute(command: GetMatchingOpportunitiesCommand): Promise<ICommandResult<MatchingOpportunityWithUser[]>> {
-    const { userId, quizSetId } = command;
+    const { userId } = command;
 
     try {
-      const opportunities = await this.getMatchingOpportunitiesUseCase.execute(userId, quizSetId);
+      const opportunities = await this.getMatchingOpportunitiesUseCase.execute(userId);
       return {
         success: true,
         data: opportunities,

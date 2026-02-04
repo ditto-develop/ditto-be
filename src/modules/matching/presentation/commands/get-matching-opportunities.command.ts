@@ -5,7 +5,6 @@ export class GetMatchingOpportunitiesCommand implements ICommand {
 
   constructor(
     public readonly userId: string,
-    public readonly quizSetId?: string,
   ) {
     this.commandId = `get-matching-opportunities-${userId}-${Date.now()}`;
   }

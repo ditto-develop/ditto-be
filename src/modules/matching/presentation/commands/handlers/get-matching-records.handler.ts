@@ -12,10 +12,10 @@ export class GetMatchingRecordsHandler implements ICommandHandler<GetMatchingRec
   constructor(private readonly getMatchingRecordsUseCase: GetMatchingRecordsUseCase) {}
 
   async execute(command: GetMatchingRecordsCommand): Promise<ICommandResult<MatchingRecordWithUser[]>> {
-    const { userId, quizSetId } = command;
+    const { userId } = command;
 
     try {
-      const records = await this.getMatchingRecordsUseCase.execute(userId, quizSetId);
+      const records = await this.getMatchingRecordsUseCase.execute(userId);
       return {
         success: true,
         data: records,

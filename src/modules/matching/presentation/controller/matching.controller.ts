@@ -4,7 +4,6 @@ import {
   Post,
   Body,
   Param,
-  Query,
   UseGuards,
   Request,
   HttpStatus,
@@ -15,6 +14,11 @@ import { RolesGuard } from '@module/user/infrastructure/guards/roles.guard';
 import { Roles } from '@module/user/infrastructure/decorators/roles.decorator';
 import { RoleCode } from '@module/role/domain/entities/role.entity';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import { ApiCommandResponse } from '@common/command/api-response.decorator';
+import { MatchingOpportunityWithUserDto } from '../../application/dto/matching-opportunity-response.dto';
+import { MatchingRecordWithUserDto } from '../../application/dto/matching-record-response.dto';
+import { MatchingStatusResponseDto } from '../../application/dto/matching-status-response.dto';
+import { RetryMatchingAlgorithmResponseDto } from '../../application/dto/retry-matching-algorithm-response.dto';
 import { GetMatchingOpportunitiesCommand } from '../commands/get-matching-opportunities.command';
 import { CreateMatchingRecordCommand } from '../commands/create-matching-record.command';
 import { GetMatchingRecordsCommand } from '../commands/get-matching-records.command';
@@ -30,6 +34,7 @@ class CreateMatchingRecordDto {
 @Controller('matching')
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
+@ApiBearerAuth('access-token')
 export class MatchingController {
   constructor(
     private readonly commandBus: CommandBus,
@@ -39,17 +44,18 @@ export class MatchingController {
   @Get('opportunities')
   @ApiOperation({
     summary: '매칭 기회 조회',
-    description: '현재 주차의 매칭 기회를 조회합니다. 이전 주차의 매칭 기회는 조회되지 않습니다.',
+    description: '사용자가 푼 이번 주차의 퀴즈 세트에 대한 매칭 기회를 조회합니다.',
   })
-  @ApiResponse({
-    status: HttpStatus.OK,
-    description: '매칭 기회 조회 성공',
-  })
+  @ApiCommandResponse(
+    HttpStatus.OK,
+    '매칭 기회 조회 성공',
+    MatchingOpportunityWithUserDto,
+    true
+  )
   async getMatchingOpportunities(
     @Request() req: any,
-    @Query('quizSetId') quizSetId?: string,
   ) {
-    const command = new GetMatchingOpportunitiesCommand(req.user.id, quizSetId);
+    const command = new GetMatchingOpportunitiesCommand(req.user.id);
     return await this.commandBus.execute(command);
   }
 
@@ -58,10 +64,11 @@ export class MatchingController {
     summary: '매칭 선택 기록 생성',
     description: '매칭 상대를 선택합니다. 한 주차에 한 명만 선택할 수 있습니다.',
   })
-  @ApiResponse({
-    status: HttpStatus.CREATED,
-    description: '매칭 선택 성공',
-  })
+  @ApiCommandResponse(
+    HttpStatus.CREATED,
+    '매칭 선택 성공',
+    MatchingRecordWithUserDto
+  )
   @ApiResponse({
     status: HttpStatus.BAD_REQUEST,
     description: '한 주차에 이미 선택했거나 유효하지 않은 요청',
@@ -95,17 +102,18 @@ export class MatchingController {
   @Get('records')
   @ApiOperation({
     summary: '매칭 기록 조회',
-    description: '현재 주차의 매칭 기록을 조회합니다.',
+    description: '사용자가 푼 이번 주차의 퀴즈 세트에 대한 매칭 기록을 조회합니다.',
   })
-  @ApiResponse({
-    status: HttpStatus.OK,
-    description: '매칭 기록 조회 성공',
-  })
+  @ApiCommandResponse(
+    HttpStatus.OK,
+    '매칭 기록 조회 성공',
+    MatchingRecordWithUserDto,
+    true
+  )
   async getMatchingRecords(
     @Request() req: any,
-    @Query('quizSetId') quizSetId?: string,
   ) {
-    const command = new GetMatchingRecordsCommand(req.user.id, quizSetId);
+    const command = new GetMatchingRecordsCommand(req.user.id);
     return await this.commandBus.execute(command);
   }
 
@@ -117,6 +125,7 @@ export class MatchingController {
   @ApiResponse({
     status: HttpStatus.OK,
     description: '상태 조회 성공',
+    type: MatchingStatusResponseDto,
   })
   async getMatchingStatus(@Param('quizSetId') quizSetId: string) {
     const status = await this.matchingRedisService.getMatchingStatus(quizSetId);
@@ -138,10 +147,11 @@ export class MatchingController {
     summary: '매칭 알고리즘 수동 재실행 (관리자용)',
     description: '실패한 매칭 알고리즘을 수동으로 재실행합니다.',
   })
-  @ApiResponse({
-    status: HttpStatus.OK,
-    description: '재실행 요청 성공',
-  })
+  @ApiCommandResponse(
+    HttpStatus.OK,
+    '재실행 요청 성공',
+    RetryMatchingAlgorithmResponseDto
+  )
   @ApiResponse({
     status: HttpStatus.FORBIDDEN,
     description: '관리자 권한 필요',
