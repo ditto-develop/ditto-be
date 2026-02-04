@@ -74,18 +74,19 @@ model UserSocialAccount {
 }
 
 model QuizSet {
-  id          String   @id @default(cuid())
-  year        Int      @default(2025) // 년도 추가
-  month       Int      @default(12) // 월 추가
+  id          String       @id @default(cuid())
+  year        Int          @default(2025) // 년도 추가
+  month       Int          @default(12) // 월 추가
   week        Int // 주차 (1, 2, 3, ...)
   category    String // 카테고리
   title       String // 퀴즈 세트 제목
   description String? // 퀴즈 세트 설명
   startDate   DateTime // 시작일
   endDate     DateTime // 종료일 (시작일로부터 7일)
-  isActive    Boolean  @default(true) // 활성화 여부
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  isActive    Boolean      @default(true) // 활성화 여부
+  matchingType MatchingType @default(ONE_TO_ONE) // 매칭 타입 (1대1 또는 그룹)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
 
   quizzes        Quiz[]
   quizProgresses UserQuizProgress[]
@@ -133,6 +134,11 @@ model QuizAnswer {
   choice Choice @relation(fields: [choiceId], references: [id], onDelete: Cascade)
 
   @@map("quiz_answers")
+}
+
+enum MatchingType {
+  ONE_TO_ONE
+  GROUP
 }
 
 enum QuizProgressStatus {

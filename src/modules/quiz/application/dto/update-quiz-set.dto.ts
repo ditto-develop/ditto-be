@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsBoolean, IsInt, IsOptional, IsString, Max, Min } from 'class-validator';
+import { IsBoolean, IsEnum, IsInt, IsOptional, IsString, Max, Min } from 'class-validator';
 
 export class UpdateQuizSetDto {
   @ApiProperty({
@@ -68,6 +68,16 @@ export class UpdateQuizSetDto {
   @IsOptional()
   @IsBoolean()
   isActive?: boolean;
+
+  @ApiProperty({
+    description: '매칭 타입 (ONE_TO_ONE: 1대1 매칭, GROUP: 그룹 매칭)',
+    example: 'ONE_TO_ONE',
+    enum: ['ONE_TO_ONE', 'GROUP'],
+    required: false,
+  })
+  @IsOptional()
+  @IsEnum(['ONE_TO_ONE', 'GROUP'])
+  matchingType?: 'ONE_TO_ONE' | 'GROUP';
 
   @ApiProperty({
     description: '강제 적용 패스워드',

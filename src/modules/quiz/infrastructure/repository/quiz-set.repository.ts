@@ -20,6 +20,7 @@ export class QuizSetRepository implements IQuizSetRepository {
         description: quizSet.description,
         startDate: quizSet.startDate,
         endDate: quizSet.endDate,
+        matchingType: quizSet.matchingType,
       },
     });
 
@@ -55,6 +56,7 @@ export class QuizSetRepository implements IQuizSetRepository {
         startDate: quizSet.startDate,
         endDate: quizSet.endDate,
         isActive: quizSet.isActive,
+        matchingType: quizSet.matchingType,
       },
     });
 
@@ -152,9 +154,10 @@ export class QuizSetRepository implements IQuizSetRepository {
     week?: number,
     category?: string,
     isActive?: boolean,
+    matchingType?: 'ONE_TO_ONE' | 'GROUP',
   ): Promise<QuizSet[]> {
     console.log(
-      `[QuizSetRepository] 다중 필터로 QuizSet 목록 조회: year=${year}, month=${month}, week=${week}, category=${category}, isActive=${isActive}`,
+      `[QuizSetRepository] 다중 필터로 QuizSet 목록 조회: year=${year}, month=${month}, week=${week}, category=${category}, isActive=${isActive}, matchingType=${matchingType}`,
     );
 
     const where: any = {};
@@ -164,6 +167,7 @@ export class QuizSetRepository implements IQuizSetRepository {
     if (week !== undefined) where.week = week;
     if (category !== undefined) where.category = category;
     if (isActive !== undefined) where.isActive = isActive;
+    if (matchingType !== undefined) where.matchingType = matchingType;
 
     const quizSets = await this.prisma.quizSet.findMany({
       where,
@@ -185,6 +189,7 @@ export class QuizSetRepository implements IQuizSetRepository {
       quizSet.startDate,
       quizSet.endDate,
       quizSet.isActive,
+      quizSet.matchingType || 'ONE_TO_ONE', // 기본값 처리
       quizSet.createdAt,
       quizSet.updatedAt,
     );

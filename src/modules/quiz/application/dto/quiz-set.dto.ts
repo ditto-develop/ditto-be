@@ -77,6 +77,13 @@ export class QuizSetDto {
   })
   isActive: boolean;
 
+  @ApiProperty({
+    description: '매칭 타입',
+    example: 'ONE_TO_ONE',
+    enum: ['ONE_TO_ONE', 'GROUP'],
+  })
+  matchingType: 'ONE_TO_ONE' | 'GROUP';
+
   static fromDomain(quizSet: QuizSet): QuizSetDto {
     return {
       id: quizSet.id,
@@ -89,6 +96,7 @@ export class QuizSetDto {
       startDate: quizSet.startDate,
       endDate: quizSet.endDate,
       isActive: quizSet.isActive,
+      matchingType: quizSet.matchingType,
       createdAt: quizSet.createdAt,
       updatedAt: quizSet.updatedAt,
     };
@@ -109,6 +117,7 @@ export class QuizSetDto {
       startDate: quizSet.startDate,
       endDate: quizSet.endDate,
       isActive: quizSet.isActive,
+      matchingType: quizSet.matchingType,
     };
   }
 

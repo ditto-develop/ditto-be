@@ -61,5 +61,12 @@ export class QuizSetListItemDto {
     example: true,
   })
   isActive: boolean;
+
+  @ApiProperty({
+    description: '매칭 타입',
+    example: 'ONE_TO_ONE',
+    enum: ['ONE_TO_ONE', 'GROUP'],
+  })
+  matchingType: 'ONE_TO_ONE' | 'GROUP';
 }
 

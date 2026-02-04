@@ -12,6 +12,7 @@ export class QuizSet {
     public readonly startDate: Date,
     public readonly endDate: Date,
     public readonly isActive: boolean,
+    public readonly matchingType: 'ONE_TO_ONE' | 'GROUP',
     public readonly createdAt: Date,
     public readonly updatedAt: Date,
   ) {}
@@ -27,6 +28,7 @@ export class QuizSet {
     startDate: Date,
     endDate: Date,
     isActive: boolean = true,
+    matchingType: 'ONE_TO_ONE' | 'GROUP' = 'ONE_TO_ONE',
     createdAt: Date = new Date(),
     updatedAt: Date = new Date(),
   ): QuizSet {
@@ -55,6 +57,10 @@ export class QuizSet {
       throw new BusinessRuleException('종료일은 시작일보다 이후여야 합니다.');
     }
 
+    if (matchingType !== 'ONE_TO_ONE' && matchingType !== 'GROUP') {
+      throw new ValidationException('매칭 타입은 ONE_TO_ONE 또는 GROUP이어야 합니다.');
+    }
+
     return new QuizSet(
       id,
       year,
@@ -66,6 +72,7 @@ export class QuizSet {
       startDate,
       endDate,
       isActive,
+      matchingType,
       createdAt,
       updatedAt,
     );
@@ -81,6 +88,7 @@ export class QuizSet {
     description: string | null,
     startDate: Date,
     isActive: boolean = true,
+    matchingType: 'ONE_TO_ONE' | 'GROUP' = 'ONE_TO_ONE',
     createdAt: Date = new Date(),
     updatedAt: Date = new Date(),
   ): QuizSet {
@@ -99,6 +107,7 @@ export class QuizSet {
       startDate,
       endDate,
       isActive,
+      matchingType,
       createdAt,
       updatedAt,
     );
@@ -114,6 +123,7 @@ export class QuizSet {
     startDate: Date,
     endDate: Date,
     isActive: boolean,
+    matchingType: 'ONE_TO_ONE' | 'GROUP',
   ): QuizSet {
     return new QuizSet(
       this.id,
@@ -126,6 +136,7 @@ export class QuizSet {
       startDate,
       endDate,
       isActive,
+      matchingType,
       this.createdAt,
       new Date(),
     );
@@ -143,6 +154,7 @@ export class QuizSet {
       this.startDate,
       this.endDate,
       true,
+      this.matchingType,
       this.createdAt,
       new Date(),
     );
@@ -160,6 +172,7 @@ export class QuizSet {
       this.startDate,
       this.endDate,
       false,
+      this.matchingType,
       this.createdAt,
       new Date(),
     );

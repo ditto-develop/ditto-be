@@ -84,6 +84,7 @@ export interface IQuizSetRepository {
     week?: number,
     category?: string,
     isActive?: boolean,
+    matchingType?: 'ONE_TO_ONE' | 'GROUP',
   ): Promise<QuizSet[]>;
 }
 
