@@ -8701,6 +8701,15 @@
             "type": "boolean",
             "description": "활성화 여부",
             "example": true
+          },
+          "matchingType": {
+            "type": "string",
+            "description": "매칭 타입",
+            "example": "ONE_TO_ONE",
+            "enum": [
+              "ONE_TO_ONE",
+              "GROUP"
+            ]
           }
         },
         "required": [
@@ -8714,7 +8723,8 @@
           "endDate",
           "createdAt",
           "updatedAt",
-          "isActive"
+          "isActive",
+          "matchingType"
         ]
       },
       "CreateQuizSetDto": {
@@ -8749,6 +8759,16 @@
             "type": "string",
             "description": "퀴즈 세트 설명",
             "example": "일상생활에 관한 퀴즈 세트입니다."
+          },
+          "matchingType": {
+            "type": "string",
+            "description": "매칭 타입 (ONE_TO_ONE: 1대1 매칭, GROUP: 그룹 매칭)",
+            "example": "ONE_TO_ONE",
+            "enum": [
+              "ONE_TO_ONE",
+              "GROUP"
+            ],
+            "default": "ONE_TO_ONE"
           },
           "forcePassword": {
             "type": "string",
@@ -8817,6 +8837,15 @@
             "type": "boolean",
             "description": "활성화 여부",
             "example": true
+          },
+          "matchingType": {
+            "type": "string",
+            "description": "매칭 타입",
+            "example": "ONE_TO_ONE",
+            "enum": [
+              "ONE_TO_ONE",
+              "GROUP"
+            ]
           }
         },
         "required": [
@@ -8828,7 +8857,8 @@
           "title",
           "startDate",
           "endDate",
-          "isActive"
+          "isActive",
+          "matchingType"
         ]
       },
       "CategoryGroupDto": {
@@ -8999,6 +9029,15 @@
             "description": "활성화 여부",
             "example": true
           },
+          "matchingType": {
+            "type": "string",
+            "description": "매칭 타입",
+            "example": "ONE_TO_ONE",
+            "enum": [
+              "ONE_TO_ONE",
+              "GROUP"
+            ]
+          },
           "quizzes": {
             "description": "퀴즈 목록 (순서대로 정렬됨)",
             "type": "array",
@@ -9017,6 +9056,7 @@
           "startDate",
           "endDate",
           "isActive",
+          "matchingType",
           "quizzes"
         ]
       },
@@ -9090,6 +9130,15 @@
             "type": "boolean",
             "description": "활성화 여부",
             "example": true
+          },
+          "matchingType": {
+            "type": "string",
+            "description": "매칭 타입 (ONE_TO_ONE: 1대1 매칭, GROUP: 그룹 매칭)",
+            "example": "ONE_TO_ONE",
+            "enum": [
+              "ONE_TO_ONE",
+              "GROUP"
+            ]
           },
           "forcePassword": {
             "type": "string",

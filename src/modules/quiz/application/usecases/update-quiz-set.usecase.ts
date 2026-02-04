@@ -116,6 +116,7 @@ export class UpdateQuizSetUseCase {
     const updatedTitle = dto.title !== undefined ? dto.title : existingQuizSet.title;
     const updatedDescription = dto.description !== undefined ? dto.description : existingQuizSet.description;
     const updatedIsActive = dto.isActive !== undefined ? dto.isActive : existingQuizSet.isActive;
+    const updatedMatchingType = dto.matchingType !== undefined ? dto.matchingType : existingQuizSet.matchingType;
 
     // QuizSet 업데이트
     const updatedQuizSet = existingQuizSet.update(
@@ -128,6 +129,7 @@ export class UpdateQuizSetUseCase {
       updatedStartDate,
       updatedEndDate,
       updatedIsActive,
+      updatedMatchingType,
     );
 
     const saved = await this.quizSetRepository.update(updatedQuizSet);
@@ -146,6 +148,7 @@ export class UpdateQuizSetUseCase {
         titleChanged: dto.title !== undefined,
         descriptionChanged: dto.description !== undefined,
         isActiveChanged: dto.isActive !== undefined,
+        matchingTypeChanged: dto.matchingType !== undefined,
       },
     });
 

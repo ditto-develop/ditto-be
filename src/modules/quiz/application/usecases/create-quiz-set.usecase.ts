@@ -87,6 +87,8 @@ export class CreateQuizSetUseCase {
       dto.title,
       dto.description || null,
       startDate,
+      true, // isActive
+      dto.matchingType || 'ONE_TO_ONE', // matchingType (기본값: ONE_TO_ONE)
     );
 
     const created = await this.quizSetRepository.create(quizSet);
