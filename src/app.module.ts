@@ -13,6 +13,7 @@ import { ConfigModule } from '@nestjs/config';
 import { ScheduleModule } from '@nestjs/schedule';
 import { validate } from '@config/env.validation';
 import { AuthModule } from '@module/auth/auth.module';
+import { AppController } from './app.controller';
 
 @Module({
   imports: [
@@ -34,5 +35,6 @@ import { AuthModule } from '@module/auth/auth.module';
     QuizModule,
     SystemModule,
   ],
+  controllers: [AppController],
 })
-export class AppModule {}
+export class AppModule { }

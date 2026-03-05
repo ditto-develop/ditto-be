@@ -1,6 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
-import { ValidationPipe } from '@nestjs/common';
+import { ValidationPipe, RequestMethod } from '@nestjs/common';
 import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
 import cookieParser from 'cookie-parser';
@@ -20,7 +20,12 @@ async function bootstrap() {
   // 커스텀 로거를 NestJS 기본 로거로 설정
   app.useLogger(logger);
 
-  app.setGlobalPrefix('api');
+  app.setGlobalPrefix('api', {
+    exclude: [
+      { path: '/', method: RequestMethod.GET },
+      { path: '/health', method: RequestMethod.GET },
+    ],
+  });
 
   // 트레이스 ID 미들웨어 적용 (로깅 전에 적용되어야 함)
   const traceIdMiddleware = app.get(TraceIdMiddleware);
@@ -58,7 +63,7 @@ async function bootstrap() {
       },
       'access-token',
     );
-  
+
   const isDevelopment = configService.get('nodeEnv') === 'development';
   if (isDevelopment) {
     configBuilder.addServer('http://localhost:4000');
