@@ -22,19 +22,19 @@ jobs:
           port: ${{ secrets.EC2_PORT || 22 }}
           script: |
             echo ">>> Move to project directory"
-            cd /home/ubuntu/ditto-be || { echo "Directory not found, cloning..."; git clone git@github.com-ditto-be:Ditto-devHQ/ditto-be.git /home/ubuntu/ditto-be && cd /home/ubuntu/ditto-be; }
+            cd /home/ubuntu/ditto-be || { echo "Directory not found, cloning..."; git clone git@github.com-ditto-be:ditto-develop/ditto-be.git /home/ubuntu/ditto-be && cd /home/ubuntu/ditto-be; }
             
-            echo ">>> Git fetch & reset to origin/main"
-            git remote set-url origin git@github.com-ditto-be:Ditto-devHQ/ditto-be.git
-            git fetch origin main
-            git reset --hard origin/main
+            echo ">>> Git fetch & reset to origin/develop"
+            git remote set-url origin git@github.com-ditto-be:ditto-develop/ditto-be.git
+            git fetch origin develop
+            git reset --hard origin/develop
 
             echo ">>> Build BE docker image"
             sudo docker build -t ditto-be:latest .
 
             echo ">>> Docker compose restart api"
             cd /home/ubuntu/ditto
-            sudo docker-compose up -d api
+            sudo docker-compose up -d --no-deps api
 
             echo ">>> Remove unused docker images"
             sudo docker image prune -f
