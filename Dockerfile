@@ -1,6 +1,8 @@
 # [Stage 1] 빌드용 이미지 (Builder)
 FROM node:22-slim AS builder
 
+RUN apt-get update && apt-get install -y openssl default-libmysqlclient-dev
+
 # pnpm 설치 및 활성화
 RUN corepack enable && corepack prepare pnpm@latest --activate
 
@@ -21,10 +23,10 @@ RUN npx prisma generate
 # 5. NestJS 빌드 (dist 폴더 생성)
 RUN pnpm build
 
-# ---------------------------------------------------
-
 # [Stage 2] 실행용 이미지 (Runner) - 가볍게 만듦
 FROM node:22-slim AS runner
+
+RUN apt-get update && apt-get install -y openssl default-libmysqlclient-dev
 
 WORKDIR /app
 
