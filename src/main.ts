@@ -68,7 +68,7 @@ async function bootstrap() {
   if (isDevelopment) {
     configBuilder.addServer('http://localhost:4000');
   } else {
-    configBuilder.addServer('https://ditto.pics:10000');
+    configBuilder.addServer('https://ditto.pics');
   }
   const config = configBuilder.build();
   const document = SwaggerModule.createDocument(app, config);
