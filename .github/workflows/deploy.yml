@@ -22,7 +22,14 @@ jobs:
           port: ${{ secrets.EC2_PORT || 22 }}
           script: |
             echo ">>> Move to project directory"
-            cd /home/ubuntu/ditto-be || { echo "Directory not found, cloning..."; git clone git@github.com-ditto-be:ditto-develop/ditto-be.git /home/ubuntu/ditto-be && cd /home/ubuntu/ditto-be; }
+            if [ -d "/home/ubuntu/ditto-be/.git" ]; then
+              cd /home/ubuntu/ditto-be
+            else
+              echo "Git repository not found, cloning..."
+              rm -rf /home/ubuntu/ditto-be
+              git clone git@github.com-ditto-be:ditto-develop/ditto-be.git /home/ubuntu/ditto-be
+              cd /home/ubuntu/ditto-be
+            fi
             
             echo ">>> Git fetch & reset to origin/develop"
             git remote set-url origin git@github.com-ditto-be:ditto-develop/ditto-be.git
