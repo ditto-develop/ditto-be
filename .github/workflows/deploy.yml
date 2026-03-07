@@ -41,7 +41,9 @@ jobs:
 
             echo ">>> Docker compose restart api"
             cd /home/ubuntu/ditto
-            sudo docker compose up -d --force-recreate api
+            sudo docker compose stop api || true
+            sudo docker compose rm -f api || true
+            sudo docker compose up -d api
 
             echo ">>> Remove unused docker images"
             sudo docker image prune -f
