@@ -27,12 +27,12 @@ jobs:
             else
               echo "Git repository not found, cloning..."
               rm -rf /home/ubuntu/ditto-be
-              git clone git@github.com-ditto-be:ditto-develop/ditto-be.git /home/ubuntu/ditto-be
+              git clone https://github.com/ditto-develop/ditto-be.git /home/ubuntu/ditto-be
               cd /home/ubuntu/ditto-be
             fi
             
             echo ">>> Git fetch & reset to origin/develop"
-            git remote set-url origin git@github.com-ditto-be:ditto-develop/ditto-be.git
+            git remote set-url origin https://github.com/ditto-develop/ditto-be.git
             git fetch origin develop
             git reset --hard origin/develop
 
