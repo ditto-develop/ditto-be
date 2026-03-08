@@ -44,6 +44,13 @@ model User {
   role           Role                @relation(fields: [roleId], references: [id])
   socialAccounts UserSocialAccount[]
   quizProgresses UserQuizProgress[]
+  profile        UserProfile?
+  sentMatchRequests     MatchRequest[] @relation("MatchRequestFrom")
+  receivedMatchRequests MatchRequest[] @relation("MatchRequestTo")
+  givenRatings         UserRating[]   @relation("RatingFrom")
+  receivedRatings      UserRating[]   @relation("RatingTo")
+  chatParticipants     ChatParticipant[]
+  chatMessages         ChatMessage[]
 
   @@map("users")
 }
@@ -90,6 +97,7 @@ model QuizSet {
 
   quizzes        Quiz[]
   quizProgresses UserQuizProgress[]
+  matchRequests  MatchRequest[]
 
   @@unique([year, month, week, category])
   @@map("quiz_sets")
@@ -165,4 +173,122 @@ model UserQuizProgress {
 
   @@unique([userId, year, month, week])
   @@map("user_quiz_progresses")
+}
+
+model UserProfile {
+  id               String   @id @default(cuid())
+  userId           String   @unique
+  introduction     String?  @db.VarChar(300)   // 자기소개 (최대 300자)
+  preferredMinAge  Int?                        // 매칭 선호 최소 나이
+  preferredMaxAge  Int?                        // 매칭 선호 최대 나이
+
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_profiles")
+}
+
+enum MatchRequestStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  CANCELLED
+  EXPIRED
+}
+
+model MatchRequest {
+  id                String             @id @default(cuid())
+  quizSetId         String
+  fromUserId        String
+  toUserId          String
+  status            MatchRequestStatus @default(PENDING)
+  score             Float              @default(0)       // 매칭 점수 (0~100)
+  scoreBreakdown    Json?                                 // { quizMatchRate, reasons[] }
+  algorithmVersion  String             @default("v1")
+
+  requestedAt       DateTime           @default(now())
+  respondedAt       DateTime?
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+
+  quizSet  QuizSet @relation(fields: [quizSetId], references: [id])
+  fromUser User    @relation("MatchRequestFrom", fields: [fromUserId], references: [id])
+  toUser   User    @relation("MatchRequestTo", fields: [toUserId], references: [id])
+  ratings  UserRating[]
+  chatRoom ChatRoom?
+
+  @@unique([quizSetId, fromUserId, toUserId])
+  @@index([fromUserId, status])
+  @@index([toUserId, status])
+  @@map("match_requests")
+}
+
+// ─── Chat ───────────────────────────────────────────────
+
+model ChatRoom {
+  id             String           @id @default(cuid())
+  matchRequestId String?          @unique      // 매칭 기반 생성 시 연결
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+
+  matchRequest   MatchRequest?    @relation(fields: [matchRequestId], references: [id])
+  participants   ChatParticipant[]
+  messages       ChatMessage[]
+
+  @@map("chat_rooms")
+}
+
+model ChatParticipant {
+  id         String    @id @default(cuid())
+  roomId     String
+  userId     String
+  joinedAt   DateTime  @default(now())
+  lastReadAt DateTime  @default(now())  // 마지막 읽음 시각
+
+  room ChatRoom @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  user User     @relation(fields: [userId], references: [id])
+
+  @@unique([roomId, userId])
+  @@index([userId])
+  @@map("chat_participants")
+}
+
+model ChatMessage {
+  id        String    @id @default(cuid())
+  roomId    String
+  senderId  String
+  content   String    @db.VarChar(2000)
+  deletedAt DateTime?                      // soft delete
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  room   ChatRoom @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  sender User     @relation(fields: [senderId], references: [id])
+
+  @@index([roomId, createdAt])
+  @@index([senderId])
+  @@map("chat_messages")
+}
+
+model UserRating {
+  id              String   @id @default(cuid())
+  matchRequestId  String
+  fromUserId      String             // 평가 작성자
+  toUserId        String             // 평가 대상
+  score           Int                // 1~5 점
+  comment         String?  @db.VarChar(500)  // 평가 코멘트 (최대 500자)
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  matchRequest MatchRequest @relation(fields: [matchRequestId], references: [id])
+  fromUser     User         @relation("RatingFrom", fields: [fromUserId], references: [id])
+  toUser       User         @relation("RatingTo", fields: [toUserId], references: [id])
+
+  @@unique([matchRequestId, fromUserId])  // 같은 매칭 건에 대해 중복 평가 방지
+  @@index([toUserId])
+  @@map("user_ratings")
 }

@@ -1,6 +1,34 @@
 {
   "openapi": "3.0.0",
   "paths": {
+    "/": {
+      "get": {
+        "operationId": "AppController_getHello",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "App"
+        ]
+      }
+    },
+    "/health": {
+      "get": {
+        "operationId": "AppController_getHealth",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "App"
+        ]
+      }
+    },
     "/api/roles": {
       "get": {
         "description": "모든 Role을 조회합니다.",
@@ -1811,12 +1839,12 @@
     },
     "/api/users/me/profile": {
       "get": {
-        "description": "현재 로그인한 사용자의 정보를 조회합니다.",
-        "operationId": "UserController_getMyProfile",
+        "description": "본인의 프로필(자기소개, 매칭 선호 조건)을 조회합니다.",
+        "operationId": "ProfileController_getMyProfile",
         "parameters": [],
         "responses": {
           "200": {
-            "description": "본인 정보 조회 성공",
+            "description": "프로필 조회 성공",
             "content": {
               "application/json": {
                 "schema": {
@@ -1827,7 +1855,7 @@
                       "example": true
                     },
                     "data": {
-                      "$ref": "#/components/schemas/UserDto"
+                      "$ref": "#/components/schemas/UserProfileDto"
                     },
                     "error": {
                       "type": "string",
@@ -2008,9 +2036,222 @@
             "access-token": []
           }
         ],
-        "summary": "본인 정보 조회",
+        "summary": "내 프로필 조회",
         "tags": [
-          "User"
+          "Profile"
+        ]
+      },
+      "patch": {
+        "description": "자기소개(최대 300자), 매칭 선호 나이를 수정합니다. null을 전송하면 해당 필드가 초기화됩니다.",
+        "operationId": "ProfileController_updateMyProfile",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateProfileDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "프로필 수정 성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/UserProfileDto"
+                    },
+                    "error": {
+                      "type": "string",
+                      "example": "에러 메시지"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "잘못된 요청입니다.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "message": {
+                          "type": "string",
+                          "example": "잘못된 요청입니다."
+                        },
+                        "code": {
+                          "type": "string",
+                          "example": "BAD_REQUEST"
+                        },
+                        "statusCode": {
+                          "type": "number",
+                          "example": 400
+                        }
+                      }
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/api/endpoint"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "인증이 필요합니다.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "message": {
+                          "type": "string",
+                          "example": "토큰이 제공되지 않았습니다."
+                        },
+                        "code": {
+                          "type": "string",
+                          "example": "UNAUTHORIZED"
+                        },
+                        "statusCode": {
+                          "type": "number",
+                          "example": 401
+                        }
+                      }
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/api/endpoint"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "접근 권한이 없습니다.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "message": {
+                          "type": "string",
+                          "example": "접근 권한이 없습니다."
+                        },
+                        "code": {
+                          "type": "string",
+                          "example": "FORBIDDEN"
+                        },
+                        "statusCode": {
+                          "type": "number",
+                          "example": 403
+                        }
+                      }
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/api/endpoint"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "서버 내부 오류가 발생했습니다.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "message": {
+                          "type": "string",
+                          "example": "알 수 없는 오류가 발생했습니다."
+                        },
+                        "code": {
+                          "type": "string",
+                          "example": "INTERNAL_SERVER_ERROR"
+                        },
+                        "statusCode": {
+                          "type": "number",
+                          "example": 500
+                        }
+                      }
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/api/endpoint"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
+        "summary": "내 프로필 수정",
+        "tags": [
+          "Profile"
         ]
       }
     },
@@ -3759,6 +4000,3149 @@
         "summary": "닉네임 사용 가능 여부 확인",
         "tags": [
           "User"
+        ]
+      }
+    },
+    "/api/users/{id}/profile": {
+      "get": {
+        "description": "다른 사용자의 공개 프로필을 조회합니다. 민감 정보(이메일, 전화번호)는 포함되지 않습니다.",
+        "operationId": "ProfileController_getUserProfile",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "대상 사용자 ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "프로필 조회 성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/PublicProfileDto"
+                    },
+                    "error": {
+                      "type": "string",
+                      "example": "에러 메시지"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "잘못된 요청입니다.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "message": {
+                          "type": "string",
+                          "example": "잘못된 요청입니다."
+                        },
+                        "code": {
+                          "type": "string",
+                          "example": "BAD_REQUEST"
+                        },
+                        "statusCode": {
+                          "type": "number",
+                          "example": 400
+                        }
+                      }
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/api/endpoint"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "인증이 필요합니다.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "message": {
+                          "type": "string",
+                          "example": "토큰이 제공되지 않았습니다."
+                        },
+                        "code": {
+                          "type": "string",
+                          "example": "UNAUTHORIZED"
+                        },
+                        "statusCode": {
+                          "type": "number",
+                          "example": 401
+                        }
+                      }
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/api/endpoint"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "접근 권한이 없습니다.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "message": {
+                          "type": "string",
+                          "example": "접근 권한이 없습니다."
+                        },
+                        "code": {
+                          "type": "string",
+                          "example": "FORBIDDEN"
+                        },
+                        "statusCode": {
+                          "type": "number",
+                          "example": 403
+                        }
+                      }
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/api/endpoint"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "사용자를 찾을 수 없음",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "message": {
+                          "type": "string",
+                          "example": "사용자를 찾을 수 없음"
+                        },
+                        "code": {
+                          "type": "string",
+                          "example": "ENTITY_NOT_FOUND"
+                        },
+                        "statusCode": {
+                          "type": "number",
+                          "example": 404
+                        }
+                      }
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/api/endpoint"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "서버 내부 오류가 발생했습니다.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "message": {
+                          "type": "string",
+                          "example": "알 수 없는 오류가 발생했습니다."
+                        },
+                        "code": {
+                          "type": "string",
+                          "example": "INTERNAL_SERVER_ERROR"
+                        },
+                        "statusCode": {
+                          "type": "number",
+                          "example": 500
+                        }
+                      }
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/api/endpoint"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
+        "summary": "타인 프로필 조회",
+        "tags": [
+          "Profile"
+        ]
+      }
+    },
+    "/api/matches/1on1": {
+      "get": {
+        "description": "Hard filter(퀴즈 완료, 탈퇴 제외, 나이 선호 불일치 제외) + Score(퀴즈 일치율) 기반 최대 5명 반환",
+        "operationId": "MatchingController_getMatchCandidates",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "매칭 후보 조회 성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/MatchCandidateListDto"
+                    },
+                    "error": {
+                      "type": "string",
+                      "example": "에러 메시지"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "잘못된 요청입니다.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "message": {
+                          "type": "string",
+                          "example": "잘못된 요청입니다."
+                        },
+                        "code": {
+                          "type": "string",
+                          "example": "BAD_REQUEST"
+                        },
+                        "statusCode": {
+                          "type": "number",
+                          "example": 400
+                        }
+                      }
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/api/endpoint"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "인증이 필요합니다.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "message": {
+                          "type": "string",
+                          "example": "토큰이 제공되지 않았습니다."
+                        },
+                        "code": {
+                          "type": "string",
+                          "example": "UNAUTHORIZED"
+                        },
+                        "statusCode": {
+                          "type": "number",
+                          "example": 401
+                        }
+                      }
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/api/endpoint"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "접근 권한이 없습니다.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "message": {
+                          "type": "string",
+                          "example": "접근 권한이 없습니다."
+                        },
+                        "code": {
+                          "type": "string",
+                          "example": "FORBIDDEN"
+                        },
+                        "statusCode": {
+                          "type": "number",
+                          "example": 403
+                        }
+                      }
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/api/endpoint"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "서버 내부 오류가 발생했습니다.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "message": {
+                          "type": "string",
+                          "example": "알 수 없는 오류가 발생했습니다."
+                        },
+                        "code": {
+                          "type": "string",
+                          "example": "INTERNAL_SERVER_ERROR"
+                        },
+                        "statusCode": {
+                          "type": "number",
+                          "example": 500
+                        }
+                      }
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/api/endpoint"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
+        "summary": "1:1 매칭 후보 조회",
+        "tags": [
+          "Matching"
+        ]
+      }
+    },
+    "/api/matches/request": {
+      "post": {
+        "description": "대상 사용자에게 1:1 대화 매칭 요청 전송",
+        "operationId": "MatchingController_sendMatchRequest",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SendMatchRequestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "매칭 요청 전송 성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/MatchRequestDto"
+                    },
+                    "error": {
+                      "type": "string",
+                      "example": "에러 메시지"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "잘못된 요청입니다.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "message": {
+                          "type": "string",
+                          "example": "잘못된 요청입니다."
+                        },
+                        "code": {
+                          "type": "string",
+                          "example": "BAD_REQUEST"
+                        },
+                        "statusCode": {
+                          "type": "number",
+                          "example": 400
+                        }
+                      }
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/api/endpoint"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "인증이 필요합니다.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "message": {
+                          "type": "string",
+                          "example": "토큰이 제공되지 않았습니다."
+                        },
+                        "code": {
+                          "type": "string",
+                          "example": "UNAUTHORIZED"
+                        },
+                        "statusCode": {
+                          "type": "number",
+                          "example": 401
+                        }
+                      }
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/api/endpoint"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "접근 권한이 없습니다.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "message": {
+                          "type": "string",
+                          "example": "접근 권한이 없습니다."
+                        },
+                        "code": {
+                          "type": "string",
+                          "example": "FORBIDDEN"
+                        },
+                        "statusCode": {
+                          "type": "number",
+                          "example": 403
+                        }
+                      }
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/api/endpoint"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "서버 내부 오류가 발생했습니다.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "message": {
+                          "type": "string",
+                          "example": "알 수 없는 오류가 발생했습니다."
+                        },
+                        "code": {
+                          "type": "string",
+                          "example": "INTERNAL_SERVER_ERROR"
+                        },
+                        "statusCode": {
+                          "type": "number",
+                          "example": 500
+                        }
+                      }
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/api/endpoint"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
+        "summary": "매칭 요청 보내기",
+        "tags": [
+          "Matching"
+        ]
+      }
+    },
+    "/api/matches/request/{id}/accept": {
+      "post": {
+        "operationId": "MatchingController_acceptMatchRequest",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "매칭 요청 ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "매칭 요청 수락 성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/MatchRequestDto"
+                    },
+                    "error": {
+                      "type": "string",
+                      "example": "에러 메시지"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "잘못된 요청입니다.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "message": {
+                          "type": "string",
+                          "example": "잘못된 요청입니다."
+                        },
+                        "code": {
+                          "type": "string",
+                          "example": "BAD_REQUEST"
+                        },
+                        "statusCode": {
+                          "type": "number",
+                          "example": 400
+                        }
+                      }
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/api/endpoint"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "인증이 필요합니다.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "message": {
+                          "type": "string",
+                          "example": "토큰이 제공되지 않았습니다."
+                        },
+                        "code": {
+                          "type": "string",
+                          "example": "UNAUTHORIZED"
+                        },
+                        "statusCode": {
+                          "type": "number",
+                          "example": 401
+                        }
+                      }
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/api/endpoint"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "접근 권한이 없습니다.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "message": {
+                          "type": "string",
+                          "example": "접근 권한이 없습니다."
+                        },
+                        "code": {
+                          "type": "string",
+                          "example": "FORBIDDEN"
+                        },
+                        "statusCode": {
+                          "type": "number",
+                          "example": 403
+                        }
+                      }
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/api/endpoint"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "매칭 요청을 찾을 수 없음",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "message": {
+                          "type": "string",
+                          "example": "매칭 요청을 찾을 수 없음"
+                        },
+                        "code": {
+                          "type": "string",
+                          "example": "ENTITY_NOT_FOUND"
+                        },
+                        "statusCode": {
+                          "type": "number",
+                          "example": 404
+                        }
+                      }
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/api/endpoint"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "서버 내부 오류가 발생했습니다.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "message": {
+                          "type": "string",
+                          "example": "알 수 없는 오류가 발생했습니다."
+                        },
+                        "code": {
+                          "type": "string",
+                          "example": "INTERNAL_SERVER_ERROR"
+                        },
+                        "statusCode": {
+                          "type": "number",
+                          "example": 500
+                        }
+                      }
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/api/endpoint"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
+        "summary": "매칭 요청 수락",
+        "tags": [
+          "Matching"
+        ]
+      }
+    },
+    "/api/matches/request/{id}/reject": {
+      "post": {
+        "operationId": "MatchingController_rejectMatchRequest",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "매칭 요청 ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "매칭 요청 거절 성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/MatchRequestDto"
+                    },
+                    "error": {
+                      "type": "string",
+                      "example": "에러 메시지"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "잘못된 요청입니다.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "message": {
+                          "type": "string",
+                          "example": "잘못된 요청입니다."
+                        },
+                        "code": {
+                          "type": "string",
+                          "example": "BAD_REQUEST"
+                        },
+                        "statusCode": {
+                          "type": "number",
+                          "example": 400
+                        }
+                      }
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/api/endpoint"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "인증이 필요합니다.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "message": {
+                          "type": "string",
+                          "example": "토큰이 제공되지 않았습니다."
+                        },
+                        "code": {
+                          "type": "string",
+                          "example": "UNAUTHORIZED"
+                        },
+                        "statusCode": {
+                          "type": "number",
+                          "example": 401
+                        }
+                      }
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/api/endpoint"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "접근 권한이 없습니다.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "message": {
+                          "type": "string",
+                          "example": "접근 권한이 없습니다."
+                        },
+                        "code": {
+                          "type": "string",
+                          "example": "FORBIDDEN"
+                        },
+                        "statusCode": {
+                          "type": "number",
+                          "example": 403
+                        }
+                      }
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/api/endpoint"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "매칭 요청을 찾을 수 없음",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "message": {
+                          "type": "string",
+                          "example": "매칭 요청을 찾을 수 없음"
+                        },
+                        "code": {
+                          "type": "string",
+                          "example": "ENTITY_NOT_FOUND"
+                        },
+                        "statusCode": {
+                          "type": "number",
+                          "example": 404
+                        }
+                      }
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/api/endpoint"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "서버 내부 오류가 발생했습니다.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "message": {
+                          "type": "string",
+                          "example": "알 수 없는 오류가 발생했습니다."
+                        },
+                        "code": {
+                          "type": "string",
+                          "example": "INTERNAL_SERVER_ERROR"
+                        },
+                        "statusCode": {
+                          "type": "number",
+                          "example": 500
+                        }
+                      }
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/api/endpoint"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
+        "summary": "매칭 요청 거절",
+        "tags": [
+          "Matching"
+        ]
+      }
+    },
+    "/api/matching/status/{quizSetId}": {
+      "get": {
+        "description": "해당 퀴즈셋에서의 매칭 요청 현황",
+        "operationId": "MatchingController_getMatchingStatus",
+        "parameters": [
+          {
+            "name": "quizSetId",
+            "required": true,
+            "in": "path",
+            "description": "퀴즈셋 ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "매칭 상태 조회 성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/MatchingStatusDto"
+                    },
+                    "error": {
+                      "type": "string",
+                      "example": "에러 메시지"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "잘못된 요청입니다.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "message": {
+                          "type": "string",
+                          "example": "잘못된 요청입니다."
+                        },
+                        "code": {
+                          "type": "string",
+                          "example": "BAD_REQUEST"
+                        },
+                        "statusCode": {
+                          "type": "number",
+                          "example": 400
+                        }
+                      }
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/api/endpoint"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "인증이 필요합니다.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "message": {
+                          "type": "string",
+                          "example": "토큰이 제공되지 않았습니다."
+                        },
+                        "code": {
+                          "type": "string",
+                          "example": "UNAUTHORIZED"
+                        },
+                        "statusCode": {
+                          "type": "number",
+                          "example": 401
+                        }
+                      }
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/api/endpoint"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "접근 권한이 없습니다.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "message": {
+                          "type": "string",
+                          "example": "접근 권한이 없습니다."
+                        },
+                        "code": {
+                          "type": "string",
+                          "example": "FORBIDDEN"
+                        },
+                        "statusCode": {
+                          "type": "number",
+                          "example": 403
+                        }
+                      }
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/api/endpoint"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "서버 내부 오류가 발생했습니다.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "message": {
+                          "type": "string",
+                          "example": "알 수 없는 오류가 발생했습니다."
+                        },
+                        "code": {
+                          "type": "string",
+                          "example": "INTERNAL_SERVER_ERROR"
+                        },
+                        "statusCode": {
+                          "type": "number",
+                          "example": 500
+                        }
+                      }
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/api/endpoint"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
+        "summary": "매칭 상태 조회",
+        "tags": [
+          "Matching"
+        ]
+      }
+    },
+    "/api/chat/rooms": {
+      "get": {
+        "description": "내가 참여 중인 채팅방 목록을 조회합니다. 최신 메시지, 안읽은 수를 포함합니다.",
+        "operationId": "ChatController_getChatRooms",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "채팅방 목록 조회 성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/ChatRoomItemDto"
+                      }
+                    },
+                    "error": {
+                      "type": "string",
+                      "example": "에러 메시지"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "잘못된 요청입니다.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "message": {
+                          "type": "string",
+                          "example": "잘못된 요청입니다."
+                        },
+                        "code": {
+                          "type": "string",
+                          "example": "BAD_REQUEST"
+                        },
+                        "statusCode": {
+                          "type": "number",
+                          "example": 400
+                        }
+                      }
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/api/endpoint"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "인증이 필요합니다.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "message": {
+                          "type": "string",
+                          "example": "토큰이 제공되지 않았습니다."
+                        },
+                        "code": {
+                          "type": "string",
+                          "example": "UNAUTHORIZED"
+                        },
+                        "statusCode": {
+                          "type": "number",
+                          "example": 401
+                        }
+                      }
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/api/endpoint"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "접근 권한이 없습니다.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "message": {
+                          "type": "string",
+                          "example": "접근 권한이 없습니다."
+                        },
+                        "code": {
+                          "type": "string",
+                          "example": "FORBIDDEN"
+                        },
+                        "statusCode": {
+                          "type": "number",
+                          "example": 403
+                        }
+                      }
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/api/endpoint"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "서버 내부 오류가 발생했습니다.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "message": {
+                          "type": "string",
+                          "example": "알 수 없는 오류가 발생했습니다."
+                        },
+                        "code": {
+                          "type": "string",
+                          "example": "INTERNAL_SERVER_ERROR"
+                        },
+                        "statusCode": {
+                          "type": "number",
+                          "example": 500
+                        }
+                      }
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/api/endpoint"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
+        "summary": "채팅방 목록 조회",
+        "tags": [
+          "Chat"
+        ]
+      },
+      "post": {
+        "description": "매칭 성사된 상대와의 채팅방을 생성합니다. 이미 존재하면 기존 방을 반환합니다.",
+        "operationId": "ChatController_createChatRoom",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateChatRoomDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "채팅방 생성 성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/ChatRoomItemDto"
+                    },
+                    "error": {
+                      "type": "string",
+                      "example": "에러 메시지"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "잘못된 요청입니다.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "message": {
+                          "type": "string",
+                          "example": "잘못된 요청입니다."
+                        },
+                        "code": {
+                          "type": "string",
+                          "example": "BAD_REQUEST"
+                        },
+                        "statusCode": {
+                          "type": "number",
+                          "example": 400
+                        }
+                      }
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/api/endpoint"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "인증이 필요합니다.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "message": {
+                          "type": "string",
+                          "example": "토큰이 제공되지 않았습니다."
+                        },
+                        "code": {
+                          "type": "string",
+                          "example": "UNAUTHORIZED"
+                        },
+                        "statusCode": {
+                          "type": "number",
+                          "example": 401
+                        }
+                      }
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/api/endpoint"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "접근 권한이 없습니다.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "message": {
+                          "type": "string",
+                          "example": "접근 권한이 없습니다."
+                        },
+                        "code": {
+                          "type": "string",
+                          "example": "FORBIDDEN"
+                        },
+                        "statusCode": {
+                          "type": "number",
+                          "example": 403
+                        }
+                      }
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/api/endpoint"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "서버 내부 오류가 발생했습니다.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "message": {
+                          "type": "string",
+                          "example": "알 수 없는 오류가 발생했습니다."
+                        },
+                        "code": {
+                          "type": "string",
+                          "example": "INTERNAL_SERVER_ERROR"
+                        },
+                        "statusCode": {
+                          "type": "number",
+                          "example": 500
+                        }
+                      }
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/api/endpoint"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
+        "summary": "채팅방 생성",
+        "tags": [
+          "Chat"
+        ]
+      }
+    },
+    "/api/chat/rooms/{roomId}/messages": {
+      "get": {
+        "description": "채팅방의 메시지를 커서 기반 페이지네이션으로 조회합니다. 최신순 정렬입니다.",
+        "operationId": "ChatController_getMessages",
+        "parameters": [
+          {
+            "name": "roomId",
+            "required": true,
+            "in": "path",
+            "description": "채팅방 ID",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "cursor",
+            "required": false,
+            "in": "query",
+            "description": "페이지 커서 (이전 응답의 nextCursor)",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "조회 건수 (기본 30)",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "메시지 조회 성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/MessageListDto"
+                    },
+                    "error": {
+                      "type": "string",
+                      "example": "에러 메시지"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "잘못된 요청입니다.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "message": {
+                          "type": "string",
+                          "example": "잘못된 요청입니다."
+                        },
+                        "code": {
+                          "type": "string",
+                          "example": "BAD_REQUEST"
+                        },
+                        "statusCode": {
+                          "type": "number",
+                          "example": 400
+                        }
+                      }
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/api/endpoint"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "인증이 필요합니다.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "message": {
+                          "type": "string",
+                          "example": "토큰이 제공되지 않았습니다."
+                        },
+                        "code": {
+                          "type": "string",
+                          "example": "UNAUTHORIZED"
+                        },
+                        "statusCode": {
+                          "type": "number",
+                          "example": 401
+                        }
+                      }
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/api/endpoint"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "접근 권한이 없습니다.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "message": {
+                          "type": "string",
+                          "example": "접근 권한이 없습니다."
+                        },
+                        "code": {
+                          "type": "string",
+                          "example": "FORBIDDEN"
+                        },
+                        "statusCode": {
+                          "type": "number",
+                          "example": 403
+                        }
+                      }
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/api/endpoint"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "서버 내부 오류가 발생했습니다.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "message": {
+                          "type": "string",
+                          "example": "알 수 없는 오류가 발생했습니다."
+                        },
+                        "code": {
+                          "type": "string",
+                          "example": "INTERNAL_SERVER_ERROR"
+                        },
+                        "statusCode": {
+                          "type": "number",
+                          "example": 500
+                        }
+                      }
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/api/endpoint"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
+        "summary": "메시지 목록 조회",
+        "tags": [
+          "Chat"
+        ]
+      },
+      "post": {
+        "description": "채팅방에 메시지를 전송합니다. 참여자만 전송 가능합니다.",
+        "operationId": "ChatController_sendMessage",
+        "parameters": [
+          {
+            "name": "roomId",
+            "required": true,
+            "in": "path",
+            "description": "채팅방 ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SendMessageDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "메시지 전송 성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/ChatMessageDto"
+                    },
+                    "error": {
+                      "type": "string",
+                      "example": "에러 메시지"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "잘못된 요청입니다.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "message": {
+                          "type": "string",
+                          "example": "잘못된 요청입니다."
+                        },
+                        "code": {
+                          "type": "string",
+                          "example": "BAD_REQUEST"
+                        },
+                        "statusCode": {
+                          "type": "number",
+                          "example": 400
+                        }
+                      }
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/api/endpoint"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "인증이 필요합니다.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "message": {
+                          "type": "string",
+                          "example": "토큰이 제공되지 않았습니다."
+                        },
+                        "code": {
+                          "type": "string",
+                          "example": "UNAUTHORIZED"
+                        },
+                        "statusCode": {
+                          "type": "number",
+                          "example": 401
+                        }
+                      }
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/api/endpoint"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "접근 권한이 없습니다.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "message": {
+                          "type": "string",
+                          "example": "접근 권한이 없습니다."
+                        },
+                        "code": {
+                          "type": "string",
+                          "example": "FORBIDDEN"
+                        },
+                        "statusCode": {
+                          "type": "number",
+                          "example": 403
+                        }
+                      }
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/api/endpoint"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "서버 내부 오류가 발생했습니다.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "message": {
+                          "type": "string",
+                          "example": "알 수 없는 오류가 발생했습니다."
+                        },
+                        "code": {
+                          "type": "string",
+                          "example": "INTERNAL_SERVER_ERROR"
+                        },
+                        "statusCode": {
+                          "type": "number",
+                          "example": 500
+                        }
+                      }
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/api/endpoint"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
+        "summary": "메시지 전송",
+        "tags": [
+          "Chat"
+        ]
+      }
+    },
+    "/api/chat/rooms/{roomId}/read": {
+      "patch": {
+        "description": "채팅방의 메시지를 현재 시각까지 읽음 처리합니다.",
+        "operationId": "ChatController_markAsRead",
+        "parameters": [
+          {
+            "name": "roomId",
+            "required": true,
+            "in": "path",
+            "description": "채팅방 ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "읽음 처리 성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "error": {
+                      "type": "string",
+                      "example": "에러 메시지"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "잘못된 요청입니다.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "message": {
+                          "type": "string",
+                          "example": "잘못된 요청입니다."
+                        },
+                        "code": {
+                          "type": "string",
+                          "example": "BAD_REQUEST"
+                        },
+                        "statusCode": {
+                          "type": "number",
+                          "example": 400
+                        }
+                      }
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/api/endpoint"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "인증이 필요합니다.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "message": {
+                          "type": "string",
+                          "example": "토큰이 제공되지 않았습니다."
+                        },
+                        "code": {
+                          "type": "string",
+                          "example": "UNAUTHORIZED"
+                        },
+                        "statusCode": {
+                          "type": "number",
+                          "example": 401
+                        }
+                      }
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/api/endpoint"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "접근 권한이 없습니다.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "message": {
+                          "type": "string",
+                          "example": "접근 권한이 없습니다."
+                        },
+                        "code": {
+                          "type": "string",
+                          "example": "FORBIDDEN"
+                        },
+                        "statusCode": {
+                          "type": "number",
+                          "example": 403
+                        }
+                      }
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/api/endpoint"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "서버 내부 오류가 발생했습니다.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "message": {
+                          "type": "string",
+                          "example": "알 수 없는 오류가 발생했습니다."
+                        },
+                        "code": {
+                          "type": "string",
+                          "example": "INTERNAL_SERVER_ERROR"
+                        },
+                        "statusCode": {
+                          "type": "number",
+                          "example": 500
+                        }
+                      }
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/api/endpoint"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
+        "summary": "읽음 처리",
+        "tags": [
+          "Chat"
+        ]
+      }
+    },
+    "/api/users/{id}/answers": {
+      "get": {
+        "description": "매칭 성사된 상대와의 퀴즈 답변을 비교합니다. 퀴즈별 일치 여부와 전체 일치율을 반환합니다.",
+        "operationId": "RatingController_getUserAnswers",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "대상 사용자 ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "답변 비교 조회 성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/UserAnswersComparisonDto"
+                    },
+                    "error": {
+                      "type": "string",
+                      "example": "에러 메시지"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "잘못된 요청입니다.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "message": {
+                          "type": "string",
+                          "example": "잘못된 요청입니다."
+                        },
+                        "code": {
+                          "type": "string",
+                          "example": "BAD_REQUEST"
+                        },
+                        "statusCode": {
+                          "type": "number",
+                          "example": 400
+                        }
+                      }
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/api/endpoint"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "인증이 필요합니다.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "message": {
+                          "type": "string",
+                          "example": "토큰이 제공되지 않았습니다."
+                        },
+                        "code": {
+                          "type": "string",
+                          "example": "UNAUTHORIZED"
+                        },
+                        "statusCode": {
+                          "type": "number",
+                          "example": 401
+                        }
+                      }
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/api/endpoint"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "접근 권한이 없습니다.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "message": {
+                          "type": "string",
+                          "example": "접근 권한이 없습니다."
+                        },
+                        "code": {
+                          "type": "string",
+                          "example": "FORBIDDEN"
+                        },
+                        "statusCode": {
+                          "type": "number",
+                          "example": 403
+                        }
+                      }
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/api/endpoint"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "서버 내부 오류가 발생했습니다.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "message": {
+                          "type": "string",
+                          "example": "알 수 없는 오류가 발생했습니다."
+                        },
+                        "code": {
+                          "type": "string",
+                          "example": "INTERNAL_SERVER_ERROR"
+                        },
+                        "statusCode": {
+                          "type": "number",
+                          "example": 500
+                        }
+                      }
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/api/endpoint"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
+        "summary": "상대 답변 비교 조회",
+        "tags": [
+          "Profile Detail"
+        ]
+      }
+    },
+    "/api/users/{id}/ratings": {
+      "get": {
+        "description": "누적 평가 3개 이상 시 평균 점수와 개별 평가를 공개합니다. 미달 시 총 평가 수만 반환합니다.",
+        "operationId": "RatingController_getUserRatings",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "대상 사용자 ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "평가 조회 성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/UserRatingSummaryDto"
+                    },
+                    "error": {
+                      "type": "string",
+                      "example": "에러 메시지"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "잘못된 요청입니다.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "message": {
+                          "type": "string",
+                          "example": "잘못된 요청입니다."
+                        },
+                        "code": {
+                          "type": "string",
+                          "example": "BAD_REQUEST"
+                        },
+                        "statusCode": {
+                          "type": "number",
+                          "example": 400
+                        }
+                      }
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/api/endpoint"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "인증이 필요합니다.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "message": {
+                          "type": "string",
+                          "example": "토큰이 제공되지 않았습니다."
+                        },
+                        "code": {
+                          "type": "string",
+                          "example": "UNAUTHORIZED"
+                        },
+                        "statusCode": {
+                          "type": "number",
+                          "example": 401
+                        }
+                      }
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/api/endpoint"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "접근 권한이 없습니다.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "message": {
+                          "type": "string",
+                          "example": "접근 권한이 없습니다."
+                        },
+                        "code": {
+                          "type": "string",
+                          "example": "FORBIDDEN"
+                        },
+                        "statusCode": {
+                          "type": "number",
+                          "example": 403
+                        }
+                      }
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/api/endpoint"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "서버 내부 오류가 발생했습니다.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "message": {
+                          "type": "string",
+                          "example": "알 수 없는 오류가 발생했습니다."
+                        },
+                        "code": {
+                          "type": "string",
+                          "example": "INTERNAL_SERVER_ERROR"
+                        },
+                        "statusCode": {
+                          "type": "number",
+                          "example": 500
+                        }
+                      }
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/api/endpoint"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
+        "summary": "사용자 평가 조회",
+        "tags": [
+          "Profile Detail"
+        ]
+      },
+      "post": {
+        "description": "매칭 성사된 상대에 대한 평가를 작성합니다. 같은 매칭 건에 대해 중복 평가는 불가합니다.",
+        "operationId": "RatingController_createRating",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "대상 사용자 ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateRatingDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "평가 작성 성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/RatingItemDto"
+                    },
+                    "error": {
+                      "type": "string",
+                      "example": "에러 메시지"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "잘못된 요청입니다.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "message": {
+                          "type": "string",
+                          "example": "잘못된 요청입니다."
+                        },
+                        "code": {
+                          "type": "string",
+                          "example": "BAD_REQUEST"
+                        },
+                        "statusCode": {
+                          "type": "number",
+                          "example": 400
+                        }
+                      }
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/api/endpoint"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "인증이 필요합니다.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "message": {
+                          "type": "string",
+                          "example": "토큰이 제공되지 않았습니다."
+                        },
+                        "code": {
+                          "type": "string",
+                          "example": "UNAUTHORIZED"
+                        },
+                        "statusCode": {
+                          "type": "number",
+                          "example": 401
+                        }
+                      }
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/api/endpoint"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "접근 권한이 없습니다.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "message": {
+                          "type": "string",
+                          "example": "접근 권한이 없습니다."
+                        },
+                        "code": {
+                          "type": "string",
+                          "example": "FORBIDDEN"
+                        },
+                        "statusCode": {
+                          "type": "number",
+                          "example": 403
+                        }
+                      }
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/api/endpoint"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "서버 내부 오류가 발생했습니다.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "message": {
+                          "type": "string",
+                          "example": "알 수 없는 오류가 발생했습니다."
+                        },
+                        "code": {
+                          "type": "string",
+                          "example": "INTERNAL_SERVER_ERROR"
+                        },
+                        "statusCode": {
+                          "type": "number",
+                          "example": 500
+                        }
+                      }
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/api/endpoint"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
+        "summary": "사용자 평가 작성",
+        "tags": [
+          "Profile Detail"
         ]
       }
     },
@@ -8282,6 +11666,607 @@
       "Object": {
         "type": "object",
         "properties": {}
+      },
+      "MatchingPreferencesDto": {
+        "type": "object",
+        "properties": {
+          "minAge": {
+            "type": "number",
+            "description": "선호 최소 나이",
+            "example": 20
+          },
+          "maxAge": {
+            "type": "number",
+            "description": "선호 최대 나이",
+            "example": 30
+          }
+        }
+      },
+      "UserProfileDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "프로필 ID"
+          },
+          "userId": {
+            "type": "string",
+            "description": "사용자 ID"
+          },
+          "introduction": {
+            "type": "string",
+            "description": "자기소개 (최대 300자)",
+            "example": "안녕하세요! 대화를 좋아하는 사람입니다."
+          },
+          "matchingPreferences": {
+            "description": "매칭 선호 조건",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/MatchingPreferencesDto"
+              }
+            ]
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "생성일시"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "수정일시"
+          }
+        },
+        "required": [
+          "id",
+          "userId",
+          "matchingPreferences",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "UpdateProfileDto": {
+        "type": "object",
+        "properties": {
+          "introduction": {
+            "type": "string",
+            "description": "자기소개 (최대 300자, null 전송 시 삭제)",
+            "example": "안녕하세요! 대화를 좋아하는 사람입니다.",
+            "maxLength": 300
+          },
+          "preferredMinAge": {
+            "type": "number",
+            "description": "선호 최소 나이 (18~100, null 전송 시 삭제)",
+            "example": 20
+          },
+          "preferredMaxAge": {
+            "type": "number",
+            "description": "선호 최대 나이 (18~100, null 전송 시 삭제)",
+            "example": 30
+          }
+        }
+      },
+      "PublicProfileDto": {
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "string",
+            "description": "사용자 ID"
+          },
+          "nickname": {
+            "type": "string",
+            "description": "닉네임",
+            "example": "ditto_user"
+          },
+          "gender": {
+            "type": "string",
+            "description": "성별",
+            "example": "MALE"
+          },
+          "age": {
+            "type": "number",
+            "description": "나이",
+            "example": 25
+          },
+          "introduction": {
+            "type": "string",
+            "description": "자기소개",
+            "example": "안녕하세요!"
+          },
+          "preferredMinAge": {
+            "type": "number",
+            "description": "선호 최소 나이",
+            "example": 20
+          },
+          "preferredMaxAge": {
+            "type": "number",
+            "description": "선호 최대 나이",
+            "example": 30
+          }
+        },
+        "required": [
+          "userId",
+          "nickname",
+          "gender",
+          "age"
+        ]
+      },
+      "ScoreBreakdownDto": {
+        "type": "object",
+        "properties": {
+          "quizMatchRate": {
+            "type": "number",
+            "description": "퀴즈 일치율 (0~100)",
+            "example": 75
+          },
+          "matchedQuestions": {
+            "type": "number",
+            "description": "일치한 퀴즈 수",
+            "example": 3
+          },
+          "totalQuestions": {
+            "type": "number",
+            "description": "전체 비교 퀴즈 수",
+            "example": 4
+          },
+          "reasons": {
+            "description": "설명 목록",
+            "example": [
+              "공통 퀴즈 4문제 중 3문제 일치 (75%)"
+            ],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "quizMatchRate",
+          "matchedQuestions",
+          "totalQuestions",
+          "reasons"
+        ]
+      },
+      "MatchCandidateDto": {
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "string",
+            "description": "사용자 ID"
+          },
+          "nickname": {
+            "type": "string",
+            "description": "닉네임"
+          },
+          "gender": {
+            "type": "string",
+            "description": "성별"
+          },
+          "age": {
+            "type": "number",
+            "description": "나이"
+          },
+          "introduction": {
+            "type": "string",
+            "description": "자기소개"
+          },
+          "matchRate": {
+            "type": "number",
+            "description": "매칭 점수 (0~100)",
+            "example": 75
+          },
+          "scoreBreakdown": {
+            "description": "스코어 상세",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ScoreBreakdownDto"
+              }
+            ]
+          }
+        },
+        "required": [
+          "userId",
+          "nickname",
+          "gender",
+          "age",
+          "matchRate",
+          "scoreBreakdown"
+        ]
+      },
+      "MatchCandidateListDto": {
+        "type": "object",
+        "properties": {
+          "quizSetId": {
+            "type": "string",
+            "description": "퀴즈셋 ID"
+          },
+          "algorithmVersion": {
+            "type": "string",
+            "description": "알고리즘 버전",
+            "example": "v1"
+          },
+          "candidates": {
+            "description": "후보 목록",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MatchCandidateDto"
+            }
+          }
+        },
+        "required": [
+          "quizSetId",
+          "algorithmVersion",
+          "candidates"
+        ]
+      },
+      "MatchRequestDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "quizSetId": {
+            "type": "string"
+          },
+          "fromUserId": {
+            "type": "string"
+          },
+          "toUserId": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "score": {
+            "type": "number"
+          },
+          "scoreBreakdown": {
+            "type": "object"
+          },
+          "algorithmVersion": {
+            "type": "string"
+          },
+          "requestedAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "respondedAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "quizSetId",
+          "fromUserId",
+          "toUserId",
+          "status",
+          "score",
+          "algorithmVersion",
+          "requestedAt"
+        ]
+      },
+      "SendMatchRequestDto": {
+        "type": "object",
+        "properties": {
+          "quizSetId": {
+            "type": "string",
+            "description": "퀴즈셋 ID"
+          },
+          "toUserId": {
+            "type": "string",
+            "description": "대상 사용자 ID"
+          }
+        },
+        "required": [
+          "quizSetId",
+          "toUserId"
+        ]
+      },
+      "MatchingStatusDto": {
+        "type": "object",
+        "properties": {
+          "quizSetId": {
+            "type": "string",
+            "description": "퀴즈셋 ID"
+          },
+          "hasAcceptedMatch": {
+            "type": "boolean",
+            "description": "이미 매칭 확정 여부"
+          },
+          "sentRequests": {
+            "description": "보낸 요청",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MatchRequestDto"
+            }
+          },
+          "receivedRequests": {
+            "description": "받은 요청",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MatchRequestDto"
+            }
+          }
+        },
+        "required": [
+          "quizSetId",
+          "hasAcceptedMatch",
+          "sentRequests",
+          "receivedRequests"
+        ]
+      },
+      "ChatMessageDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "메시지 ID"
+          },
+          "senderId": {
+            "type": "string",
+            "description": "발신자 ID"
+          },
+          "content": {
+            "type": "string",
+            "description": "메시지 내용"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "생성일"
+          }
+        },
+        "required": [
+          "id",
+          "senderId",
+          "content",
+          "createdAt"
+        ]
+      },
+      "ChatRoomItemDto": {
+        "type": "object",
+        "properties": {
+          "roomId": {
+            "type": "string",
+            "description": "채팅방 ID"
+          },
+          "matchRequestId": {
+            "type": "string",
+            "description": "매칭 요청 ID"
+          },
+          "participantUserIds": {
+            "description": "참여자 ID 목록",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "lastMessage": {
+            "description": "마지막 메시지",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ChatMessageDto"
+              }
+            ]
+          },
+          "unreadCount": {
+            "type": "number",
+            "description": "안읽은 메시지 수"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "생성일"
+          }
+        },
+        "required": [
+          "roomId",
+          "matchRequestId",
+          "participantUserIds",
+          "unreadCount",
+          "createdAt"
+        ]
+      },
+      "CreateChatRoomDto": {
+        "type": "object",
+        "properties": {
+          "matchRequestId": {
+            "type": "string",
+            "description": "매칭 요청 ID"
+          }
+        },
+        "required": [
+          "matchRequestId"
+        ]
+      },
+      "MessageListDto": {
+        "type": "object",
+        "properties": {
+          "messages": {
+            "description": "메시지 목록",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ChatMessageDto"
+            }
+          },
+          "nextCursor": {
+            "type": "string",
+            "description": "다음 페이지 커서 (없으면 마지막 페이지)"
+          }
+        },
+        "required": [
+          "messages"
+        ]
+      },
+      "SendMessageDto": {
+        "type": "object",
+        "properties": {
+          "content": {
+            "type": "string",
+            "description": "메시지 내용 (최대 2000자)"
+          }
+        },
+        "required": [
+          "content"
+        ]
+      },
+      "AnswerComparisonItemDto": {
+        "type": "object",
+        "properties": {
+          "quizId": {
+            "type": "string",
+            "description": "퀴즈 ID"
+          },
+          "question": {
+            "type": "string",
+            "description": "퀴즈 질문"
+          },
+          "myChoice": {
+            "type": "string",
+            "description": "내 선택 답변"
+          },
+          "theirChoice": {
+            "type": "string",
+            "description": "상대 선택 답변"
+          },
+          "isMatch": {
+            "type": "boolean",
+            "description": "일치 여부"
+          }
+        },
+        "required": [
+          "quizId",
+          "question",
+          "myChoice",
+          "theirChoice",
+          "isMatch"
+        ]
+      },
+      "UserAnswersComparisonDto": {
+        "type": "object",
+        "properties": {
+          "targetUserId": {
+            "type": "string",
+            "description": "대상 사용자 ID"
+          },
+          "quizSetId": {
+            "type": "string",
+            "description": "퀴즈셋 ID"
+          },
+          "matchRate": {
+            "type": "number",
+            "description": "일치율 (0~100)"
+          },
+          "matchedCount": {
+            "type": "number",
+            "description": "일치 문제 수"
+          },
+          "totalCount": {
+            "type": "number",
+            "description": "전체 비교 문제 수"
+          },
+          "comparisons": {
+            "description": "답변 비교 상세",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AnswerComparisonItemDto"
+            }
+          }
+        },
+        "required": [
+          "targetUserId",
+          "quizSetId",
+          "matchRate",
+          "matchedCount",
+          "totalCount",
+          "comparisons"
+        ]
+      },
+      "RatingItemDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "score": {
+            "type": "number"
+          },
+          "comment": {
+            "type": "string"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "score",
+          "createdAt"
+        ]
+      },
+      "UserRatingSummaryDto": {
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "string",
+            "description": "대상 사용자 ID"
+          },
+          "totalCount": {
+            "type": "number",
+            "description": "총 평가 수"
+          },
+          "averageScore": {
+            "type": "number",
+            "description": "평균 점수 (공개 시)"
+          },
+          "isPublic": {
+            "type": "boolean",
+            "description": "공개 여부"
+          },
+          "publicThreshold": {
+            "type": "number",
+            "description": "공개 기준 수"
+          },
+          "ratings": {
+            "description": "개별 평가 목록 (공개 시에만)",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RatingItemDto"
+            }
+          }
+        },
+        "required": [
+          "userId",
+          "totalCount",
+          "averageScore",
+          "isPublic",
+          "publicThreshold"
+        ]
+      },
+      "CreateRatingDto": {
+        "type": "object",
+        "properties": {
+          "matchRequestId": {
+            "type": "string",
+            "description": "매칭 요청 ID"
+          },
+          "score": {
+            "type": "number",
+            "description": "평가 점수 (1~5)",
+            "example": 4
+          },
+          "comment": {
+            "type": "string",
+            "description": "코멘트 (최대 500자)",
+            "example": "좋은 대화였습니다!"
+          }
+        },
+        "required": [
+          "matchRequestId",
+          "score"
+        ]
       },
       "QuizChoiceDto": {
         "type": "object",

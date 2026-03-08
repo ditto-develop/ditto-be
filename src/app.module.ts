@@ -8,6 +8,10 @@ import { QuizModule } from '@module/quiz/quiz.module';
 import { RoleModule } from '@module/role/role.module';
 import { SystemModule } from '@module/system/system.module';
 import { UserModule } from '@module/user/user.module';
+import { ProfileModule } from '@module/profile/profile.module';
+import { MatchingModule } from '@module/matching/matching.module';
+import { RatingModule } from '@module/rating/rating.module';
+import { ChatModule } from '@module/chat/chat.module';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { ScheduleModule } from '@nestjs/schedule';
@@ -32,6 +36,10 @@ import { AppController } from './app.controller';
     CommandBusModule,
     RoleModule,
     UserModule,
+    ProfileModule,
+    MatchingModule,
+    RatingModule,
+    ChatModule,
     QuizModule,
     SystemModule,
   ],
