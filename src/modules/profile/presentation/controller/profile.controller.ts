@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Patch, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Put, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { CommandBus } from '@common/command/command-bus';
 import { ApiCommandResponse } from '@common/command/api-response.decorator';
@@ -11,9 +11,12 @@ import { User } from '@module/user/domain/entities/user.entity';
 import { UserProfileDto } from '@module/profile/application/dto/user-profile.dto';
 import { UpdateProfileDto } from '@module/profile/application/dto/update-profile.dto';
 import { PublicProfileDto } from '@module/profile/application/dto/public-profile.dto';
+import { IntroNotesDto, UpdateIntroNotesDto } from '@module/profile/application/dto/intro-notes.dto';
 import { GetMyProfileCommand } from '@module/profile/presentation/commands/get-my-profile.command';
 import { UpdateMyProfileCommand } from '@module/profile/presentation/commands/update-my-profile.command';
 import { GetUserProfileCommand } from '@module/profile/presentation/commands/get-user-profile.command';
+import { GetIntroNotesCommand } from '@module/profile/presentation/commands/get-intro-notes.command';
+import { UpdateIntroNotesCommand } from '@module/profile/presentation/commands/update-intro-notes.command';
 
 @ApiTags('Profile')
 @Controller('users')
@@ -47,6 +50,25 @@ export class ProfileController {
         console.log(`[ProfileController] 프로필 수정: userId=${user.id}`);
         const command = new UpdateMyProfileCommand(user.id, dto);
         return await this.commandBus.execute<UserProfileDto>(command);
+    }
+
+    @Get('me/intro-notes')
+    @ApiOperation({ summary: '내 소개 노트 조회', description: '10개 답변 배열과 작성 완료 수를 반환합니다. 미작성 시 빈 문자열 배열을 반환합니다.' })
+    @ApiCommandResponse(200, '소개 노트 조회 성공', IntroNotesDto)
+    async getIntroNotes(@CurrentUser() user: User): Promise<ICommandResult<IntroNotesDto>> {
+        const command = new GetIntroNotesCommand(user.id);
+        return await this.commandBus.execute<IntroNotesDto>(command);
+    }
+
+    @Put('me/intro-notes')
+    @ApiOperation({ summary: '내 소개 노트 저장/수정', description: '10개 답변 배열을 저장합니다. 빈 문자열로 부분 저장 가능합니다.' })
+    @ApiCommandResponse(200, '소개 노트 저장 성공', IntroNotesDto)
+    async updateIntroNotes(
+        @CurrentUser() user: User,
+        @Body() dto: UpdateIntroNotesDto,
+    ): Promise<ICommandResult<IntroNotesDto>> {
+        const command = new UpdateIntroNotesCommand(user.id, dto);
+        return await this.commandBus.execute<IntroNotesDto>(command);
     }
 
     @Get(':id/profile')

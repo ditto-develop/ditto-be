@@ -19,6 +19,12 @@ export class UserProfileDto {
     @ApiPropertyOptional({ description: '자기소개 (최대 300자)', example: '안녕하세요! 대화를 좋아하는 사람입니다.' })
     introduction: string | null;
 
+    @ApiPropertyOptional({ description: '프로필 이미지 URL', example: 'https://example.com/image.jpg' })
+    profileImageUrl: string | null;
+
+    @ApiPropertyOptional({ description: '지역', example: '서울' })
+    location: string | null;
+
     @ApiProperty({ description: '매칭 선호 조건' })
     matchingPreferences: MatchingPreferencesDto;
 
@@ -33,6 +39,8 @@ export class UserProfileDto {
         dto.id = profile.id;
         dto.userId = profile.userId;
         dto.introduction = profile.introduction;
+        dto.profileImageUrl = profile.profileImageUrl;
+        dto.location = profile.location;
         dto.matchingPreferences = {
             minAge: profile.preferredMinAge,
             maxAge: profile.preferredMaxAge,

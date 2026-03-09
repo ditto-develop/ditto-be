@@ -40,6 +40,8 @@ export class GetUserProfileUseCase {
         publicProfile.gender = user.gender;
         publicProfile.age = user.age;
         publicProfile.introduction = profile?.introduction ?? null;
+        publicProfile.profileImageUrl = profile?.profileImageUrl ?? null;
+        publicProfile.location = profile?.location ?? null;
         publicProfile.preferredMinAge = profile?.preferredMinAge ?? null;
         publicProfile.preferredMaxAge = profile?.preferredMaxAge ?? null;
 

@@ -39,5 +39,5 @@ COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package.json ./package.json
 COPY --from=builder /app/prisma ./prisma
 
-# 실행
-CMD ["node", "dist/src/main.js"]
+# 실행 (마이그레이션 후 서버 시작)
+CMD ["sh", "-c", "npx prisma migrate deploy && node dist/src/main.js"]

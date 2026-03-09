@@ -58,7 +58,7 @@ describe('UpdateMyProfileUseCase', () => {
     it('should update age preferences successfully', async () => {
         mockUserRepo.findById.mockResolvedValue(activeUser);
         mockProfileRepo.findByUserId.mockResolvedValue(null);
-        const updatedProfile = UserProfile.create('p-1', 'user-1', null, 20, 30);
+        const updatedProfile = UserProfile.create('p-1', 'user-1', null, null, null, 20, 30);
         mockProfileRepo.upsert.mockResolvedValue(updatedProfile);
 
         const result = await useCase.execute('user-1', { preferredMinAge: 20, preferredMaxAge: 30 });
@@ -94,7 +94,7 @@ describe('UpdateMyProfileUseCase', () => {
 
     it('should validate cross-field minAge > existing maxAge', async () => {
         mockUserRepo.findById.mockResolvedValue(activeUser);
-        const existingProfile = UserProfile.create('p-1', 'user-1', null, 20, 25);
+        const existingProfile = UserProfile.create('p-1', 'user-1', null, null, null, 20, 25);
         mockProfileRepo.findByUserId.mockResolvedValue(existingProfile);
 
         // Only updating minAge to 30 while existing maxAge is 25 -> should fail

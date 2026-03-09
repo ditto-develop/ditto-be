@@ -38,7 +38,7 @@ export class GetMatchCandidatesUseCase {
         });
 
         if (!myProgress) {
-            return { quizSetId: '', algorithmVersion: MATCHING_CONSTANTS.ALGORITHM_VERSION, candidates: [] };
+            throw new EntityNotFoundException('완료된 퀴즈 참여 기록', userId);
         }
 
         const quizSetId = myProgress.quizSetId;
@@ -110,6 +110,7 @@ export class GetMatchCandidatesUseCase {
                 gender: other.gender,
                 age: other.age,
                 introduction: otherProfile?.introduction ?? null,
+                location: otherProfile?.location ?? null,
                 score: breakdown.quizMatchRate,
                 scoreBreakdown: breakdown,
             });
@@ -128,6 +129,7 @@ export class GetMatchCandidatesUseCase {
             gender: c.gender,
             age: c.age,
             introduction: c.introduction,
+            location: c.location,
             matchRate: c.score,
             scoreBreakdown: c.scoreBreakdown,
         }));

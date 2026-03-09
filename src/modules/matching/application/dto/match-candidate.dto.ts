@@ -30,6 +30,9 @@ export class MatchCandidateDto {
     @ApiPropertyOptional({ description: '자기소개' })
     introduction: string | null;
 
+    @ApiPropertyOptional({ description: '지역', example: '서울' })
+    location: string | null;
+
     @ApiProperty({ description: '매칭 점수 (0~100)', example: 75 })
     matchRate: number;
 

@@ -12,6 +12,8 @@ export class UserProfile {
         public readonly id: string,
         public readonly userId: string,
         public readonly introduction: string | null,
+        public readonly profileImageUrl: string | null,
+        public readonly location: string | null,
         public readonly preferredMinAge: number | null,
         public readonly preferredMaxAge: number | null,
         public readonly createdAt: Date,
@@ -22,6 +24,8 @@ export class UserProfile {
         id: string,
         userId: string,
         introduction: string | null = null,
+        profileImageUrl: string | null = null,
+        location: string | null = null,
         preferredMinAge: number | null = null,
         preferredMaxAge: number | null = null,
         createdAt: Date = new Date(),
@@ -31,6 +35,8 @@ export class UserProfile {
             id,
             userId,
             introduction,
+            profileImageUrl,
+            location,
             preferredMinAge,
             preferredMaxAge,
             createdAt,
@@ -42,6 +48,8 @@ export class UserProfile {
 
     update(props: {
         introduction?: string | null;
+        profileImageUrl?: string | null;
+        location?: string | null;
         preferredMinAge?: number | null;
         preferredMaxAge?: number | null;
     }): UserProfile {
@@ -49,6 +57,8 @@ export class UserProfile {
             this.id,
             this.userId,
             props.introduction !== undefined ? props.introduction : this.introduction,
+            props.profileImageUrl !== undefined ? props.profileImageUrl : this.profileImageUrl,
+            props.location !== undefined ? props.location : this.location,
             props.preferredMinAge !== undefined ? props.preferredMinAge : this.preferredMinAge,
             props.preferredMaxAge !== undefined ? props.preferredMaxAge : this.preferredMaxAge,
             this.createdAt,

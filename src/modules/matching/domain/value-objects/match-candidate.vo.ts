@@ -7,6 +7,7 @@ export interface MatchCandidate {
     gender: string;
     age: number;
     introduction: string | null;
+    location: string | null;
     score: number;                    // 0~100
     scoreBreakdown: ScoreBreakdown;
 }

@@ -20,6 +20,12 @@ export class PublicProfileDto {
     @ApiPropertyOptional({ description: '자기소개', example: '안녕하세요!' })
     introduction: string | null;
 
+    @ApiPropertyOptional({ description: '프로필 이미지 URL', example: 'https://example.com/image.jpg' })
+    profileImageUrl: string | null;
+
+    @ApiPropertyOptional({ description: '지역', example: '서울' })
+    location: string | null;
+
     @ApiPropertyOptional({ description: '선호 최소 나이', example: 20 })
     preferredMinAge: number | null;
 

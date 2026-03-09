@@ -45,6 +45,7 @@ model User {
   socialAccounts UserSocialAccount[]
   quizProgresses UserQuizProgress[]
   profile        UserProfile?
+  introNote      UserIntroNote?
   sentMatchRequests     MatchRequest[] @relation("MatchRequestFrom")
   receivedMatchRequests MatchRequest[] @relation("MatchRequestTo")
   givenRatings         UserRating[]   @relation("RatingFrom")
@@ -175,10 +176,24 @@ model UserQuizProgress {
   @@map("user_quiz_progresses")
 }
 
+model UserIntroNote {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  answers   String[] // 10개 고정 배열, 빈 문자열 허용
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_intro_notes")
+}
+
 model UserProfile {
   id               String   @id @default(cuid())
   userId           String   @unique
   introduction     String?  @db.VarChar(300)   // 자기소개 (최대 300자)
+  profileImageUrl  String?  @db.VarChar(500)   // 프로필 이미지 URL
+  location         String?  @db.VarChar(100)   // 지역 (예: 서울, 부산)
   preferredMinAge  Int?                        // 매칭 선호 최소 나이
   preferredMaxAge  Int?                        // 매칭 선호 최대 나이
 
