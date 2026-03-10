@@ -3,7 +3,7 @@ name: 🚀 DITTO BE ACTION
 on:
   push:
     branches:
-      - main   # main 브랜치에 push 될 때마다 실행
+      - develop   # develop 브랜치에 push 될 때마다 실행
 
 jobs:
   deploy:
@@ -28,7 +28,7 @@ jobs:
             else
               echo "Git repository not found, cloning..."
               rm -rf /home/ubuntu/ditto-be
-              git clone https://github.com/ditto-develop/ditto-be.git /home/ubuntu/ditto-be
+              git clone -b develop https://github.com/ditto-develop/ditto-be.git /home/ubuntu/ditto-be
               cd /home/ubuntu/ditto-be
             fi
 
@@ -38,8 +38,8 @@ jobs:
 
             echo ">>> Git fetch & reset to origin/main"
             git remote set-url origin https://github.com/ditto-develop/ditto-be.git
-            git fetch origin main
-            git reset --hard origin/main
+            git fetch origin develop
+            git reset --hard origin/develop
 
             echo ">>> Build BE docker image"
             sudo docker build -t ditto-be:latest .
