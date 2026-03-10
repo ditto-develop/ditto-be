@@ -30,22 +30,20 @@ export class LoggingModule {
             const isProduction = nodeEnv === 'production';
 
             if (isProduction) {
-              // Production 환경: LokiLogger 사용
+              // Production 환경: LokiLogger 사용 (LOKI_HOST 없으면 ConsoleLogger로 폴백)
               const lokiHost = configService.get<string>('loki.host');
-              if (!lokiHost) {
-                throw new Error('LOKI_HOST 환경변수가 설정되지 않았습니다.');
+              if (lokiHost) {
+                const lokiConfig = {
+                  host: lokiHost,
+                  labels: {
+                    app: configService.get<string>('loki.labels.app', 'ditto-be'),
+                    environment: nodeEnv,
+                    service: configService.get<string>('loki.labels.service', 'api'),
+                  },
+                };
+                return new LokiLoggerService(lokiConfig);
               }
-
-              const lokiConfig = {
-                host: lokiHost,
-                labels: {
-                  app: configService.get<string>('loki.labels.app', 'ditto-be'),
-                  environment: nodeEnv,
-                  service: configService.get<string>('loki.labels.service', 'api'),
-                },
-              };
-
-              return new LokiLoggerService(lokiConfig);
+              return new ConsoleLoggerService();
             } else {
               // Development 환경: ConsoleLogger 사용
               return new ConsoleLoggerService();

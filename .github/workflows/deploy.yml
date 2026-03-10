@@ -21,6 +21,7 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           port: ${{ secrets.EC2_PORT || 22 }}
           script: |
+            set -e
             echo ">>> Move to project directory"
             if [ -d "/home/ubuntu/ditto-be/.git" ]; then
               cd /home/ubuntu/ditto-be
