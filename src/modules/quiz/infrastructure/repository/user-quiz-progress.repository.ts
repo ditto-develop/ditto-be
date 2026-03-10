@@ -103,6 +103,12 @@ export class UserQuizProgressRepository implements IUserQuizProgressRepository {
     return progresses.map((p) => p.userId);
   }
 
+  async countCompletedByYearMonthWeek(year: number, month: number, week: number): Promise<number> {
+    return this.prisma.userQuizProgress.count({
+      where: { year, month, week, status: QuizProgressStatus.COMPLETED },
+    });
+  }
+
   private toDomain(p: any): UserQuizProgress {
     return UserQuizProgress.create(
       p.id,

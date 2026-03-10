@@ -34,4 +34,10 @@ export class QuizProgressDto {
     example: 5,
   })
   answeredQuizzes: number;
+
+  @ApiProperty({
+    description: '이번 주 퀴즈 완료 참여자 수',
+    example: 128,
+  })
+  participantCount: number;
 }

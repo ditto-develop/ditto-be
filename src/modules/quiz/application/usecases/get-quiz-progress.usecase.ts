@@ -20,6 +20,7 @@ export interface QuizProgressResponse {
   quizSetTitle: string | null;
   totalQuizzes: number;
   answeredQuizzes: number;
+  participantCount: number;
 }
 
 @Injectable()
@@ -46,6 +47,8 @@ export class GetQuizProgressUseCase {
       week,
     );
 
+    const participantCount = await this.userQuizProgressRepository.countCompletedByYearMonthWeek(year, month, week);
+
     if (!progress) {
       return {
         status: QuizProgressStatus.NOT_STARTED,
@@ -53,6 +56,7 @@ export class GetQuizProgressUseCase {
         quizSetTitle: null,
         totalQuizzes: 0,
         answeredQuizzes: 0,
+        participantCount,
       };
     }
 
@@ -66,6 +70,7 @@ export class GetQuizProgressUseCase {
       quizSetTitle: quizSet?.title || null,
       totalQuizzes,
       answeredQuizzes: answers.length,
+      participantCount,
     };
   }
 }

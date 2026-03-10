@@ -13,6 +13,7 @@ export interface IUserQuizProgressRepository {
   delete(id: string): Promise<void>;
   findByUserId(userId: string): Promise<UserQuizProgress[]>;
   findCompletedUsersByQuizSetId(quizSetId: string, year: number, month: number, week: number): Promise<string[]>;
+  countCompletedByYearMonthWeek(year: number, month: number, week: number): Promise<number>;
 }
 
 export const USER_QUIZ_PROGRESS_REPOSITORY_TOKEN = Symbol('IUserQuizProgressRepository');
