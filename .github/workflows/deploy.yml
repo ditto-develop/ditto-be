@@ -1,0 +1,57 @@
+name: 🚀 DITTO BE ACTION
+
+on:
+  push:
+    branches:
+      - develop   # develop 브랜치에 push 될 때마다 실행
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🚀 Ditto BE Action
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          port: ${{ secrets.EC2_PORT || 22 }}
+          script: |
+            set -e
+            echo ">>> Move to project directory"
+            if [ -d "/home/ubuntu/ditto-be/.git" ]; then
+              cd /home/ubuntu/ditto-be
+            else
+              echo "Git repository not found, cloning..."
+              rm -rf /home/ubuntu/ditto-be
+              git clone -b develop https://github.com/ditto-develop/ditto-be.git /home/ubuntu/ditto-be
+              cd /home/ubuntu/ditto-be
+            fi
+
+            echo ">>> Inspecting directory structure"
+            pwd
+            ls -la
+
+            echo ">>> Git fetch & reset to origin/main"
+            git remote set-url origin https://github.com/ditto-develop/ditto-be.git
+            git fetch origin develop
+            git reset --hard origin/develop
+
+            echo ">>> Build BE docker image"
+            sudo docker build -t ditto-be:latest .
+
+            echo ">>> Docker compose restart api"
+            cd /home/ubuntu/ditto
+            sudo docker compose stop api || true
+            sudo docker compose rm -f api || true
+            sudo docker compose up -d api
+
+            echo ">>> Run Prisma migrations"
+            sudo docker compose exec -T api npx prisma migrate deploy
+
+            echo ">>> Remove unused docker images"
+            sudo docker image prune -f
