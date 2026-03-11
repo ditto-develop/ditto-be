@@ -1,5 +1,5 @@
 import { Injectable, OnModuleInit, Inject } from '@nestjs/common';
-import { Cron, CronExpression } from '@nestjs/schedule';
+import { Cron } from '@nestjs/schedule';
 import { SystemStateService } from '../services/system-state.service';
 import { WeekCalculator } from '@module/quiz/domain/utils/week-calculator.util';
 import { SystemPeriod } from '@module/quiz/domain/value-objects/system-period.vo';
@@ -21,11 +21,11 @@ export class SystemStateScheduler implements OnModuleInit {
   }
 
   /**
-   * 매일 자정에 시스템 상태를 업데이트합니다.
+   * 매일 KST 자정(UTC 15:00)에 시스템 상태를 업데이트합니다.
    */
-  @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
+  @Cron('0 15 * * *')
   async handleMidnightUpdate() {
-    this.logger.log('자정 시스템 상태 업데이트 시작', SystemStateScheduler.name);
+    this.logger.log('KST 자정 시스템 상태 업데이트 시작', SystemStateScheduler.name);
     await this.updateSystemState();
   }
 

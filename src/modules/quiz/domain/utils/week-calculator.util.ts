@@ -3,6 +3,13 @@
  */
 export class WeekCalculator {
   /**
+   * UTC Date를 KST Date로 변환합니다. (UTC+9)
+   */
+  static toKst(date: Date = new Date()): Date {
+    return new Date(date.getTime() + 9 * 60 * 60 * 1000);
+  }
+
+  /**
    * 해당 월의 첫 번째 월요일을 가져옵니다.
    */
   static getFirstMondayOfMonth(year: number, month: number): Date {
@@ -20,7 +27,8 @@ export class WeekCalculator {
    * 해당 월의 첫 번째 월요일을 1주차 시작으로 하며, 그 이전은 이전 달의 마지막 주로 취급합니다.
    */
   static calculateYearMonthWeek(date: Date = new Date()): { year: number; month: number; week: number } {
-    const target = new Date(date.getTime());
+    const kst = this.toKst(date);
+    const target = new Date(kst.getTime());
     target.setHours(0, 0, 0, 0);
 
     let year = target.getFullYear();
@@ -94,26 +102,26 @@ export class WeekCalculator {
   }
 
   /**
-   * 현재 요일이 퀴즈 기간(월~수)인지 확인합니다.
+   * 현재 요일이 퀴즈 기간(월~수)인지 확인합니다. (KST 기준)
    * (0: 일, 1: 월, 2: 화, 3: 수, 4: 목, 5: 금, 6: 토)
    */
   static isQuizPeriod(date: Date = new Date()): boolean {
-    const day = date.getDay();
+    const day = this.toKst(date).getDay();
     return day >= 1 && day <= 3;
   }
 
   /**
-   * 현재 요일이 매칭 기간(목)인지 확인합니다.
+   * 현재 요일이 매칭 기간(목)인지 확인합니다. (KST 기준)
    */
   static isMatchingPeriod(date: Date = new Date()): boolean {
-    return date.getDay() === 4;
+    return this.toKst(date).getDay() === 4;
   }
 
   /**
-   * 현재 요일이 채팅 기간(금~일)인지 확인합니다.
+   * 현재 요일이 채팅 기간(금~일)인지 확인합니다. (KST 기준)
    */
   static isChattingPeriod(date: Date = new Date()): boolean {
-    const day = date.getDay();
+    const day = this.toKst(date).getDay();
     return day === 5 || day === 6 || day === 0;
   }
 }
