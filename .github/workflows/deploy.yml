@@ -40,10 +40,9 @@ jobs:
             echo ">>> Build BE docker image"
             sudo docker build -t ditto-be:latest .
 
-            echo ">>> Docker compose restart api"
+            echo ">>> Docker compose recreate api"
             cd /home/ubuntu/ditto
-            sudo docker compose stop api || true
-            sudo docker compose rm -f api || true
+            sudo docker compose rm -f -s api || true
             sudo docker compose up -d api
 
             echo ">>> Remove unused docker images"
