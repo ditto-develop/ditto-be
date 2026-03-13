@@ -45,6 +45,7 @@ export class MatchRequestDto {
 export class MatchingStatusDto {
     @ApiProperty({ description: '퀴즈셋 ID' }) quizSetId: string;
     @ApiProperty({ description: '이미 매칭 확정 여부' }) hasAcceptedMatch: boolean;
+    @ApiPropertyOptional({ description: '매칭 확정된 상대방 userId' }) acceptedMatchUserId?: string;
     @ApiProperty({ description: '보낸 요청', type: [MatchRequestDto] }) sentRequests: MatchRequestDto[];
     @ApiProperty({ description: '받은 요청', type: [MatchRequestDto] }) receivedRequests: MatchRequestDto[];
 }

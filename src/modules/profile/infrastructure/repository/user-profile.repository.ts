@@ -24,6 +24,8 @@ export class UserProfileRepository implements IUserProfileRepository {
             row.preferredMaxAge,
             row.createdAt,
             row.updatedAt,
+            row.occupation ?? null,
+            row.interests ?? [],
         );
     }
 

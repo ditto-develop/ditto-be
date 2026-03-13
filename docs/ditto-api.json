@@ -4421,6 +4421,221 @@
         ]
       }
     },
+    "/api/users/{id}/intro-notes": {
+      "get": {
+        "description": "다른 사용자의 소개 노트 답변을 조회합니다.",
+        "operationId": "ProfileController_getUserIntroNotes",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "대상 사용자 ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "소개 노트 조회 성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/IntroNotesDto"
+                    },
+                    "error": {
+                      "type": "string",
+                      "example": "에러 메시지"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "잘못된 요청입니다.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "message": {
+                          "type": "string",
+                          "example": "잘못된 요청입니다."
+                        },
+                        "code": {
+                          "type": "string",
+                          "example": "BAD_REQUEST"
+                        },
+                        "statusCode": {
+                          "type": "number",
+                          "example": 400
+                        }
+                      }
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/api/endpoint"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "인증이 필요합니다.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "message": {
+                          "type": "string",
+                          "example": "토큰이 제공되지 않았습니다."
+                        },
+                        "code": {
+                          "type": "string",
+                          "example": "UNAUTHORIZED"
+                        },
+                        "statusCode": {
+                          "type": "number",
+                          "example": 401
+                        }
+                      }
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/api/endpoint"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "접근 권한이 없습니다.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "message": {
+                          "type": "string",
+                          "example": "접근 권한이 없습니다."
+                        },
+                        "code": {
+                          "type": "string",
+                          "example": "FORBIDDEN"
+                        },
+                        "statusCode": {
+                          "type": "number",
+                          "example": 403
+                        }
+                      }
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/api/endpoint"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "서버 내부 오류가 발생했습니다.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "message": {
+                          "type": "string",
+                          "example": "알 수 없는 오류가 발생했습니다."
+                        },
+                        "code": {
+                          "type": "string",
+                          "example": "INTERNAL_SERVER_ERROR"
+                        },
+                        "statusCode": {
+                          "type": "number",
+                          "example": 500
+                        }
+                      }
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/api/endpoint"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
+        "summary": "타인 소개 노트 조회",
+        "tags": [
+          "Profile"
+        ]
+      }
+    },
     "/api/users/{id}/profile": {
       "get": {
         "description": "다른 사용자의 공개 프로필을 조회합니다. 민감 정보(이메일, 전화번호)는 포함되지 않습니다.",
@@ -12282,6 +12497,22 @@
             "type": "number",
             "description": "선호 최대 나이",
             "example": 30
+          },
+          "occupation": {
+            "type": "string",
+            "description": "직업",
+            "example": "IT/개발"
+          },
+          "interests": {
+            "description": "관심사 목록",
+            "example": [
+              "운동",
+              "독서"
+            ],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           }
         },
         "required": [
@@ -12355,6 +12586,10 @@
             "description": "지역",
             "example": "서울"
           },
+          "profileImageUrl": {
+            "type": "string",
+            "description": "프로필 이미지 URL"
+          },
           "matchRate": {
             "type": "number",
             "description": "매칭 점수 (0~100)",
@@ -12385,6 +12620,15 @@
             "type": "string",
             "description": "퀴즈셋 ID"
           },
+          "matchingType": {
+            "type": "string",
+            "description": "매칭 타입",
+            "enum": [
+              "ONE_TO_ONE",
+              "GROUP"
+            ],
+            "example": "ONE_TO_ONE"
+          },
           "algorithmVersion": {
             "type": "string",
             "description": "알고리즘 버전",
@@ -12400,6 +12644,7 @@
         },
         "required": [
           "quizSetId",
+          "matchingType",
           "algorithmVersion",
           "candidates"
         ]
@@ -12478,6 +12723,10 @@
           "hasAcceptedMatch": {
             "type": "boolean",
             "description": "이미 매칭 확정 여부"
+          },
+          "acceptedMatchUserId": {
+            "type": "string",
+            "description": "매칭 확정된 상대방 userId"
           },
           "sentRequests": {
             "description": "보낸 요청",

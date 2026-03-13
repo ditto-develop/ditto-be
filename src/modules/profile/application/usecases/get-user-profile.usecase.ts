@@ -44,6 +44,8 @@ export class GetUserProfileUseCase {
         publicProfile.location = profile?.location ?? null;
         publicProfile.preferredMinAge = profile?.preferredMinAge ?? null;
         publicProfile.preferredMaxAge = profile?.preferredMaxAge ?? null;
+        publicProfile.occupation = profile?.occupation ?? null;
+        publicProfile.interests = profile?.interests ?? [];
 
         return publicProfile;
     }

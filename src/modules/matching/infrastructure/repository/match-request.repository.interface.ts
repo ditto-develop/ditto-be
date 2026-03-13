@@ -9,6 +9,7 @@ export interface IMatchRequestRepository {
     findReceivedByUser(userId: string, quizSetId?: string): Promise<MatchRequest[]>;
     updateStatus(id: string, status: MatchRequestStatus, respondedAt?: Date): Promise<MatchRequest>;
     hasAcceptedMatch(userId: string, quizSetId: string): Promise<boolean>;
+    findAcceptedMatch(userId: string, quizSetId: string): Promise<MatchRequest | null>;
 }
 
 export const MATCH_REQUEST_REPOSITORY_TOKEN = Symbol('IMatchRequestRepository');

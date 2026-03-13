@@ -75,7 +75,7 @@ export class MatchRequestRepository implements IMatchRequestRepository {
 
     async findSentByUser(userId: string, quizSetId?: string): Promise<MatchRequest[]> {
         const rows = await this.prisma.matchRequest.findMany({
-            where: { fromUserId: userId, ...(quizSetId ? { quizSetId } : {}) },
+            where: { fromUserId: userId, status: 'PENDING', ...(quizSetId ? { quizSetId } : {}) },
             orderBy: { createdAt: 'desc' },
         });
         return rows.map((r) => this.toDomain(r));
@@ -83,7 +83,7 @@ export class MatchRequestRepository implements IMatchRequestRepository {
 
     async findReceivedByUser(userId: string, quizSetId?: string): Promise<MatchRequest[]> {
         const rows = await this.prisma.matchRequest.findMany({
-            where: { toUserId: userId, ...(quizSetId ? { quizSetId } : {}) },
+            where: { toUserId: userId, status: 'PENDING', ...(quizSetId ? { quizSetId } : {}) },
             orderBy: { createdAt: 'desc' },
         });
         return rows.map((r) => this.toDomain(r));
@@ -95,6 +95,17 @@ export class MatchRequestRepository implements IMatchRequestRepository {
             data: { status, respondedAt: respondedAt ?? new Date() },
         });
         return this.toDomain(row);
+    }
+
+    async findAcceptedMatch(userId: string, quizSetId: string): Promise<MatchRequest | null> {
+        const row = await this.prisma.matchRequest.findFirst({
+            where: {
+                quizSetId,
+                status: 'ACCEPTED',
+                OR: [{ fromUserId: userId }, { toUserId: userId }],
+            },
+        });
+        return row ? this.toDomain(row) : null;
     }
 
     async hasAcceptedMatch(userId: string, quizSetId: string): Promise<boolean> {

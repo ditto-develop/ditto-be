@@ -71,6 +71,15 @@ export class ProfileController {
         return await this.commandBus.execute<IntroNotesDto>(command);
     }
 
+    @Get(':id/intro-notes')
+    @ApiOperation({ summary: '타인 소개 노트 조회', description: '다른 사용자의 소개 노트 답변을 조회합니다.' })
+    @ApiParam({ name: 'id', description: '대상 사용자 ID' })
+    @ApiCommandResponse(200, '소개 노트 조회 성공', IntroNotesDto)
+    async getUserIntroNotes(@Param('id') id: string): Promise<ICommandResult<IntroNotesDto>> {
+        const command = new GetIntroNotesCommand(id);
+        return await this.commandBus.execute<IntroNotesDto>(command);
+    }
+
     @Get(':id/profile')
     @ApiOperation({
         summary: '타인 프로필 조회',

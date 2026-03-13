@@ -15,15 +15,20 @@ export class GetMatchingStatusUseCase {
     async execute(userId: string, quizSetId: string): Promise<MatchingStatusDto> {
         this.logger.log('매칭 상태 조회', 'GetMatchingStatusUseCase', { userId, quizSetId });
 
-        const [sent, received, hasMatch] = await Promise.all([
+        const [sent, received, acceptedMatch] = await Promise.all([
             this.repo.findSentByUser(userId, quizSetId),
             this.repo.findReceivedByUser(userId, quizSetId),
-            this.repo.hasAcceptedMatch(userId, quizSetId),
+            this.repo.findAcceptedMatch(userId, quizSetId),
         ]);
 
         const dto = new MatchingStatusDto();
         dto.quizSetId = quizSetId;
-        dto.hasAcceptedMatch = hasMatch;
+        dto.hasAcceptedMatch = !!acceptedMatch;
+        if (acceptedMatch) {
+            dto.acceptedMatchUserId = acceptedMatch.fromUserId === userId
+                ? acceptedMatch.toUserId
+                : acceptedMatch.fromUserId;
+        }
         dto.sentRequests = sent.map(MatchRequestDto.fromDomain);
         dto.receivedRequests = received.map(MatchRequestDto.fromDomain);
 

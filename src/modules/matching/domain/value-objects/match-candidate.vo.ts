@@ -8,6 +8,7 @@ export interface MatchCandidate {
     age: number;
     introduction: string | null;
     location: string | null;
+    profileImageUrl: string | null;
     score: number;                    // 0~100
     scoreBreakdown: ScoreBreakdown;
 }

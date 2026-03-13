@@ -43,6 +43,10 @@ export class GetMatchCandidatesUseCase {
 
         const quizSetId = myProgress.quizSetId;
 
+        // 1-1. 퀴즈셋 매칭 타입 조회
+        const quizSet = await this.prisma.quizSet.findUnique({ where: { id: quizSetId }, select: { matchingType: true } });
+        const matchingType = quizSet?.matchingType ?? 'ONE_TO_ONE';
+
         // 2. 같은 퀴즈셋을 COMPLETED한 다른 사용자들 조회
         const otherProgresses = await this.prisma.userQuizProgress.findMany({
             where: { quizSetId, status: 'COMPLETED', userId: { not: userId } },
@@ -66,8 +70,20 @@ export class GetMatchCandidatesUseCase {
         // 4. 내 프로필(선호 나이) 로드
         const myProfile = await this.profileRepo.findByUserId(userId);
 
-        // 5. Batch 로드: 프로필 + 답변 (N+1 방지)
-        const activeOtherUsers = otherUsers.filter((u) => !u.leftAt);
+        // 5. REJECTED된 매칭 요청 상대방 제외 (내가 거절했거나 상대가 나를 거절한 경우)
+        const rejectedRequests = await this.prisma.matchRequest.findMany({
+            where: {
+                quizSetId,
+                status: 'REJECTED',
+                OR: [{ fromUserId: userId }, { toUserId: userId }],
+            },
+        });
+        const rejectedUserIds = new Set(
+            rejectedRequests.map((r) => r.fromUserId === userId ? r.toUserId : r.fromUserId)
+        );
+
+        // 5-1. Batch 로드: 프로필 + 답변 (N+1 방지)
+        const activeOtherUsers = otherUsers.filter((u) => !u.leftAt && !rejectedUserIds.has(u.id));
         const activeOtherUserIds = activeOtherUsers.map((u) => u.id);
 
         const otherProfiles = await this.prisma.userProfile.findMany({
@@ -88,7 +104,16 @@ export class GetMatchCandidatesUseCase {
         const candidates: MatchCandidate[] = [];
 
         for (const other of activeOtherUsers) {
-            // Hard filter: 나이 선호 범위 불일치 제외
+            // Hard filter 1: 이성 매칭 (성별이 달라야 함)
+            if (other.gender === me.gender) continue;
+
+            // Hard filter 2: 연령대 차이 최대 1개 대수 (10년 단위, 20대-30대까지만 허용)
+            // 예: 20대(20-29) ↔ 30대(30-39) O, 20대 ↔ 40대 X
+            const myDecade = Math.floor(me.age / 10);
+            const otherDecade = Math.floor(other.age / 10);
+            if (Math.abs(myDecade - otherDecade) > 1) continue;
+
+            // Hard filter 3: 사용자 설정 나이 선호 범위 불일치 제외
             if (myProfile?.preferredMinAge && other.age < myProfile.preferredMinAge) continue;
             if (myProfile?.preferredMaxAge && other.age > myProfile.preferredMaxAge) continue;
 
@@ -111,6 +136,7 @@ export class GetMatchCandidatesUseCase {
                 age: other.age,
                 introduction: otherProfile?.introduction ?? null,
                 location: otherProfile?.location ?? null,
+                profileImageUrl: otherProfile?.profileImageUrl ?? null,
                 score: breakdown.quizMatchRate,
                 scoreBreakdown: breakdown,
             });
@@ -130,12 +156,14 @@ export class GetMatchCandidatesUseCase {
             age: c.age,
             introduction: c.introduction,
             location: c.location,
+            profileImageUrl: c.profileImageUrl,
             matchRate: c.score,
             scoreBreakdown: c.scoreBreakdown,
         }));
 
         return {
             quizSetId,
+            matchingType,
             algorithmVersion: MATCHING_CONSTANTS.ALGORITHM_VERSION,
             candidates: candidateDtos,
         };

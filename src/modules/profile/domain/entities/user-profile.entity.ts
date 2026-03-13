@@ -18,6 +18,8 @@ export class UserProfile {
         public readonly preferredMaxAge: number | null,
         public readonly createdAt: Date,
         public readonly updatedAt: Date,
+        public readonly occupation: string | null = null,
+        public readonly interests: string[] = [],
     ) { }
 
     static create(
@@ -30,6 +32,8 @@ export class UserProfile {
         preferredMaxAge: number | null = null,
         createdAt: Date = new Date(),
         updatedAt: Date = new Date(),
+        occupation: string | null = null,
+        interests: string[] = [],
     ): UserProfile {
         const profile = new UserProfile(
             id,
@@ -41,6 +45,8 @@ export class UserProfile {
             preferredMaxAge,
             createdAt,
             updatedAt,
+            occupation,
+            interests,
         );
         profile.validate();
         return profile;

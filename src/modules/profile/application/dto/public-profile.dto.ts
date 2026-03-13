@@ -31,4 +31,10 @@ export class PublicProfileDto {
 
     @ApiPropertyOptional({ description: '선호 최대 나이', example: 30 })
     preferredMaxAge: number | null;
+
+    @ApiPropertyOptional({ description: '직업', example: 'IT/개발' })
+    occupation: string | null;
+
+    @ApiPropertyOptional({ description: '관심사 목록', example: ['운동', '독서'] })
+    interests: string[];
 }

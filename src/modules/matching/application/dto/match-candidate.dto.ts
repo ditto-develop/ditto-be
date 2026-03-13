@@ -33,6 +33,9 @@ export class MatchCandidateDto {
     @ApiPropertyOptional({ description: '지역', example: '서울' })
     location: string | null;
 
+    @ApiPropertyOptional({ description: '프로필 이미지 URL' })
+    profileImageUrl: string | null;
+
     @ApiProperty({ description: '매칭 점수 (0~100)', example: 75 })
     matchRate: number;
 
@@ -43,6 +46,9 @@ export class MatchCandidateDto {
 export class MatchCandidateListDto {
     @ApiProperty({ description: '퀴즈셋 ID' })
     quizSetId: string;
+
+    @ApiProperty({ description: '매칭 타입', enum: ['ONE_TO_ONE', 'GROUP'], example: 'ONE_TO_ONE' })
+    matchingType: 'ONE_TO_ONE' | 'GROUP';
 
     @ApiProperty({ description: '알고리즘 버전', example: 'v1' })
     algorithmVersion: string;
