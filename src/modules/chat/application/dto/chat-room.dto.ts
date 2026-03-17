@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsString } from 'class-validator';
+import { IsOptional, IsString } from 'class-validator';
 import { ChatMessageDto } from './chat-message.dto';
 
 export class CreateChatRoomDto {
@@ -26,4 +26,36 @@ export class ChatRoomItemDto {
 
     @ApiProperty({ description: '생성일' })
     createdAt: Date;
+}
+
+export class ChatPartnerDto {
+    @ApiProperty({ description: '파트너 유저 ID' })
+    userId: string;
+
+    @ApiProperty({ description: '파트너 닉네임' })
+    nickname: string;
+
+    @ApiPropertyOptional({ description: '파트너 프로필 이미지 URL' })
+    profileImageUrl: string | null;
+
+    @ApiPropertyOptional({ description: '매칭 점수 (0~100)' })
+    matchScore: number | null;
+}
+
+export class ChatRoomDetailDto {
+    @ApiProperty({ description: '채팅방 ID' })
+    roomId: string;
+
+    @ApiPropertyOptional({ description: '채팅방 만료 시각 (72시간)' })
+    expiresAt: Date | null;
+
+    @ApiProperty({ description: '상대방 정보', type: ChatPartnerDto })
+    partner: ChatPartnerDto;
+}
+
+export class LeaveChatRoomDto {
+    @ApiPropertyOptional({ description: '나가기 사유' })
+    @IsOptional()
+    @IsString()
+    reason?: string;
 }

@@ -6865,6 +6865,221 @@
         ]
       }
     },
+    "/api/chat/rooms/{roomId}": {
+      "get": {
+        "description": "채팅방 상세 정보 (파트너 프로필, 만료 시각 등)를 조회합니다. 참여자만 조회 가능합니다.",
+        "operationId": "ChatController_getChatRoomDetail",
+        "parameters": [
+          {
+            "name": "roomId",
+            "required": true,
+            "in": "path",
+            "description": "채팅방 ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "채팅방 상세 조회 성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/ChatRoomDetailDto"
+                    },
+                    "error": {
+                      "type": "string",
+                      "example": "에러 메시지"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "잘못된 요청입니다.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "message": {
+                          "type": "string",
+                          "example": "잘못된 요청입니다."
+                        },
+                        "code": {
+                          "type": "string",
+                          "example": "BAD_REQUEST"
+                        },
+                        "statusCode": {
+                          "type": "number",
+                          "example": 400
+                        }
+                      }
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/api/endpoint"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "인증이 필요합니다.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "message": {
+                          "type": "string",
+                          "example": "토큰이 제공되지 않았습니다."
+                        },
+                        "code": {
+                          "type": "string",
+                          "example": "UNAUTHORIZED"
+                        },
+                        "statusCode": {
+                          "type": "number",
+                          "example": 401
+                        }
+                      }
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/api/endpoint"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "접근 권한이 없습니다.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "message": {
+                          "type": "string",
+                          "example": "접근 권한이 없습니다."
+                        },
+                        "code": {
+                          "type": "string",
+                          "example": "FORBIDDEN"
+                        },
+                        "statusCode": {
+                          "type": "number",
+                          "example": 403
+                        }
+                      }
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/api/endpoint"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "서버 내부 오류가 발생했습니다.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "message": {
+                          "type": "string",
+                          "example": "알 수 없는 오류가 발생했습니다."
+                        },
+                        "code": {
+                          "type": "string",
+                          "example": "INTERNAL_SERVER_ERROR"
+                        },
+                        "statusCode": {
+                          "type": "number",
+                          "example": 500
+                        }
+                      }
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/api/endpoint"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
+        "summary": "채팅방 상세 조회",
+        "tags": [
+          "Chat"
+        ]
+      }
+    },
     "/api/chat/rooms/{roomId}/messages": {
       "get": {
         "description": "채팅방의 메시지를 커서 기반 페이지네이션으로 조회합니다. 최신순 정렬입니다.",
@@ -7528,6 +7743,228 @@
           }
         ],
         "summary": "읽음 처리",
+        "tags": [
+          "Chat"
+        ]
+      }
+    },
+    "/api/chat/rooms/{roomId}/leave": {
+      "post": {
+        "description": "채팅방을 나갑니다. 나간 후에는 재입장할 수 없습니다.",
+        "operationId": "ChatController_leaveChatRoom",
+        "parameters": [
+          {
+            "name": "roomId",
+            "required": true,
+            "in": "path",
+            "description": "채팅방 ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LeaveChatRoomDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "채팅방 나가기 성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "error": {
+                      "type": "string",
+                      "example": "에러 메시지"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "잘못된 요청입니다.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "message": {
+                          "type": "string",
+                          "example": "잘못된 요청입니다."
+                        },
+                        "code": {
+                          "type": "string",
+                          "example": "BAD_REQUEST"
+                        },
+                        "statusCode": {
+                          "type": "number",
+                          "example": 400
+                        }
+                      }
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/api/endpoint"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "인증이 필요합니다.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "message": {
+                          "type": "string",
+                          "example": "토큰이 제공되지 않았습니다."
+                        },
+                        "code": {
+                          "type": "string",
+                          "example": "UNAUTHORIZED"
+                        },
+                        "statusCode": {
+                          "type": "number",
+                          "example": 401
+                        }
+                      }
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/api/endpoint"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "접근 권한이 없습니다.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "message": {
+                          "type": "string",
+                          "example": "접근 권한이 없습니다."
+                        },
+                        "code": {
+                          "type": "string",
+                          "example": "FORBIDDEN"
+                        },
+                        "statusCode": {
+                          "type": "number",
+                          "example": 403
+                        }
+                      }
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/api/endpoint"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "서버 내부 오류가 발생했습니다.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "message": {
+                          "type": "string",
+                          "example": "알 수 없는 오류가 발생했습니다."
+                        },
+                        "code": {
+                          "type": "string",
+                          "example": "INTERNAL_SERVER_ERROR"
+                        },
+                        "statusCode": {
+                          "type": "number",
+                          "example": 500
+                        }
+                      }
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/api/endpoint"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
+        "summary": "채팅방 나가기",
         "tags": [
           "Chat"
         ]
@@ -12714,6 +13151,55 @@
           "Admin"
         ]
       }
+    },
+    "/api/admin/users/{userId}/match-candidates": {
+      "get": {
+        "operationId": "AdminController_getMatchCandidates",
+        "parameters": [
+          {
+            "name": "userId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "매칭 후보 조회 성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/MatchCandidateListDto"
+                    },
+                    "error": {
+                      "type": "string",
+                      "example": "에러 메시지"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
+        "summary": "특정 사용자의 매칭 후보 조회 (관리자용)",
+        "tags": [
+          "Admin"
+        ]
+      }
     }
   },
   "info": {
@@ -13616,6 +14102,57 @@
           "matchRequestId"
         ]
       },
+      "ChatPartnerDto": {
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "string",
+            "description": "파트너 유저 ID"
+          },
+          "nickname": {
+            "type": "string",
+            "description": "파트너 닉네임"
+          },
+          "profileImageUrl": {
+            "type": "string",
+            "description": "파트너 프로필 이미지 URL"
+          },
+          "matchScore": {
+            "type": "number",
+            "description": "매칭 점수 (0~100)"
+          }
+        },
+        "required": [
+          "userId",
+          "nickname"
+        ]
+      },
+      "ChatRoomDetailDto": {
+        "type": "object",
+        "properties": {
+          "roomId": {
+            "type": "string",
+            "description": "채팅방 ID"
+          },
+          "expiresAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "채팅방 만료 시각 (72시간)"
+          },
+          "partner": {
+            "description": "상대방 정보",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ChatPartnerDto"
+              }
+            ]
+          }
+        },
+        "required": [
+          "roomId",
+          "partner"
+        ]
+      },
       "MessageListDto": {
         "type": "object",
         "properties": {
@@ -13646,6 +14183,15 @@
         "required": [
           "content"
         ]
+      },
+      "LeaveChatRoomDto": {
+        "type": "object",
+        "properties": {
+          "reason": {
+            "type": "string",
+            "description": "나가기 사유"
+          }
+        }
       },
       "AnswerComparisonItemDto": {
         "type": "object",

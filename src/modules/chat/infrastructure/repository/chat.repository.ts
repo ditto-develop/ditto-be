@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@module/common/prisma/prisma.service';
-import { IChatRepository, ChatRoomWithMeta } from './chat.repository.interface';
+import { IChatRepository, ChatRoomWithMeta, ChatRoomDetail } from './chat.repository.interface';
 import { ChatRoom } from '@module/chat/domain/entities/chat-room.entity';
 import { ChatMessage } from '@module/chat/domain/entities/chat-message.entity';
 
@@ -11,7 +11,7 @@ export class ChatRepository implements IChatRepository {
     constructor(private readonly prisma: PrismaService) { }
 
     private toRoomDomain(row: any): ChatRoom {
-        return new ChatRoom(row.id, row.matchRequestId, row.createdAt, row.updatedAt);
+        return new ChatRoom(row.id, row.matchRequestId, row.createdAt, row.updatedAt, row.expiresAt ?? null);
     }
 
     private toMessageDomain(row: any): ChatMessage {
@@ -26,6 +26,7 @@ export class ChatRepository implements IChatRepository {
             data: {
                 id: room.id,
                 matchRequestId: room.matchRequestId,
+                expiresAt: room.expiresAt,
                 participants: {
                     create: participantUserIds.map((userId) => ({ userId })),
                 },
@@ -45,7 +46,6 @@ export class ChatRepository implements IChatRepository {
     }
 
     async findRoomByParticipants(userIdA: string, userIdB: string): Promise<ChatRoom | null> {
-        // 두 사용자가 모두 참여중인 방 찾기
         const row = await this.prisma.chatRoom.findFirst({
             where: {
                 AND: [
@@ -75,7 +75,6 @@ export class ChatRepository implements IChatRepository {
             orderBy: { room: { updatedAt: 'desc' } },
         });
 
-        // unreadCount를 한번에 계산
         const results: ChatRoomWithMeta[] = await Promise.all(
             participantRows.map(async (p) => {
                 const room = this.toRoomDomain(p.room);
@@ -100,11 +99,57 @@ export class ChatRepository implements IChatRepository {
         return results;
     }
 
+    async findRoomDetailById(roomId: string, currentUserId: string): Promise<ChatRoomDetail | null> {
+        const room = await this.prisma.chatRoom.findUnique({
+            where: { id: roomId },
+            include: {
+                participants: {
+                    include: {
+                        user: {
+                            select: {
+                                id: true,
+                                nickname: true,
+                                profile: {
+                                    select: { profileImageUrl: true },
+                                },
+                            },
+                        },
+                    },
+                },
+                matchRequest: {
+                    select: { score: true },
+                },
+            },
+        });
+
+        if (!room) return null;
+
+        const partnerParticipant = room.participants.find((p) => p.userId !== currentUserId);
+        if (!partnerParticipant) return null;
+
+        return {
+            roomId: room.id,
+            expiresAt: room.expiresAt,
+            partner: {
+                userId: partnerParticipant.user.id,
+                nickname: partnerParticipant.user.nickname,
+                profileImageUrl: partnerParticipant.user.profile?.profileImageUrl ?? null,
+                matchScore: room.matchRequest?.score ?? null,
+            },
+        };
+    }
+
     async isParticipant(roomId: string, userId: string): Promise<boolean> {
         const count = await this.prisma.chatParticipant.count({
             where: { roomId, userId },
         });
         return count > 0;
+    }
+
+    async removeParticipant(roomId: string, userId: string): Promise<void> {
+        await this.prisma.chatParticipant.delete({
+            where: { roomId_userId: { roomId, userId } },
+        });
     }
 
     async createMessage(message: ChatMessage): Promise<ChatMessage> {
@@ -130,7 +175,6 @@ export class ChatRepository implements IChatRepository {
         cursor?: string,
         limit: number = DEFAULT_PAGE_SIZE,
     ): Promise<{ messages: ChatMessage[]; nextCursor: string | null }> {
-        // cursor가 있으면 해당 메시지의 createdAt 기준으로 이전 메시지 조회
         let cursorDate: Date | undefined;
         if (cursor) {
             const cursorMessage = await this.prisma.chatMessage.findUnique({ where: { id: cursor } });

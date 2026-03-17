@@ -4,9 +4,12 @@ export class ChatRoom {
         public readonly matchRequestId: string | null,
         public readonly createdAt: Date,
         public readonly updatedAt: Date,
+        public readonly expiresAt: Date | null = null,
     ) { }
 
     static create(id: string, matchRequestId: string | null): ChatRoom {
-        return new ChatRoom(id, matchRequestId, new Date(), new Date());
+        const now = new Date();
+        const expiresAt = new Date(now.getTime() + 72 * 60 * 60 * 1000);
+        return new ChatRoom(id, matchRequestId, now, now, expiresAt);
     }
 }

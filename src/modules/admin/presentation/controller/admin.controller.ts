@@ -5,6 +5,7 @@ import {
   Get,
   HttpCode,
   HttpStatus,
+  Param,
   Query,
   Post,
   UseGuards,
@@ -32,6 +33,8 @@ import { ClearSystemOverrideCommand } from '../commands/clear-system-override.co
 import { ResetAllQuizProgressCommand } from '../commands/reset-all-quiz-progress.command';
 import { GetAdminQuizProgressCommand } from '../commands/get-admin-quiz-progress.command';
 import { SeedDummyDataCommand } from '../commands/seed-dummy-data.command';
+import { GetAdminMatchCandidatesCommand } from '../commands/get-admin-match-candidates.command';
+import { MatchCandidateListDto } from '@module/matching/application/dto/match-candidate.dto';
 
 @ApiTags('Admin')
 @Controller('admin')
@@ -96,5 +99,14 @@ export class AdminController {
   @ApiCommandResponse(200, '더미 데이터 생성 성공', AdminSeedDummyResultDto)
   async seedDummyData(): Promise<ICommandResult<AdminSeedDummyResultDto>> {
     return this.commandBus.execute<AdminSeedDummyResultDto>(new SeedDummyDataCommand());
+  }
+
+  @Get('users/:userId/match-candidates')
+  @ApiOperation({ summary: '특정 사용자의 매칭 후보 조회 (관리자용)' })
+  @ApiCommandResponse(200, '매칭 후보 조회 성공', MatchCandidateListDto)
+  async getMatchCandidates(
+    @Param('userId') userId: string,
+  ): Promise<ICommandResult<MatchCandidateListDto>> {
+    return this.commandBus.execute<MatchCandidateListDto>(new GetAdminMatchCandidatesCommand(userId));
   }
 }

@@ -8,13 +8,15 @@ import { JwtAuthGuard } from '@module/user/infrastructure/guards/jwt-auth.guard'
 import { CurrentUser } from '@module/user/infrastructure/decorators/current-user.decorator';
 import { User } from '@module/user/domain/entities/user.entity';
 
-import { ChatRoomItemDto, CreateChatRoomDto } from '@module/chat/application/dto/chat-room.dto';
+import { ChatRoomItemDto, CreateChatRoomDto, ChatRoomDetailDto, LeaveChatRoomDto } from '@module/chat/application/dto/chat-room.dto';
 import { ChatMessageDto, MessageListDto, SendMessageDto } from '@module/chat/application/dto/chat-message.dto';
 import { GetChatRoomsCommand } from '@module/chat/presentation/commands/get-chat-rooms.command';
 import { CreateChatRoomCommand } from '@module/chat/presentation/commands/create-chat-room.command';
 import { GetMessagesCommand } from '@module/chat/presentation/commands/get-messages.command';
 import { SendMessageCommand } from '@module/chat/presentation/commands/send-message.command';
 import { MarkAsReadCommand } from '@module/chat/presentation/commands/mark-as-read.command';
+import { GetChatRoomDetailCommand } from '@module/chat/presentation/commands/get-chat-room-detail.command';
+import { LeaveChatRoomCommand } from '@module/chat/presentation/commands/leave-chat-room.command';
 
 @ApiTags('Chat')
 @Controller('chat')
@@ -49,6 +51,21 @@ export class ChatController {
     ): Promise<ICommandResult<ChatRoomItemDto>> {
         const command = new CreateChatRoomCommand(user.id, dto);
         return await this.commandBus.execute<ChatRoomItemDto>(command);
+    }
+
+    @Get('rooms/:roomId')
+    @ApiOperation({
+        summary: '채팅방 상세 조회',
+        description: '채팅방 상세 정보 (파트너 프로필, 만료 시각 등)를 조회합니다. 참여자만 조회 가능합니다.',
+    })
+    @ApiParam({ name: 'roomId', description: '채팅방 ID' })
+    @ApiCommandResponse(200, '채팅방 상세 조회 성공', ChatRoomDetailDto)
+    async getChatRoomDetail(
+        @CurrentUser() user: User,
+        @Param('roomId') roomId: string,
+    ): Promise<ICommandResult<ChatRoomDetailDto>> {
+        const command = new GetChatRoomDetailCommand(user.id, roomId);
+        return await this.commandBus.execute<ChatRoomDetailDto>(command);
     }
 
     @Get('rooms/:roomId/messages')
@@ -100,6 +117,22 @@ export class ChatController {
         @Param('roomId') roomId: string,
     ): Promise<ICommandResult<void>> {
         const command = new MarkAsReadCommand(user.id, roomId);
+        return await this.commandBus.execute<void>(command);
+    }
+
+    @Post('rooms/:roomId/leave')
+    @ApiOperation({
+        summary: '채팅방 나가기',
+        description: '채팅방을 나갑니다. 나간 후에는 재입장할 수 없습니다.',
+    })
+    @ApiParam({ name: 'roomId', description: '채팅방 ID' })
+    @ApiCommandResponse(200, '채팅방 나가기 성공')
+    async leaveChatRoom(
+        @CurrentUser() user: User,
+        @Param('roomId') roomId: string,
+        @Body() dto: LeaveChatRoomDto,
+    ): Promise<ICommandResult<void>> {
+        const command = new LeaveChatRoomCommand(user.id, roomId, dto.reason);
         return await this.commandBus.execute<void>(command);
     }
 }

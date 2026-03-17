@@ -72,7 +72,7 @@ const MatchRequestRepositoryProvider = {
         JoinGroupHandler,
         DeclineGroupHandler,
     ],
-    exports: [MATCH_REQUEST_REPOSITORY_TOKEN, MatchingScoreService],
+    exports: [MATCH_REQUEST_REPOSITORY_TOKEN, MatchingScoreService, GetMatchCandidatesUseCase],
 })
 export class MatchingModule implements OnModuleInit {
     constructor(

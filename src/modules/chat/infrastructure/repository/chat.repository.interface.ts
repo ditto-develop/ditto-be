@@ -8,6 +8,17 @@ export interface ChatRoomWithMeta {
     unreadCount: number;
 }
 
+export interface ChatRoomDetail {
+    roomId: string;
+    expiresAt: Date | null;
+    partner: {
+        userId: string;
+        nickname: string;
+        profileImageUrl: string | null;
+        matchScore: number | null;
+    };
+}
+
 export interface IChatRepository {
     // Room
     createRoom(room: ChatRoom, participantUserIds: string[]): Promise<ChatRoom>;
@@ -15,7 +26,9 @@ export interface IChatRepository {
     findRoomByMatchRequestId(matchRequestId: string): Promise<ChatRoom | null>;
     findRoomByParticipants(userIdA: string, userIdB: string): Promise<ChatRoom | null>;
     findRoomsByUserId(userId: string): Promise<ChatRoomWithMeta[]>;
+    findRoomDetailById(roomId: string, currentUserId: string): Promise<ChatRoomDetail | null>;
     isParticipant(roomId: string, userId: string): Promise<boolean>;
+    removeParticipant(roomId: string, userId: string): Promise<void>;
 
     // Message
     createMessage(message: ChatMessage): Promise<ChatMessage>;

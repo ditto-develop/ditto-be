@@ -155,9 +155,12 @@ function buildIntroAnswers(index: number): string[] {
   return INTRO_ANSWERS_POOL.map((pool) => pool[index % pool.length]);
 }
 
-function profileImageUrl(nickname: string): string {
-  // DiceBear Avataaars: 닉네임 기반 일관된 아바타
-  return `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(nickname)}&backgroundColor=b6e3f4,c0aede,d1d4f9,ffd5dc,ffdfbf`;
+const FEMALE_AVATARS = ['f1', 'f2', 'f3', 'f4', 'f5', 'f6', 'f7', 'f8'];
+const MALE_AVATARS   = ['m1', 'm2', 'm3', 'm4', 'm5', 'm6', 'm7', 'm8'];
+
+function profileImageUrl(gender: string): string {
+  const pool = gender === 'FEMALE' ? FEMALE_AVATARS : MALE_AVATARS;
+  return `/assets/avatar/${pool[Math.floor(Math.random() * pool.length)]}.svg`;
 }
 
 function buildIntroduction(userData: { name: string; nickname: string; age: number; gender: string }): string {
@@ -295,7 +298,7 @@ export class SeedDummyDataUseCase {
           profile: {
             create: {
               introduction: buildIntroduction(u),
-              profileImageUrl: profileImageUrl(u.nickname),
+              profileImageUrl: profileImageUrl(u.gender),
               location: pickRandom(LOCATIONS),
               occupation: pickRandom(OCCUPATIONS),
               interests: pickRandomN(INTEREST_POOL, Math.floor(Math.random() * 3) + 2),
@@ -318,12 +321,12 @@ export class SeedDummyDataUseCase {
         where: { userId: user.id },
         update: {
           introduction: buildIntroduction(u),
-          profileImageUrl: profileImageUrl(u.nickname),
+          profileImageUrl: profileImageUrl(u.gender),
         },
         create: {
           userId: user.id,
           introduction: buildIntroduction(u),
-          profileImageUrl: profileImageUrl(u.nickname),
+          profileImageUrl: profileImageUrl(u.gender),
           location: pickRandom(LOCATIONS),
           occupation: pickRandom(OCCUPATIONS),
           interests: pickRandomN(INTEREST_POOL, 3),

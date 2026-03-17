@@ -5,6 +5,7 @@ import { registerCommandHandlers } from '@common/command/command-handler-registr
 import { CommonModule } from '@module/common/common.module';
 import { QuizModule } from '@module/quiz/quiz.module';
 import { UserModule } from '@module/user/user.module';
+import { MatchingModule } from '@module/matching/matching.module';
 import { GetDbStatsUseCase } from './application/usecases/get-db-stats.usecase';
 import { GetAllMatchesUseCase } from './application/usecases/get-all-matches.usecase';
 import { SetSystemOverrideUseCase } from './application/usecases/set-system-override.usecase';
@@ -19,10 +20,11 @@ import { ClearSystemOverrideHandler } from './presentation/commands/handlers/cle
 import { ResetAllQuizProgressHandler } from './presentation/commands/handlers/reset-all-quiz-progress.handler';
 import { GetAdminQuizProgressHandler } from './presentation/commands/handlers/get-admin-quiz-progress.handler';
 import { SeedDummyDataHandler } from './presentation/commands/handlers/seed-dummy-data.handler';
+import { GetAdminMatchCandidatesHandler } from './presentation/commands/handlers/get-admin-match-candidates.handler';
 import { AdminController } from './presentation/controller/admin.controller';
 
 @Module({
-  imports: [CommandBusModule, CommonModule, QuizModule, UserModule],
+  imports: [CommandBusModule, CommonModule, QuizModule, UserModule, MatchingModule],
   controllers: [AdminController],
   providers: [
     GetDbStatsUseCase,
@@ -39,6 +41,7 @@ import { AdminController } from './presentation/controller/admin.controller';
     ResetAllQuizProgressHandler,
     GetAdminQuizProgressHandler,
     SeedDummyDataHandler,
+    GetAdminMatchCandidatesHandler,
   ],
 })
 export class AdminModule implements OnModuleInit {
@@ -51,6 +54,7 @@ export class AdminModule implements OnModuleInit {
     private readonly resetAllQuizProgressHandler: ResetAllQuizProgressHandler,
     private readonly getAdminQuizProgressHandler: GetAdminQuizProgressHandler,
     private readonly seedDummyDataHandler: SeedDummyDataHandler,
+    private readonly getAdminMatchCandidatesHandler: GetAdminMatchCandidatesHandler,
   ) {}
 
   onModuleInit(): void {
@@ -64,6 +68,7 @@ export class AdminModule implements OnModuleInit {
         { handler: this.resetAllQuizProgressHandler, class: ResetAllQuizProgressHandler },
         { handler: this.getAdminQuizProgressHandler, class: GetAdminQuizProgressHandler },
         { handler: this.seedDummyDataHandler, class: SeedDummyDataHandler },
+        { handler: this.getAdminMatchCandidatesHandler, class: GetAdminMatchCandidatesHandler },
       ],
       'AdminModule',
     );

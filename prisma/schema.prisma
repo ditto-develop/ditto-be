@@ -200,6 +200,7 @@ model ChatRoom {
   id             String            @id @default(cuid())
   matchRequestId String?           @unique
   quizSetId      String?           @unique   // 그룹 채팅방 식별자 (GROUP 타입 전용)
+  expiresAt      DateTime?                   // 채팅방 만료 시각 (생성 시 +72h)
   createdAt      DateTime          @default(now())
   updatedAt      DateTime          @updatedAt
   messages       ChatMessage[]

@@ -18,6 +18,8 @@ import { CreateChatRoomUseCase } from '@module/chat/application/usecases/create-
 import { GetMessagesUseCase } from '@module/chat/application/usecases/get-messages.usecase';
 import { SendMessageUseCase } from '@module/chat/application/usecases/send-message.usecase';
 import { MarkAsReadUseCase } from '@module/chat/application/usecases/mark-as-read.usecase';
+import { GetChatRoomDetailUseCase } from '@module/chat/application/usecases/get-chat-room-detail.usecase';
+import { LeaveChatRoomUseCase } from '@module/chat/application/usecases/leave-chat-room.usecase';
 
 // Handlers
 import { GetChatRoomsHandler } from '@module/chat/presentation/commands/handlers/get-chat-rooms.handler';
@@ -25,6 +27,8 @@ import { CreateChatRoomHandler } from '@module/chat/presentation/commands/handle
 import { GetMessagesHandler } from '@module/chat/presentation/commands/handlers/get-messages.handler';
 import { SendMessageHandler } from '@module/chat/presentation/commands/handlers/send-message.handler';
 import { MarkAsReadHandler } from '@module/chat/presentation/commands/handlers/mark-as-read.handler';
+import { GetChatRoomDetailHandler } from '@module/chat/presentation/commands/handlers/get-chat-room-detail.handler';
+import { LeaveChatRoomHandler } from '@module/chat/presentation/commands/handlers/leave-chat-room.handler';
 
 const ChatRepositoryProvider = {
     provide: CHAT_REPOSITORY_TOKEN,
@@ -48,6 +52,8 @@ const ChatRepositoryProvider = {
         GetMessagesUseCase,
         SendMessageUseCase,
         MarkAsReadUseCase,
+        GetChatRoomDetailUseCase,
+        LeaveChatRoomUseCase,
 
         // Handlers
         GetChatRoomsHandler,
@@ -55,6 +61,8 @@ const ChatRepositoryProvider = {
         GetMessagesHandler,
         SendMessageHandler,
         MarkAsReadHandler,
+        GetChatRoomDetailHandler,
+        LeaveChatRoomHandler,
     ],
     exports: [CHAT_REPOSITORY_TOKEN],
 })
@@ -66,6 +74,8 @@ export class ChatModule implements OnModuleInit {
         private readonly getMessagesHandler: GetMessagesHandler,
         private readonly sendMessageHandler: SendMessageHandler,
         private readonly markAsReadHandler: MarkAsReadHandler,
+        private readonly getChatRoomDetailHandler: GetChatRoomDetailHandler,
+        private readonly leaveChatRoomHandler: LeaveChatRoomHandler,
     ) {
         console.log('[ChatModule] 초기화');
     }
@@ -79,6 +89,8 @@ export class ChatModule implements OnModuleInit {
                 { handler: this.getMessagesHandler, class: GetMessagesHandler },
                 { handler: this.sendMessageHandler, class: SendMessageHandler },
                 { handler: this.markAsReadHandler, class: MarkAsReadHandler },
+                { handler: this.getChatRoomDetailHandler, class: GetChatRoomDetailHandler },
+                { handler: this.leaveChatRoomHandler, class: LeaveChatRoomHandler },
             ],
             'ChatModule',
         );
