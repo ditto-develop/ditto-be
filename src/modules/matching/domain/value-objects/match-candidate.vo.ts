@@ -22,8 +22,12 @@ export interface UserAnswerMap {
 
 /** 알고리즘 설정 상수 */
 export const MATCHING_CONSTANTS = {
-    /** 최대 후보 반환 수 */
+    /** 최대 후보 반환 수 (1:1) */
     MAX_CANDIDATES: 5,
+    /** 최대 후보 반환 수 (그룹) */
+    MAX_GROUP_CANDIDATES: 6,
+    /** 그룹 채팅 최소 참여 인원 */
+    MIN_GROUP_PARTICIPANTS: 3,
     /** 현재 알고리즘 버전 */
     ALGORITHM_VERSION: 'v1',
 } as const;

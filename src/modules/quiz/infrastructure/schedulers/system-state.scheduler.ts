@@ -33,6 +33,12 @@ export class SystemStateScheduler implements OnModuleInit {
    * 현재 날짜에 맞춰 시스템 상태와 주차를 업데이트합니다.
    */
   private async updateSystemState() {
+    const isOverride = await this.systemStateService.isOverrideActive();
+    if (isOverride) {
+      this.logger.log('시간 오버라이드 활성 중 - 자동 업데이트 스킵', SystemStateScheduler.name);
+      return;
+    }
+
     const now = new Date();
 
     // 1. 년, 월, 주차 업데이트

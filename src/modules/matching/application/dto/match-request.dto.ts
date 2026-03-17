@@ -48,4 +48,6 @@ export class MatchingStatusDto {
     @ApiPropertyOptional({ description: '매칭 확정된 상대방 userId' }) acceptedMatchUserId?: string;
     @ApiProperty({ description: '보낸 요청', type: [MatchRequestDto] }) sentRequests: MatchRequestDto[];
     @ApiProperty({ description: '받은 요청', type: [MatchRequestDto] }) receivedRequests: MatchRequestDto[];
+    @ApiProperty({ description: '그룹 매칭 거절 여부' }) groupDeclined: boolean;
+    @ApiProperty({ description: '그룹 매칭 참여 여부' }) groupJoined: boolean;
 }

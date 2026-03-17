@@ -142,9 +142,10 @@ export class GetMatchCandidatesUseCase {
             });
         }
 
-        // 6. 점수 내림차순 정렬 + 상위 N명
+        // 6. 점수 내림차순 정렬 + 상위 N명 (그룹은 최대 6명, 1:1은 최대 5명)
         candidates.sort((a, b) => b.score - a.score);
-        const topCandidates = candidates.slice(0, MATCHING_CONSTANTS.MAX_CANDIDATES);
+        const maxCount = matchingType === 'GROUP' ? MATCHING_CONSTANTS.MAX_GROUP_CANDIDATES : MATCHING_CONSTANTS.MAX_CANDIDATES;
+        const topCandidates = candidates.slice(0, maxCount);
 
         this.logger.log(`매칭 후보 ${topCandidates.length}명 반환`, 'GetMatchCandidatesUseCase', { userId, quizSetId });
 

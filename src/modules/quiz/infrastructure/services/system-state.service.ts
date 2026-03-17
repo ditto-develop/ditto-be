@@ -8,6 +8,7 @@ export class SystemStateService {
   private readonly CURRENT_YEAR_KEY = 'system:current_year';
   private readonly CURRENT_MONTH_KEY = 'system:current_month';
   private readonly CURRENT_WEEK_KEY = 'system:current_week';
+  private readonly OVERRIDE_ACTIVE_KEY = 'system:override_active';
 
   constructor(private readonly redisService: RedisService) {}
 
@@ -69,5 +70,20 @@ export class SystemStateService {
    */
   async setCurrentWeek(week: number): Promise<void> {
     await this.redisService.set(this.CURRENT_WEEK_KEY, week.toString());
+  }
+
+  /**
+   * 시간 오버라이드 활성 여부를 조회합니다.
+   */
+  async isOverrideActive(): Promise<boolean> {
+    const value = await this.redisService.get(this.OVERRIDE_ACTIVE_KEY);
+    return value === 'true';
+  }
+
+  /**
+   * 시간 오버라이드 활성 여부를 설정합니다.
+   */
+  async setOverrideActive(active: boolean): Promise<void> {
+    await this.redisService.set(this.OVERRIDE_ACTIVE_KEY, active ? 'true' : 'false');
   }
 }

@@ -7,6 +7,7 @@ import { RedisModule } from '@module/common/redis/redis.module';
 import { QuizModule } from '@module/quiz/quiz.module';
 import { RoleModule } from '@module/role/role.module';
 import { SystemModule } from '@module/system/system.module';
+import { AdminModule } from '@module/admin/admin.module';
 import { UserModule } from '@module/user/user.module';
 import { ProfileModule } from '@module/profile/profile.module';
 import { MatchingModule } from '@module/matching/matching.module';
@@ -42,6 +43,7 @@ import { AppController } from './app.controller';
     ChatModule,
     QuizModule,
     SystemModule,
+    AdminModule,
   ],
   controllers: [AppController],
 })

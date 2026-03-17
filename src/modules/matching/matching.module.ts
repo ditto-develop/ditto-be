@@ -22,6 +22,8 @@ import { SendMatchRequestUseCase } from '@module/matching/application/usecases/s
 import { AcceptMatchRequestUseCase } from '@module/matching/application/usecases/accept-match-request.usecase';
 import { RejectMatchRequestUseCase } from '@module/matching/application/usecases/reject-match-request.usecase';
 import { GetMatchingStatusUseCase } from '@module/matching/application/usecases/get-matching-status.usecase';
+import { JoinGroupUseCase } from '@module/matching/application/usecases/join-group.usecase';
+import { DeclineGroupUseCase } from '@module/matching/application/usecases/decline-group.usecase';
 
 // Handlers
 import { GetMatchCandidatesHandler } from '@module/matching/presentation/commands/handlers/get-match-candidates.handler';
@@ -29,6 +31,8 @@ import { SendMatchRequestHandler } from '@module/matching/presentation/commands/
 import { AcceptMatchRequestHandler } from '@module/matching/presentation/commands/handlers/accept-match-request.handler';
 import { RejectMatchRequestHandler } from '@module/matching/presentation/commands/handlers/reject-match-request.handler';
 import { GetMatchingStatusHandler } from '@module/matching/presentation/commands/handlers/get-matching-status.handler';
+import { JoinGroupHandler } from '@module/matching/presentation/commands/handlers/join-group.handler';
+import { DeclineGroupHandler } from '@module/matching/presentation/commands/handlers/decline-group.handler';
 
 const MatchRequestRepositoryProvider = {
     provide: MATCH_REQUEST_REPOSITORY_TOKEN,
@@ -56,6 +60,8 @@ const MatchRequestRepositoryProvider = {
         AcceptMatchRequestUseCase,
         RejectMatchRequestUseCase,
         GetMatchingStatusUseCase,
+        JoinGroupUseCase,
+        DeclineGroupUseCase,
 
         // Handlers
         GetMatchCandidatesHandler,
@@ -63,6 +69,8 @@ const MatchRequestRepositoryProvider = {
         AcceptMatchRequestHandler,
         RejectMatchRequestHandler,
         GetMatchingStatusHandler,
+        JoinGroupHandler,
+        DeclineGroupHandler,
     ],
     exports: [MATCH_REQUEST_REPOSITORY_TOKEN, MatchingScoreService],
 })
@@ -74,6 +82,8 @@ export class MatchingModule implements OnModuleInit {
         private readonly acceptMatchRequestHandler: AcceptMatchRequestHandler,
         private readonly rejectMatchRequestHandler: RejectMatchRequestHandler,
         private readonly getMatchingStatusHandler: GetMatchingStatusHandler,
+        private readonly joinGroupHandler: JoinGroupHandler,
+        private readonly declineGroupHandler: DeclineGroupHandler,
     ) {
         console.log('[MatchingModule] 초기화');
     }
@@ -87,6 +97,8 @@ export class MatchingModule implements OnModuleInit {
                 { handler: this.acceptMatchRequestHandler, class: AcceptMatchRequestHandler },
                 { handler: this.rejectMatchRequestHandler, class: RejectMatchRequestHandler },
                 { handler: this.getMatchingStatusHandler, class: GetMatchingStatusHandler },
+                { handler: this.joinGroupHandler, class: JoinGroupHandler },
+                { handler: this.declineGroupHandler, class: DeclineGroupHandler },
             ],
             'MatchingModule',
         );

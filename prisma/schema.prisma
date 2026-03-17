@@ -79,6 +79,7 @@ model QuizSet {
   matchRequests  MatchRequest[]
   quizzes        Quiz[]
   quizProgresses UserQuizProgress[]
+  groupChatRoom  ChatRoom?
 
   @@unique([year, month, week, category])
   @@map("quiz_sets")
@@ -129,11 +130,12 @@ model UserQuizProgress {
   month       Int                @default(12)
   week        Int
   quizSetId   String
-  status      QuizProgressStatus @default(NOT_STARTED)
-  selectedAt  DateTime           @default(now())
-  completedAt DateTime?
-  createdAt   DateTime           @default(now())
-  updatedAt   DateTime           @updatedAt
+  status         QuizProgressStatus @default(NOT_STARTED)
+  groupDeclined  Boolean            @default(false)
+  selectedAt     DateTime           @default(now())
+  completedAt    DateTime?
+  createdAt      DateTime           @default(now())
+  updatedAt      DateTime           @updatedAt
   quizSet     QuizSet            @relation(fields: [quizSetId], references: [id], onDelete: Cascade)
   user        User               @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -197,11 +199,13 @@ model MatchRequest {
 model ChatRoom {
   id             String            @id @default(cuid())
   matchRequestId String?           @unique
+  quizSetId      String?           @unique   // 그룹 채팅방 식별자 (GROUP 타입 전용)
   createdAt      DateTime          @default(now())
   updatedAt      DateTime          @updatedAt
   messages       ChatMessage[]
   participants   ChatParticipant[]
   matchRequest   MatchRequest?     @relation(fields: [matchRequestId], references: [id])
+  quizSet        QuizSet?          @relation(fields: [quizSetId], references: [id])
 
   @@map("chat_rooms")
 }

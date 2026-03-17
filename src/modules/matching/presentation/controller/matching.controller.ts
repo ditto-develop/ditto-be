@@ -15,6 +15,9 @@ import { SendMatchRequestCommand } from '@module/matching/presentation/commands/
 import { AcceptMatchRequestCommand } from '@module/matching/presentation/commands/accept-match-request.command';
 import { RejectMatchRequestCommand } from '@module/matching/presentation/commands/reject-match-request.command';
 import { GetMatchingStatusCommand } from '@module/matching/presentation/commands/get-matching-status.command';
+import { JoinGroupCommand } from '@module/matching/presentation/commands/join-group.command';
+import { GroupJoinResultDto } from '@module/matching/application/usecases/join-group.usecase';
+import { DeclineGroupCommand } from '@module/matching/presentation/commands/decline-group.command';
 
 @ApiTags('Matching')
 @Controller()
@@ -82,5 +85,21 @@ export class MatchingController {
     ): Promise<ICommandResult<MatchingStatusDto>> {
         const command = new GetMatchingStatusCommand(user.id, quizSetId);
         return await this.commandBus.execute<MatchingStatusDto>(command);
+    }
+
+    @Post('matches/group/join')
+    @ApiOperation({ summary: '그룹 매칭 참여', description: '현재 완료된 GROUP 퀴즈셋의 그룹 채팅방에 참여 신청' })
+    @ApiCommandResponse(201, '그룹 참여 성공', GroupJoinResultDto)
+    async joinGroup(@CurrentUser() user: User): Promise<ICommandResult<GroupJoinResultDto>> {
+        const command = new JoinGroupCommand(user.id);
+        return await this.commandBus.execute<GroupJoinResultDto>(command);
+    }
+
+    @Post('matches/group/decline')
+    @ApiOperation({ summary: '그룹 매칭 거절', description: '이번 주 그룹 매칭 참여를 거절 (이번 주 내 복구 불가)' })
+    @ApiCommandResponse(200, '그룹 거절 성공')
+    async declineGroup(@CurrentUser() user: User): Promise<ICommandResult<void>> {
+        const command = new DeclineGroupCommand(user.id);
+        return await this.commandBus.execute<void>(command);
     }
 }
