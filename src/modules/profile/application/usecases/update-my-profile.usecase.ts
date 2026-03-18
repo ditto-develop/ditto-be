@@ -46,6 +46,10 @@ export class UpdateMyProfileUseCase {
         // upsert (프로필 없으면 생성, 있으면 수정)
         const profile = await this.profileRepo.upsert(userId, {
             introduction: dto.introduction,
+            profileImageUrl: dto.profileImageUrl,
+            location: dto.location,
+            occupation: dto.occupation,
+            interests: dto.interests,
             preferredMinAge: dto.preferredMinAge,
             preferredMaxAge: dto.preferredMaxAge,
         } as Partial<UserProfile>);

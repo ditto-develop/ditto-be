@@ -52,6 +52,8 @@ export class UserProfileRepository implements IUserProfileRepository {
             row.preferredMaxAge,
             row.createdAt,
             row.updatedAt,
+            row.occupation ?? null,
+            row.interests ?? [],
         );
     }
 
@@ -62,6 +64,8 @@ export class UserProfileRepository implements IUserProfileRepository {
                 introduction: data.introduction,
                 profileImageUrl: data.profileImageUrl,
                 location: data.location,
+                occupation: data.occupation,
+                interests: data.interests,
                 preferredMinAge: data.preferredMinAge,
                 preferredMaxAge: data.preferredMaxAge,
             },
@@ -77,6 +81,8 @@ export class UserProfileRepository implements IUserProfileRepository {
             row.preferredMaxAge,
             row.createdAt,
             row.updatedAt,
+            row.occupation ?? null,
+            row.interests ?? [],
         );
     }
 
@@ -88,6 +94,8 @@ export class UserProfileRepository implements IUserProfileRepository {
                 introduction: data.introduction ?? null,
                 profileImageUrl: data.profileImageUrl ?? null,
                 location: data.location ?? null,
+                occupation: data.occupation ?? null,
+                interests: data.interests ?? [],
                 preferredMinAge: data.preferredMinAge ?? null,
                 preferredMaxAge: data.preferredMaxAge ?? null,
             },
@@ -95,6 +103,8 @@ export class UserProfileRepository implements IUserProfileRepository {
                 introduction: data.introduction,
                 profileImageUrl: data.profileImageUrl,
                 location: data.location,
+                occupation: data.occupation,
+                interests: data.interests,
                 preferredMinAge: data.preferredMinAge,
                 preferredMaxAge: data.preferredMaxAge,
             },
@@ -110,6 +120,8 @@ export class UserProfileRepository implements IUserProfileRepository {
             row.preferredMaxAge,
             row.createdAt,
             row.updatedAt,
+            row.occupation ?? null,
+            row.interests ?? [],
         );
     }
 }
