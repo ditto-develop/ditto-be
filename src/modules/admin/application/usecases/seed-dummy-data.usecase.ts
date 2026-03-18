@@ -146,6 +146,17 @@ function pickRandom<T>(arr: T[]): T {
   return arr[Math.floor(Math.random() * arr.length)];
 }
 
+/**
+ * 나이 기반 선호 나이 범위 계산
+ * 실제 앱과 동일하게 나이대(bracket)로 처리: age ± 10살, 최소 20세
+ */
+function preferredAgeRange(age: number): { preferredMinAge: number; preferredMaxAge: number } {
+  return {
+    preferredMinAge: Math.max(20, age - 10),
+    preferredMaxAge: age + 10,
+  };
+}
+
 function pickRandomN<T>(arr: T[], n: number): T[] {
   return [...arr].sort(() => 0.5 - Math.random()).slice(0, n);
 }
@@ -302,8 +313,7 @@ export class SeedDummyDataUseCase {
               location: pickRandom(LOCATIONS),
               occupation: pickRandom(OCCUPATIONS),
               interests: pickRandomN(INTEREST_POOL, Math.floor(Math.random() * 3) + 2),
-              preferredMinAge: 22,
-              preferredMaxAge: 36,
+              ...preferredAgeRange(u.age),
             },
           },
         },
@@ -330,8 +340,7 @@ export class SeedDummyDataUseCase {
           location: pickRandom(LOCATIONS),
           occupation: pickRandom(OCCUPATIONS),
           interests: pickRandomN(INTEREST_POOL, 3),
-          preferredMinAge: 22,
-          preferredMaxAge: 36,
+          ...preferredAgeRange(u.age),
         },
       });
       await this.prisma.userIntroNote.upsert({
