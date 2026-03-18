@@ -126,7 +126,7 @@ const GROUP_USERS = [
 
 const LOCATIONS = ['서울', '경기', '인천', '부산', '대구', '대전', '광주', '울산', '수원', '성남'];
 const OCCUPATIONS = ['개발자', '디자이너', '마케터', '의사', '교사', '회계사', '금융', '학생', '프리랜서', '영업', '간호사', '공무원', '연구원', '작가'];
-const INTEREST_POOL = ['운동', '독서', '여행', '요리', '음악', '영화', '게임', '사진', '등산', '카페', '전시', '반려동물', '유튜브', '맛집탐방', '드라이브'];
+const INTEREST_POOL = ['workout', 'movie-drama', 'performance', 'photography', 'reading', 'music', 'cooking', 'travel', 'gaming', 'finance', 'self-improvement', 'pets'];
 
 // 10개 소개 노트 질문에 대한 답변 풀 (각 10개)
 const INTRO_ANSWERS_POOL: string[][] = [
@@ -279,7 +279,7 @@ const MALE_AVATARS   = ['m1', 'm2', 'm3', 'm4', 'm5', 'm6', 'm7', 'm8'];
 
 function profileImageUrl(gender: string): string {
   const pool = gender === 'FEMALE' ? FEMALE_AVATARS : MALE_AVATARS;
-  return `/assets/avatar/${pool[Math.floor(Math.random() * pool.length)]}.svg`;
+  return `/assets/avatar/${pool[Math.floor(Math.random() * pool.length)]}.png`;
 }
 
 function buildIntroduction(userData: { name: string; nickname: string; age: number; gender: string }): string {
