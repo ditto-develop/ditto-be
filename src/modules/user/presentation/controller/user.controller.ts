@@ -205,7 +205,6 @@ export class UserController {
   @ApiUnauthorizedResponse('인증 실패')
   async login(
     @Body() dto: LoginDto,
-    @Res({ passthrough: true }) res: Response,
   ): Promise<ICommandResult<LoginResponseDto>> {
     console.log('[UserController] 관리자 로그인 요청');
     const command = new LoginCommand(dto);
