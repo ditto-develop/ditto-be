@@ -1,6 +1,8 @@
 import { Global, Module } from '@nestjs/common';
 import { JwtModule, JwtModuleOptions } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import { KakaoController } from './kakao.controller';
+import { KakaoService } from './kakao.service';
 
 @Global()
 @Module({
@@ -18,6 +20,8 @@ import { ConfigService } from '@nestjs/config';
       inject: [ConfigService],
     }),
   ],
+  controllers: [KakaoController],
+  providers: [KakaoService],
   exports: [JwtModule],
 })
 export class AuthModule {}

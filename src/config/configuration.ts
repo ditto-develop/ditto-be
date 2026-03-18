@@ -43,4 +43,7 @@ export default () => ({
       service: process.env.LOKI_LABELS_SERVICE || 'api',
     },
   },
+  kakao: {
+    restApiKey: process.env.KAKAO_REST_API_KEY || '',
+  },
 });
