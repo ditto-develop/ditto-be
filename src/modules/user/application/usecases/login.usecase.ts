@@ -71,6 +71,44 @@ export class LoginUseCase {
   }
 
   /**
+   * 로컬 테스트 로그인 처리 (개발 환경 전용)
+   * - 관리자 권한 불필요, username + password 로 일반 유저도 로그인 가능
+   */
+  async executeLocalLogin(dto: LoginDto): Promise<LoginResponseDto> {
+    this.logger.log('로컬 테스트 로그인 시도', 'LoginUseCase', { username: dto.username });
+
+    const user = await this.userRepository.findByUsername(dto.username);
+    if (!user) {
+      this.logger.warn('로컬 로그인 실패: 사용자를 찾을 수 없음', 'LoginUseCase', { username: dto.username });
+      throw new EntityNotFoundException('사용자', dto.username);
+    }
+
+    if (!user.isActive()) {
+      throw new BusinessRuleException('탈퇴한 사용자입니다.', 'USER_DEACTIVATED');
+    }
+
+    if (!user.passwordHash) {
+      throw new BusinessRuleException('비밀번호가 설정되지 않았습니다.', 'PASSWORD_NOT_SET');
+    }
+
+    const isPasswordValid = await this.authService.comparePassword(dto.password, user.passwordHash);
+    if (!isPasswordValid) {
+      throw new BusinessRuleException('비밀번호가 일치하지 않습니다.', 'INVALID_PASSWORD');
+    }
+
+    const accessToken = await this.authService.generateAccessToken(user);
+    const refreshToken = await this.refreshTokenService.generateRefreshToken(user.id);
+
+    this.logger.log('로컬 테스트 로그인 성공', 'LoginUseCase', { userId: user.id, username: dto.username });
+
+    return {
+      accessToken,
+      refreshToken,
+      user: UserDto.fromDomain(user),
+    };
+  }
+
+  /**
    * 소셜 로그인 처리
    */
   async executeSocialLogin(dto: SocialLoginDto): Promise<LoginResponseDto> {

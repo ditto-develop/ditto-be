@@ -29,5 +29,7 @@ export const MATCHING_CONSTANTS = {
     /** 그룹 채팅 최소 참여 인원 */
     MIN_GROUP_PARTICIPANTS: 3,
     /** 현재 알고리즘 버전 */
-    ALGORITHM_VERSION: 'v1',
+    ALGORITHM_VERSION: 'v2',
+    /** 전체 조합 중 선발 비율 (상위 20%) */
+    TOP_PAIR_RATIO: 0.2,
 } as const;

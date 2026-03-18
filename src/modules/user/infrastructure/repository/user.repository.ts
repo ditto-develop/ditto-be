@@ -165,9 +165,13 @@ export class UserRepository implements IUserRepository {
 
   async delete(id: string): Promise<void> {
     console.log(`[UserRepository] 사용자 영구 삭제: id=${id}`);
-    await this.prisma.user.delete({
-      where: { id },
-    });
+    await this.prisma.$transaction([
+      this.prisma.matchRequest.deleteMany({ where: { OR: [{ fromUserId: id }, { toUserId: id }] } }),
+      this.prisma.userRating.deleteMany({ where: { OR: [{ fromUserId: id }, { toUserId: id }] } }),
+      this.prisma.chatMessage.deleteMany({ where: { senderId: id } }),
+      this.prisma.chatParticipant.deleteMany({ where: { userId: id } }),
+      this.prisma.user.delete({ where: { id } }),
+    ]);
   }
 
   async softDelete(id: string): Promise<User> {

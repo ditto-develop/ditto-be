@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards, Res, Req, HttpCode } from '@nestjs/common';
+import { Body, Controller, Delete, ForbiddenException, Get, Param, Patch, Post, UseGuards, Res, Req, HttpCode } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { CommandBus } from '@common/command/command-bus';
 import { ApiCommandResponse } from '@common/command/api-response.decorator';
@@ -26,6 +26,7 @@ import { LeaveUserCommand } from '@module/user/presentation/commands/leave-user.
 import { RemoveSocialAccountCommand } from '@module/user/presentation/commands/remove-social-account.command';
 import { UpdateUserCommand } from '@module/user/presentation/commands/update-user.command';
 import { LoginCommand } from '@module/user/presentation/commands/login.command';
+import { LocalLoginCommand } from '@module/user/presentation/commands/local-login.command';
 import { SocialLoginCommand } from '@module/user/presentation/commands/social-login.command';
 import { RefreshAccessTokenCommand } from '@module/user/presentation/commands/refresh-access-token.command';
 import { LogoutCommand } from '@module/user/presentation/commands/logout.command';
@@ -208,6 +209,30 @@ export class UserController {
   ): Promise<ICommandResult<LoginResponseDto>> {
     console.log('[UserController] 관리자 로그인 요청');
     const command = new LoginCommand(dto);
+    const result = await this.commandBus.execute<LoginResponseDto>(command);
+
+    // 어드민 로그인은 refreshToken 쿠키를 세팅하지 않음
+    // (일반 유저의 refreshToken 쿠키를 덮어쓰는 문제 방지)
+    if (result.success && result.data?.refreshToken) {
+      delete result.data.refreshToken;
+    }
+
+    return result;
+  }
+
+  @Post('/local-login')
+  @ApiOperation({ summary: '로컬 테스트 로그인 (개발 환경 전용)', description: 'localhost 개발 환경에서만 사용 가능한 username/password 로그인입니다.' })
+  @ApiCommandResponse(200, '로그인 성공', LoginResponseDto, false)
+  @ApiUnauthorizedResponse('인증 실패')
+  async localLogin(
+    @Body() dto: LoginDto,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<ICommandResult<LoginResponseDto>> {
+    if (process.env.NODE_ENV === 'production') {
+      throw new ForbiddenException('로컬 로그인은 개발 환경에서만 사용 가능합니다.');
+    }
+
+    const command = new LocalLoginCommand(dto);
     const result = await this.commandBus.execute<LoginResponseDto>(command);
 
     if (result.success && result.data?.refreshToken) {

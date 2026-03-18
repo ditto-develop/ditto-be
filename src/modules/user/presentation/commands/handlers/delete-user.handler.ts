@@ -15,24 +15,12 @@ export class DeleteUserHandler implements ICommandHandler<DeleteUserCommand, voi
   async execute(command: DeleteUserCommand): Promise<ICommandResult<void>> {
     console.log(`[DeleteUserHandler] Command 실행 시작: id=${command.id}`);
 
-    try {
-      // TODO: 인증 시스템 구현 후 currentUser 조회 로직 추가
-      const currentUser = { isAdmin: () => true } as any; // 임시
+    // TODO: 인증 시스템 구현 후 currentUser 조회 로직 추가
+    const currentUser = { isAdmin: () => true } as any; // 임시
 
-      await this.deleteUserUseCase.execute(command.id, currentUser);
+    await this.deleteUserUseCase.execute(command.id, currentUser);
 
-      console.log(`[DeleteUserHandler] Command 실행 완료: 사용자 삭제 성공`);
-      return {
-        success: true,
-        data: undefined,
-      };
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : '알 수 없는 오류가 발생했습니다.';
-      console.error(`[DeleteUserHandler] Command 실행 실패:`, errorMessage);
-      return {
-        success: false,
-        error: errorMessage,
-      };
-    }
+    console.log(`[DeleteUserHandler] Command 실행 완료: 사용자 삭제 성공`);
+    return { success: true, data: undefined };
   }
 }

@@ -36,6 +36,7 @@ import { LoginHandler } from '@module/user/presentation/commands/handlers/login.
 import { SocialLoginHandler } from '@module/user/presentation/commands/handlers/social-login.handler';
 import { RefreshAccessTokenHandler } from '@module/user/presentation/commands/handlers/refresh-access-token.handler';
 import { LogoutHandler } from '@module/user/presentation/commands/handlers/logout.handler';
+import { LocalLoginHandler } from '@module/user/presentation/commands/handlers/local-login.handler';
 import { AuthService } from '@module/user/application/services/auth.service';
 import { LoginUseCase } from '@module/user/application/usecases/login.usecase';
 import { RefreshTokenService } from '@module/user/application/services/refresh-token.service';
@@ -97,6 +98,7 @@ const UserSocialAccountRepositoryProvider = {
     SocialLoginHandler,
     RefreshAccessTokenHandler,
     LogoutHandler,
+    LocalLoginHandler,
   ],
   exports: [USER_REPOSITORY_TOKEN, USER_SOCIAL_ACCOUNT_REPOSITORY_TOKEN],
 })
@@ -118,6 +120,7 @@ export class UserModule implements OnModuleInit {
     private readonly socialLoginHandler: SocialLoginHandler,
     private readonly refreshAccessTokenHandler: RefreshAccessTokenHandler,
     private readonly logoutHandler: LogoutHandler,
+    private readonly localLoginHandler: LocalLoginHandler,
   ) {
     console.log('[UserModule] UserModule 초기화');
   }
@@ -141,6 +144,7 @@ export class UserModule implements OnModuleInit {
         { handler: this.socialLoginHandler, class: SocialLoginHandler },
         { handler: this.refreshAccessTokenHandler, class: RefreshAccessTokenHandler },
         { handler: this.logoutHandler, class: LogoutHandler },
+        { handler: this.localLoginHandler, class: LocalLoginHandler },
       ],
       'UserModule',
     );
