@@ -332,6 +332,7 @@ export class SeedDummyDataUseCase {
         update: {
           introduction: buildIntroduction(u),
           profileImageUrl: profileImageUrl(u.gender),
+          ...preferredAgeRange(u.age),
         },
         create: {
           userId: user.id,
