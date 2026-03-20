@@ -16,7 +16,7 @@ const MALE_AVATARS   = ['m1','m2','m3','m4','m5','m6','m7','m8'];
 
 function randomAvatar(gender: string): string {
   const pool = gender === 'FEMALE' ? FEMALE_AVATARS : MALE_AVATARS;
-  return `/assets/avatar/${pool[Math.floor(Math.random() * pool.length)]}.svg`;
+  return `/assets/avatar/${pool[Math.floor(Math.random() * pool.length)]}.png`;
 }
 
 // age는 FE 연령대 하한값으로 저장: 20(20~24), 25(25~29), 30(30~34), 35(35~39), 40(40~44), 45(45~49), 50(50~59), 60(60+)

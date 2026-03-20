@@ -29,6 +29,31 @@
         ]
       }
     },
+    "/api/auth/kakao/callback": {
+      "post": {
+        "operationId": "KakaoController_kakaoCallback",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/KakaoCallbackDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "카카오 OAuth 콜백 - 인가 코드로 사용자 정보 조회",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
     "/api/roles": {
       "get": {
         "description": "모든 Role을 조회합니다.",
@@ -13356,7 +13381,7 @@
             "access-token": []
           }
         ],
-        "summary": "더미 데이터 생성 (1:1 15명 + GROUP 15명)",
+        "summary": "더미 데이터 생성 (1:1 50명 + GROUP 50명)",
         "tags": [
           "Admin"
         ]
@@ -13410,6 +13435,96 @@
           "Admin"
         ]
       }
+    },
+    "/api/admin/quiz-sets/active": {
+      "get": {
+        "operationId": "AdminController_getActiveQuizSets",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "활성 퀴즈셋 조회 성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/AdminActiveQuizSetDto"
+                    },
+                    "error": {
+                      "type": "string",
+                      "example": "에러 메시지"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
+        "summary": "현재 활성화된 퀴즈셋 목록 조회",
+        "tags": [
+          "Admin"
+        ]
+      }
+    },
+    "/api/admin/match-requests/dummy-request": {
+      "post": {
+        "operationId": "AdminController_createDummyMatchRequest",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminCreateDummyMatchRequestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "대화 신청 생성 성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/AdminCreateDummyMatchResultDto"
+                    },
+                    "error": {
+                      "type": "string",
+                      "example": "에러 메시지"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
+        "summary": "더미 유저 → 실제 유저 대화 신청 생성 (관리자용)",
+        "tags": [
+          "Admin"
+        ]
+      }
     }
   },
   "info": {
@@ -13433,6 +13548,23 @@
       }
     },
     "schemas": {
+      "KakaoCallbackDto": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "카카오 인가 코드"
+          },
+          "redirectUri": {
+            "type": "string",
+            "description": "리다이렉트 URI"
+          }
+        },
+        "required": [
+          "code",
+          "redirectUri"
+        ]
+      },
       "RoleDto": {
         "type": "object",
         "properties": {}
@@ -13818,6 +13950,33 @@
             "example": "안녕하세요! 대화를 좋아하는 사람입니다.",
             "maxLength": 300
           },
+          "profileImageUrl": {
+            "type": "string",
+            "description": "프로필 이미지 URL (null 전송 시 삭제)",
+            "example": "/assets/avatar/f1.png"
+          },
+          "location": {
+            "type": "string",
+            "description": "사는 지역 코드 (null 전송 시 삭제)",
+            "example": "SEOUL"
+          },
+          "occupation": {
+            "type": "string",
+            "description": "직업 (null 전송 시 삭제)",
+            "example": "개발자"
+          },
+          "interests": {
+            "description": "관심사 태그 목록",
+            "example": [
+              "운동",
+              "영화/드라마",
+              "여행"
+            ],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
           "preferredMinAge": {
             "type": "number",
             "description": "선호 최소 나이 (18~100, null 전송 시 삭제)",
@@ -14189,7 +14348,11 @@
           },
           "groupJoined": {
             "type": "boolean",
-            "description": "그룹 매칭 참여 여부"
+            "description": "그룹 매칭 참여 여부 (3명 이상 충족)"
+          },
+          "groupJoinPending": {
+            "type": "boolean",
+            "description": "그룹 참여 신청했으나 3명 미만 대기 중"
           }
         },
         "required": [
@@ -14198,7 +14361,8 @@
           "sentRequests",
           "receivedRequests",
           "groupDeclined",
-          "groupJoined"
+          "groupJoined",
+          "groupJoinPending"
         ]
       },
       "GroupJoinResultDto": {
@@ -15721,6 +15885,36 @@
       "AdminSeedDummyResultDto": {
         "type": "object",
         "properties": {}
+      },
+      "AdminActiveQuizSetDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "AdminCreateDummyMatchResultDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "AdminCreateDummyMatchRequestDto": {
+        "type": "object",
+        "properties": {
+          "fromUserId": {
+            "type": "string",
+            "description": "더미 유저 ID (fromUser)"
+          },
+          "toUserId": {
+            "type": "string",
+            "description": "실제 유저 ID (toUser)"
+          },
+          "quizSetId": {
+            "type": "string",
+            "description": "퀴즈셋 ID"
+          }
+        },
+        "required": [
+          "fromUserId",
+          "toUserId",
+          "quizSetId"
+        ]
       }
     }
   }

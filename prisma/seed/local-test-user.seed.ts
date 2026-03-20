@@ -24,7 +24,7 @@ const LOCAL_TEST_USER = {
   gender: 'FEMALE',
   age: 25,
   birthDate: '2000-03-17',
-  profileImageUrl: '/assets/avatar/f3.svg',
+  profileImageUrl: '/assets/avatar/f3.png',
 };
 
 async function main() {

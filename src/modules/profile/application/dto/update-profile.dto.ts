@@ -19,7 +19,7 @@ export class UpdateProfileDto {
 
     @ApiPropertyOptional({
         description: '프로필 이미지 URL (null 전송 시 삭제)',
-        example: '/assets/avatar/f1.svg',
+        example: '/assets/avatar/f1.png',
     })
     @IsOptional()
     @ValidateIf((o) => o.profileImageUrl !== null)

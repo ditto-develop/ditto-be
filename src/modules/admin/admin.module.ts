@@ -13,6 +13,8 @@ import { ClearSystemOverrideUseCase } from './application/usecases/clear-system-
 import { ResetAllQuizProgressUseCase } from './application/usecases/reset-all-quiz-progress.usecase';
 import { GetQuizProgressUseCase } from './application/usecases/get-quiz-progress.usecase';
 import { SeedDummyDataUseCase } from './application/usecases/seed-dummy-data.usecase';
+import { AdminCreateDummyMatchRequestUseCase } from './application/usecases/admin-create-dummy-match-request.usecase';
+import { AdminGetActiveQuizSetsUseCase } from './application/usecases/admin-get-active-quiz-sets.usecase';
 import { GetDbStatsHandler } from './presentation/commands/handlers/get-db-stats.handler';
 import { GetAllMatchesHandler } from './presentation/commands/handlers/get-all-matches.handler';
 import { SetSystemOverrideHandler } from './presentation/commands/handlers/set-system-override.handler';
@@ -21,6 +23,8 @@ import { ResetAllQuizProgressHandler } from './presentation/commands/handlers/re
 import { GetAdminQuizProgressHandler } from './presentation/commands/handlers/get-admin-quiz-progress.handler';
 import { SeedDummyDataHandler } from './presentation/commands/handlers/seed-dummy-data.handler';
 import { GetAdminMatchCandidatesHandler } from './presentation/commands/handlers/get-admin-match-candidates.handler';
+import { AdminCreateDummyMatchRequestHandler } from './presentation/commands/handlers/admin-create-dummy-match-request.handler';
+import { AdminGetActiveQuizSetsHandler } from './presentation/commands/handlers/admin-get-active-quiz-sets.handler';
 import { AdminController } from './presentation/controller/admin.controller';
 
 @Module({
@@ -34,6 +38,8 @@ import { AdminController } from './presentation/controller/admin.controller';
     ResetAllQuizProgressUseCase,
     GetQuizProgressUseCase,
     SeedDummyDataUseCase,
+    AdminCreateDummyMatchRequestUseCase,
+    AdminGetActiveQuizSetsUseCase,
     GetDbStatsHandler,
     GetAllMatchesHandler,
     SetSystemOverrideHandler,
@@ -42,6 +48,8 @@ import { AdminController } from './presentation/controller/admin.controller';
     GetAdminQuizProgressHandler,
     SeedDummyDataHandler,
     GetAdminMatchCandidatesHandler,
+    AdminCreateDummyMatchRequestHandler,
+    AdminGetActiveQuizSetsHandler,
   ],
 })
 export class AdminModule implements OnModuleInit {
@@ -55,6 +63,8 @@ export class AdminModule implements OnModuleInit {
     private readonly getAdminQuizProgressHandler: GetAdminQuizProgressHandler,
     private readonly seedDummyDataHandler: SeedDummyDataHandler,
     private readonly getAdminMatchCandidatesHandler: GetAdminMatchCandidatesHandler,
+    private readonly adminCreateDummyMatchRequestHandler: AdminCreateDummyMatchRequestHandler,
+    private readonly adminGetActiveQuizSetsHandler: AdminGetActiveQuizSetsHandler,
   ) {}
 
   onModuleInit(): void {
@@ -69,6 +79,8 @@ export class AdminModule implements OnModuleInit {
         { handler: this.getAdminQuizProgressHandler, class: GetAdminQuizProgressHandler },
         { handler: this.seedDummyDataHandler, class: SeedDummyDataHandler },
         { handler: this.getAdminMatchCandidatesHandler, class: GetAdminMatchCandidatesHandler },
+        { handler: this.adminCreateDummyMatchRequestHandler, class: AdminCreateDummyMatchRequestHandler },
+        { handler: this.adminGetActiveQuizSetsHandler, class: AdminGetActiveQuizSetsHandler },
       ],
       'AdminModule',
     );

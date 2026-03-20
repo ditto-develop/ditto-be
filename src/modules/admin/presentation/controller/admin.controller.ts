@@ -26,6 +26,11 @@ import {
 import { AdminQuizProgressResponseDto } from '@module/admin/application/dto/admin-quiz-progress.dto';
 import { AdminSeedDummyResultDto } from '@module/admin/application/dto/admin-seed-dummy.dto';
 import { SetSystemOverrideDto } from '@module/admin/application/dto/set-system-override.dto';
+import {
+  AdminCreateDummyMatchRequestDto,
+  AdminCreateDummyMatchResultDto,
+  AdminActiveQuizSetDto,
+} from '@module/admin/application/dto/admin-create-dummy-match-request.dto';
 import { GetDbStatsCommand } from '../commands/get-db-stats.command';
 import { GetAllMatchesCommand } from '../commands/get-all-matches.command';
 import { SetSystemOverrideCommand } from '../commands/set-system-override.command';
@@ -34,6 +39,8 @@ import { ResetAllQuizProgressCommand } from '../commands/reset-all-quiz-progress
 import { GetAdminQuizProgressCommand } from '../commands/get-admin-quiz-progress.command';
 import { SeedDummyDataCommand } from '../commands/seed-dummy-data.command';
 import { GetAdminMatchCandidatesCommand } from '../commands/get-admin-match-candidates.command';
+import { AdminCreateDummyMatchRequestCommand } from '../commands/admin-create-dummy-match-request.command';
+import { AdminGetActiveQuizSetsCommand } from '../commands/admin-get-active-quiz-sets.command';
 import { MatchCandidateListDto } from '@module/matching/application/dto/match-candidate.dto';
 
 @ApiTags('Admin')
@@ -95,7 +102,7 @@ export class AdminController {
 
   @Post('seed-dummy')
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: '더미 데이터 생성 (1:1 15명 + GROUP 15명)' })
+  @ApiOperation({ summary: '더미 데이터 생성 (1:1 50명 + GROUP 50명)' })
   @ApiCommandResponse(200, '더미 데이터 생성 성공', AdminSeedDummyResultDto)
   async seedDummyData(): Promise<ICommandResult<AdminSeedDummyResultDto>> {
     return this.commandBus.execute<AdminSeedDummyResultDto>(new SeedDummyDataCommand());
@@ -108,5 +115,24 @@ export class AdminController {
     @Param('userId') userId: string,
   ): Promise<ICommandResult<MatchCandidateListDto>> {
     return this.commandBus.execute<MatchCandidateListDto>(new GetAdminMatchCandidatesCommand(userId));
+  }
+
+  @Get('quiz-sets/active')
+  @ApiOperation({ summary: '현재 활성화된 퀴즈셋 목록 조회' })
+  @ApiCommandResponse(200, '활성 퀴즈셋 조회 성공', AdminActiveQuizSetDto)
+  async getActiveQuizSets(): Promise<ICommandResult<AdminActiveQuizSetDto[]>> {
+    return this.commandBus.execute<AdminActiveQuizSetDto[]>(new AdminGetActiveQuizSetsCommand());
+  }
+
+  @Post('match-requests/dummy-request')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: '더미 유저 → 실제 유저 대화 신청 생성 (관리자용)' })
+  @ApiCommandResponse(200, '대화 신청 생성 성공', AdminCreateDummyMatchResultDto)
+  async createDummyMatchRequest(
+    @Body() dto: AdminCreateDummyMatchRequestDto,
+  ): Promise<ICommandResult<AdminCreateDummyMatchResultDto>> {
+    return this.commandBus.execute<AdminCreateDummyMatchResultDto>(
+      new AdminCreateDummyMatchRequestCommand(dto),
+    );
   }
 }
