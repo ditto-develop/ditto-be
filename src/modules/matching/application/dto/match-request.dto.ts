@@ -49,5 +49,6 @@ export class MatchingStatusDto {
     @ApiProperty({ description: '보낸 요청', type: [MatchRequestDto] }) sentRequests: MatchRequestDto[];
     @ApiProperty({ description: '받은 요청', type: [MatchRequestDto] }) receivedRequests: MatchRequestDto[];
     @ApiProperty({ description: '그룹 매칭 거절 여부' }) groupDeclined: boolean;
-    @ApiProperty({ description: '그룹 매칭 참여 여부' }) groupJoined: boolean;
+    @ApiProperty({ description: '그룹 매칭 참여 여부 (3명 이상 충족)' }) groupJoined: boolean;
+    @ApiProperty({ description: '그룹 참여 신청했으나 3명 미만 대기 중' }) groupJoinPending: boolean;
 }

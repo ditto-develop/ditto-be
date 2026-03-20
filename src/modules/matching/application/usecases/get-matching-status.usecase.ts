@@ -5,6 +5,7 @@ import {
 import { MatchRequestDto, MatchingStatusDto } from '@module/matching/application/dto/match-request.dto';
 import { ILOGGER_SERVICE_TOKEN, ILoggerService } from '@common/logging/interfaces/logger.interface';
 import { PrismaService } from '@module/common/prisma/prisma.service';
+import { MATCHING_CONSTANTS } from '@module/matching/domain/value-objects/match-candidate.vo';
 
 @Injectable()
 export class GetMatchingStatusUseCase {
@@ -30,6 +31,7 @@ export class GetMatchingStatusUseCase {
                     userId,
                     room: { quizSetId },
                 },
+                include: { room: { include: { _count: { select: { participants: true } } } } },
             }),
         ]);
 
@@ -44,7 +46,11 @@ export class GetMatchingStatusUseCase {
         dto.sentRequests = sent.map(MatchRequestDto.fromDomain);
         dto.receivedRequests = received.map(MatchRequestDto.fromDomain);
         dto.groupDeclined = progress?.groupDeclined ?? false;
-        dto.groupJoined = !!groupParticipant;
+        // 참여자 수가 MIN_GROUP_PARTICIPANTS 이상일 때만 그룹 참여 완료로 처리
+        const participantCount = groupParticipant?.room?._count?.participants ?? 0;
+        const isGroupActive = participantCount >= MATCHING_CONSTANTS.MIN_GROUP_PARTICIPANTS;
+        dto.groupJoined = !!groupParticipant && isGroupActive;
+        dto.groupJoinPending = !!groupParticipant && !isGroupActive;
 
         return dto;
     }

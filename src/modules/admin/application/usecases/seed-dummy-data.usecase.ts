@@ -234,7 +234,7 @@ const INTRO_ANSWERS_POOL: string[][] = [
     '자기 전 30분, 책 읽기',
     '저녁 8시, 운동하고 샤워 후 치킨',
   ],
-  // Q9: 내가 절대 양보 못하는 것은?
+  // Q9: 내가 절�� 양보 못하는 것은?
   [
     '잠자는 시간',
     '주말 나만의 시간',
@@ -389,17 +389,11 @@ export class SeedDummyDataUseCase {
       groupIds.push(user.id);
     }
 
-    // ── 그룹 채팅방 생성 & 참여 ──
-    let groupRoom = await this.prisma.chatRoom.findUnique({ where: { quizSetId: groupSet.id } });
-    if (!groupRoom) {
-      groupRoom = await this.prisma.chatRoom.create({ data: { quizSetId: groupSet.id } });
+    // ── 그룹 채팅방 생성만 (참여자 추가 안 함 — 어드민이 직접 컨트롤) ──
+    const existingGroupRoom = await this.prisma.chatRoom.findUnique({ where: { quizSetId: groupSet.id } });
+    if (!existingGroupRoom) {
+      await this.prisma.chatRoom.create({ data: { quizSetId: groupSet.id } });
       createdChatRooms++;
-    }
-    for (const userId of groupIds) {
-      const exists = await this.prisma.chatParticipant.findUnique({ where: { roomId_userId: { roomId: groupRoom.id, userId } } });
-      if (!exists) {
-        await this.prisma.chatParticipant.create({ data: { roomId: groupRoom.id, userId } });
-      }
     }
 
     return {

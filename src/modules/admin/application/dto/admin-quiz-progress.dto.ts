@@ -10,6 +10,7 @@ export class AdminQuizProgressItemDto {
   completedAt: Date | null;
   selectedAt: Date;
   groupDeclined: boolean;
+  groupJoined: boolean;
 }
 
 export class AdminQuizProgressResponseDto {

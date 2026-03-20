@@ -24,28 +24,36 @@ export class GetQuizProgressUseCase {
         user: { select: { id: true, nickname: true, email: true } },
         quizSet: {
           select: {
+            id: true,
             title: true,
             matchingType: true,
             quizzes: { select: { id: true } },
+            groupChatRoom: { select: { id: true, participants: { select: { userId: true } } } },
           },
         },
       },
       orderBy: [{ status: 'asc' }, { completedAt: 'desc' }],
     });
 
-    const items: AdminQuizProgressItemDto[] = records.map((r) => ({
-      userId: r.userId,
-      nickname: r.user.nickname ?? '',
-      email: r.user.email ?? '',
-      quizSetId: r.quizSetId,
-      quizSetTitle: r.quizSet.title,
-      matchingType: r.quizSet.matchingType,
-      status: r.status,
-      totalQuizzes: r.quizSet.quizzes.length,
-      completedAt: r.completedAt,
-      selectedAt: r.selectedAt,
-      groupDeclined: r.groupDeclined,
-    }));
+    const items: AdminQuizProgressItemDto[] = records.map((r) => {
+      const joinedUserIds = new Set(
+        r.quizSet.groupChatRoom?.participants.map((p) => p.userId) ?? [],
+      );
+      return {
+        userId: r.userId,
+        nickname: r.user.nickname ?? '',
+        email: r.user.email ?? '',
+        quizSetId: r.quizSetId,
+        quizSetTitle: r.quizSet.title,
+        matchingType: r.quizSet.matchingType,
+        status: r.status,
+        totalQuizzes: r.quizSet.quizzes.length,
+        completedAt: r.completedAt,
+        selectedAt: r.selectedAt,
+        groupDeclined: r.groupDeclined,
+        groupJoined: joinedUserIds.has(r.userId),
+      };
+    });
 
     return { year, month, week, items, total: items.length };
   }
