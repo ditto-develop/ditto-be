@@ -47,6 +47,23 @@ export class AuthService {
     return this.jwtService.sign(payload, signOptions);
   }
 
+  async generateAdminAccessToken(user: User): Promise<string> {
+    const payload = {
+      sub: user.id,
+      userId: user.id,
+      roleId: user.roleId,
+      roleCode: user.role.code,
+      username: user.username,
+      name: user.name,
+      email: user.email,
+      type: 'access',
+    };
+
+    const accessSecret = this.configService.get<string>('jwt.accessSecret');
+
+    return this.jwtService.sign(payload, { secret: accessSecret });
+  }
+
   // 기존 메서드 호환성을 위해 유지
   async generateToken(user: User): Promise<string> {
     return this.generateAccessToken(user);

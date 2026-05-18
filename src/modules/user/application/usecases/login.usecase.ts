@@ -57,8 +57,8 @@ export class LoginUseCase {
       throw new BusinessRuleException('비밀번호가 일치하지 않습니다.', 'INVALID_PASSWORD');
     }
 
-    // JWT 토큰 생성
-    const accessToken = await this.authService.generateAccessToken(user);
+    // JWT 토큰 생성 (어드민은 만료 없는 토큰)
+    const accessToken = await this.authService.generateAdminAccessToken(user);
     const refreshToken = await this.refreshTokenService.generateRefreshToken(user.id);
 
     this.logger.log('관리자 로그인 성공', 'LoginUseCase', { userId: user.id, username: dto.username });

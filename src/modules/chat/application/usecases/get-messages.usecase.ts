@@ -1,6 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import {
-    IChatRepository, CHAT_REPOSITORY_TOKEN,
+  IChatRepository,
+  CHAT_REPOSITORY_TOKEN,
 } from '@module/chat/infrastructure/repository/chat.repository.interface';
 import { MessageListDto, ChatMessageDto } from '@module/chat/application/dto/chat-message.dto';
 import { EntityNotFoundException, BusinessRuleException } from '@common/exceptions/domain.exception';
@@ -8,30 +9,37 @@ import { ILOGGER_SERVICE_TOKEN, ILoggerService } from '@common/logging/interface
 
 @Injectable()
 export class GetMessagesUseCase {
-    constructor(
-        @Inject(CHAT_REPOSITORY_TOKEN) private readonly chatRepo: IChatRepository,
-        @Inject(ILOGGER_SERVICE_TOKEN) private readonly logger: ILoggerService,
-    ) { }
+  constructor(
+    @Inject(CHAT_REPOSITORY_TOKEN) private readonly chatRepo: IChatRepository,
+    @Inject(ILOGGER_SERVICE_TOKEN) private readonly logger: ILoggerService,
+  ) {}
 
-    async execute(userId: string, roomId: string, cursor?: string, limit?: number): Promise<MessageListDto> {
-        this.logger.log('메시지 조회', 'GetMessagesUseCase', { userId, roomId, cursor });
+  async execute(userId: string, roomId: string, cursor?: string, limit?: number): Promise<MessageListDto> {
+    this.logger.log('메시지 조회', 'GetMessagesUseCase', { userId, roomId, cursor });
 
-        // 1. 방 존재 확인
-        const room = await this.chatRepo.findRoomById(roomId);
-        if (!room) throw new EntityNotFoundException('채팅방', roomId);
+    // 1. 방 존재 확인
+    const room = await this.chatRepo.findRoomById(roomId);
+    if (!room) throw new EntityNotFoundException('채팅방', roomId);
 
-        // 2. 참여자 확인
-        const isParticipant = await this.chatRepo.isParticipant(roomId, userId);
-        if (!isParticipant) {
-            throw new BusinessRuleException('채팅방 참여자만 메시지를 조회할 수 있습니다.');
-        }
-
-        // 3. 메시지 조회 (cursor-based pagination)
-        const result = await this.chatRepo.findMessagesByRoomId(roomId, cursor, limit);
-
-        return {
-            messages: result.messages.map(ChatMessageDto.fromDomain),
-            nextCursor: result.nextCursor,
-        };
+    // 2. 참여자 확인
+    const isParticipant = await this.chatRepo.isParticipant(roomId, userId);
+    if (!isParticipant) {
+      throw new BusinessRuleException('채팅방 참여자만 메시지를 조회할 수 있습니다.');
     }
+
+    // 3. 메시지 조회 (cursor-based pagination)
+    const result = await this.chatRepo.findMessagesByRoomId(roomId, cursor, limit);
+    const readReceipts = await this.chatRepo.findReadReceiptsByRoomId(roomId);
+
+    return {
+      messages: result.messages.map(ChatMessageDto.fromDomain),
+      nextCursor: result.nextCursor,
+      partnerLastReadMessageId: readReceipts.find((receipt) => receipt.userId !== userId)?.lastReadMessageId ?? null,
+      readReceipts: readReceipts.map((receipt) => ({
+        userId: receipt.userId,
+        lastReadMessageId: receipt.lastReadMessageId,
+        readAt: receipt.readAt.toISOString(),
+      })),
+    };
+  }
 }

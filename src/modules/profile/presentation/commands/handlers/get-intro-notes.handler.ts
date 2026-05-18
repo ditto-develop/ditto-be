@@ -15,7 +15,7 @@ export class GetIntroNotesHandler implements ICommandHandler<GetIntroNotesComman
 
     async execute(command: GetIntroNotesCommand): Promise<ICommandResult<IntroNotesDto>> {
         try {
-            const data = await this.useCase.execute(command.userId);
+            const data = await this.useCase.execute(command.userId, command.currentUserId);
             return { success: true, data };
         } catch (error) {
             const msg = error instanceof Error ? error.message : '알 수 없는 오류';

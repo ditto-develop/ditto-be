@@ -47,7 +47,7 @@ describe('ChatMessage', () => {
         });
 
         it('deletedAt이 설정되면 true', () => {
-            const msg = new ChatMessage('id-1', roomId, senderId, 'test', new Date(), new Date(), new Date());
+            const msg = new ChatMessage('id-1', roomId, senderId, 'CHAT', 'test', new Date(), new Date(), new Date());
             expect(msg.isDeleted).toBe(true);
         });
     });

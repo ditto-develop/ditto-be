@@ -124,20 +124,20 @@ model QuizAnswer {
 }
 
 model UserQuizProgress {
-  id          String             @id @default(cuid())
-  userId      String
-  year        Int                @default(2025)
-  month       Int                @default(12)
-  week        Int
-  quizSetId   String
-  status         QuizProgressStatus @default(NOT_STARTED)
-  groupDeclined  Boolean            @default(false)
-  selectedAt     DateTime           @default(now())
-  completedAt    DateTime?
-  createdAt      DateTime           @default(now())
-  updatedAt      DateTime           @updatedAt
-  quizSet     QuizSet            @relation(fields: [quizSetId], references: [id], onDelete: Cascade)
-  user        User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id            String             @id @default(cuid())
+  userId        String
+  year          Int                @default(2025)
+  month         Int                @default(12)
+  week          Int
+  quizSetId     String
+  status        QuizProgressStatus @default(NOT_STARTED)
+  groupDeclined Boolean            @default(false)
+  selectedAt    DateTime           @default(now())
+  completedAt   DateTime?
+  createdAt     DateTime           @default(now())
+  updatedAt     DateTime           @updatedAt
+  quizSet       QuizSet            @relation(fields: [quizSetId], references: [id], onDelete: Cascade)
+  user          User               @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, year, month, week])
   @@map("user_quiz_progresses")
@@ -197,16 +197,21 @@ model MatchRequest {
 }
 
 model ChatRoom {
-  id             String            @id @default(cuid())
-  matchRequestId String?           @unique
-  quizSetId      String?           @unique   // 그룹 채팅방 식별자 (GROUP 타입 전용)
-  expiresAt      DateTime?                   // 채팅방 만료 시각 (생성 시 +72h)
-  createdAt      DateTime          @default(now())
-  updatedAt      DateTime          @updatedAt
+  id             String               @id @default(cuid())
+  matchRequestId String?              @unique
+  quizSetId      String?              @unique // 그룹 채팅방 식별자 (GROUP 타입 전용)
+  expiresAt      DateTime? // 채팅방 만료 시각 (생성 시 +72h)
+  status         ChatRoomStatus       @default(ACTIVE)
+  endedAt        DateTime?
+  endedByUserId  String?
+  endedReason    ChatRoomEndedReason?
+  createdAt      DateTime             @default(now())
+  updatedAt      DateTime             @updatedAt
   messages       ChatMessage[]
   participants   ChatParticipant[]
-  matchRequest   MatchRequest?     @relation(fields: [matchRequestId], references: [id])
-  quizSet        QuizSet?          @relation(fields: [quizSetId], references: [id])
+  votes          ChatVote[]
+  matchRequest   MatchRequest?        @relation(fields: [matchRequestId], references: [id])
+  quizSet        QuizSet?             @relation(fields: [quizSetId], references: [id])
 
   @@map("chat_rooms")
 }
@@ -225,20 +230,78 @@ model ChatParticipant {
   @@map("chat_participants")
 }
 
+enum MessageType {
+  CHAT
+  SYSTEM
+  VOTE_OPENED
+}
+
 model ChatMessage {
-  id        String    @id @default(cuid())
+  id        String      @id @default(cuid())
   roomId    String
-  senderId  String
-  content   String    @db.VarChar(2000)
+  senderId  String? // SYSTEM 메시지는 null
+  type      MessageType @default(CHAT)
+  content   String      @db.VarChar(2000)
   deletedAt DateTime?
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  room      ChatRoom  @relation(fields: [roomId], references: [id], onDelete: Cascade)
-  sender    User      @relation(fields: [senderId], references: [id])
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  room      ChatRoom    @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  sender    User?       @relation(fields: [senderId], references: [id])
 
   @@index([roomId, createdAt])
   @@index([senderId])
   @@map("chat_messages")
+}
+
+model ChatVote {
+  id              String           @id @default(cuid())
+  roomId          String
+  createdByUserId String
+  title           String           @db.VarChar(200)
+  allowMultiple   Boolean          @default(false)
+  status          VoteStatus       @default(ACTIVE)
+  closedAt        DateTime?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  room            ChatRoom         @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  options         ChatVoteOption[]
+  answers         ChatVoteAnswer[]
+
+  @@index([roomId, status])
+  @@map("chat_votes")
+}
+
+model ChatVoteOption {
+  id         String           @id @default(cuid())
+  voteId     String
+  optionType VoteOptionType // PLACE 또는 TIME
+  label      String           @db.VarChar(300)
+  address    String?          @db.VarChar(500) // PLACE: 주소
+  mapLink    String?          @db.VarChar(1000) // PLACE: 지도 URL
+  latitude   Float? // PLACE: 위도
+  longitude  Float? // PLACE: 경도
+  date       String?          @db.VarChar(20) // TIME: YYYY-MM-DD
+  time       String?          @db.VarChar(10) // TIME: HH:mm
+  order      Int              @default(0)
+  vote       ChatVote         @relation(fields: [voteId], references: [id], onDelete: Cascade)
+  answers    ChatVoteAnswer[]
+
+  @@map("chat_vote_options")
+}
+
+model ChatVoteAnswer {
+  id        String         @id @default(cuid())
+  voteId    String
+  optionId  String
+  userId    String
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+  vote      ChatVote       @relation(fields: [voteId], references: [id], onDelete: Cascade)
+  option    ChatVoteOption @relation(fields: [optionId], references: [id], onDelete: Cascade)
+
+  @@unique([voteId, optionId, userId])
+  @@index([voteId, userId])
+  @@map("chat_vote_answers")
 }
 
 model UserRating {
@@ -276,4 +339,24 @@ enum MatchRequestStatus {
   REJECTED
   CANCELLED
   EXPIRED
+}
+
+enum ChatRoomStatus {
+  ACTIVE
+  ENDED
+}
+
+enum ChatRoomEndedReason {
+  USER_LEFT
+  EXPIRED
+}
+
+enum VoteOptionType {
+  PLACE
+  TIME
+}
+
+enum VoteStatus {
+  ACTIVE
+  CLOSED
 }

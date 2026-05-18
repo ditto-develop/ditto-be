@@ -45,5 +45,8 @@ export default () => ({
   },
   kakao: {
     restApiKey: process.env.KAKAO_REST_API_KEY || '',
+    localOrigin:
+      process.env.KAKAO_LOCAL_ORIGIN ||
+      (process.env.NODE_ENV === 'production' ? 'https://ditto.pics' : 'http://localhost:3000'),
   },
 });

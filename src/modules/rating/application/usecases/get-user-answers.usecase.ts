@@ -22,7 +22,7 @@ export class GetUserAnswersUseCase {
         const targetUser = await this.userRepo.findById(targetUserId);
         if (!targetUser) throw new EntityNotFoundException('사용자', targetUserId);
 
-        // 2. 매칭 성사 여부 확인 — ACCEPTED 매칭이 있어야 답변 조회 가능
+        // 2. 매칭 성사 여부 또는 그룹 채팅 멤버십 확인
         const matchRequests = await this.prisma.matchRequest.findMany({
             where: {
                 status: 'ACCEPTED',
@@ -35,12 +35,29 @@ export class GetUserAnswersUseCase {
             take: 1,
         });
 
-        if (matchRequests.length === 0) {
-            throw new BusinessRuleException('매칭이 성사된 사용자의 답변만 조회할 수 있습니다.');
-        }
+        let quizSetId: string;
 
-        const matchRequest = matchRequests[0];
-        const quizSetId = matchRequest.quizSetId;
+        if (matchRequests.length > 0) {
+            quizSetId = matchRequests[0].quizSetId;
+        } else {
+            // 1:1 매칭이 없으면 그룹 채팅 멤버십으로 폴백
+            const sharedGroupRoom = await this.prisma.chatRoom.findFirst({
+                where: {
+                    quizSetId: { not: null },
+                    AND: [
+                        { participants: { some: { userId: currentUserId } } },
+                        { participants: { some: { userId: targetUserId } } },
+                    ],
+                },
+                select: { quizSetId: true },
+            });
+
+            if (!sharedGroupRoom?.quizSetId) {
+                throw new BusinessRuleException('매칭이 성사되었거나 같은 그룹 채팅에 참여한 사용자의 답변만 조회할 수 있습니다.');
+            }
+
+            quizSetId = sharedGroupRoom.quizSetId;
+        }
 
         // 3. 퀴즈 목록 (해당 퀴즈셋) + 선택지
         const quizzes = await this.prisma.quiz.findMany({

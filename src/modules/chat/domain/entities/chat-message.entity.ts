@@ -2,11 +2,14 @@ import { ValidationException } from '@common/exceptions/domain.exception';
 
 export const MESSAGE_MAX_LENGTH = 2000;
 
+export type MessageType = 'CHAT' | 'SYSTEM' | 'VOTE_OPENED';
+
 export class ChatMessage {
     constructor(
         public readonly id: string,
         public readonly roomId: string,
-        public readonly senderId: string,
+        public readonly senderId: string | null,
+        public readonly type: MessageType,
         public readonly content: string,
         public readonly deletedAt: Date | null,
         public readonly createdAt: Date,
@@ -20,7 +23,15 @@ export class ChatMessage {
         if (content.length > MESSAGE_MAX_LENGTH) {
             throw new ValidationException(`메시지는 최대 ${MESSAGE_MAX_LENGTH}자까지 입력할 수 있습니다.`);
         }
-        return new ChatMessage(id, roomId, senderId, content.trim(), null, new Date(), new Date());
+        return new ChatMessage(id, roomId, senderId, 'CHAT', content.trim(), null, new Date(), new Date());
+    }
+
+    static createSystem(id: string, roomId: string, content: string): ChatMessage {
+        return new ChatMessage(id, roomId, null, 'SYSTEM', content, null, new Date(), new Date());
+    }
+
+    static createVoteOpened(id: string, roomId: string, senderId: string, content: string): ChatMessage {
+        return new ChatMessage(id, roomId, senderId, 'VOTE_OPENED', content, null, new Date(), new Date());
     }
 
     get isDeleted(): boolean {
